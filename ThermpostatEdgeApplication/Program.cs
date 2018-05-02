@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace ThermpostatEdgeApplication
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            var edgeApp = new ThermostatApplication();
+            await edgeApp.RunAsync();
+
             Console.WriteLine("Hello World!");
         }
     }

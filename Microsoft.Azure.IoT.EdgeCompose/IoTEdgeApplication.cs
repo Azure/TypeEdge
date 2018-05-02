@@ -32,5 +32,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose
         }
 
         public abstract ApplicationInitializationResult InitializeApplication(Container container);
+
+        public async Task RunAsync() { }
     }
 }
