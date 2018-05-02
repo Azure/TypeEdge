@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Azure.IoT.EdgeCompose", "Microsoft.Azure.IoT.EdgeCompose\Microsoft.Azure.IoT.EdgeCompose.csproj", "{32D5A8D6-6F46-4987-ADB8-7FD12433E77C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThermpostatEdgeApplication", "ThermpostatEdgeApplication\ThermpostatEdgeApplication.csproj", "{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{32D5A8D6-6F46-4987-ADB8-7FD12433E77C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32D5A8D6-6F46-4987-ADB8-7FD12433E77C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32D5A8D6-6F46-4987-ADB8-7FD12433E77C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
