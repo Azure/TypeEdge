@@ -1,9 +1,11 @@
 ﻿using Microsoft.Azure.IoT.EdgeCompose.Hubs;
 using Microsoft.Azure.IoT.EdgeCompose.Modules;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using StructureMap;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IoT.EdgeCompose
@@ -15,7 +17,12 @@ namespace Microsoft.Azure.IoT.EdgeCompose
         public ModuleCollection Modules { get; private set; }
         public IoTEdgeApplication()
         {
-            
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("config/appsettings.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             // add the framework services
             var services = new ServiceCollection().AddLogging();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace ThermpostatEdgeApplication
@@ -7,6 +8,8 @@ namespace ThermpostatEdgeApplication
     {
         static async Task Main(string[] args)
         {
+            
+
             var edgeApp = new ThermostatApplication();
             await edgeApp.RunAsync();
 
