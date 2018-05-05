@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Azure.IoT.EdgeCompose
+﻿namespace Microsoft.Azure.IoT.EdgeCompose.Modules.Methods
 {
     public class MethodResponse
     {

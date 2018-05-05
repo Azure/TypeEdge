@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Azure.IoT.EdgeCompose
+﻿namespace Microsoft.Azure.IoT.EdgeCompose.Modules
 {
     public enum InputMessageCallbackResult
     {

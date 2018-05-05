@@ -1,4 +1,7 @@
 ﻿using Microsoft.Azure.IoT.EdgeCompose;
+using Microsoft.Azure.IoT.EdgeCompose.Hubs;
+using Microsoft.Azure.IoT.EdgeCompose.Modules;
+using Microsoft.Azure.IoT.EdgeCompose.Modules.Methods;
 using StructureMap;
 using System;
 using System.Collections.Generic;
@@ -10,15 +13,16 @@ namespace ThermpostatEdgeApplication
 {
     public class ThermostatApplication : IoTEdgeApplication
     {
-        public override ApplicationInitializationResult InitializeApplication(Container container)
+        public override CompositionResult Compose()
         {
             //setup modules
             var readTemperature = new Module<TemperatureModuleInput, TemperatureModuleOutput, ReadTemperatureOptions>(
                "ReadTemperatureModule",
+               Container,
                async (config) =>
                {
                    //initialize the user code of the module
-                   return ModuleInitializationResult.OK;
+                   return CreationResult.OK;
                },
                async (output) =>
                {
@@ -33,7 +37,7 @@ namespace ThermpostatEdgeApplication
                async (update, output) =>
                {
                    //twin handler
-                   return ModuleTwinResult.OK;
+                   return TwinResult.OK;
                },
                async (msg, output) =>
                {
@@ -44,7 +48,7 @@ namespace ThermpostatEdgeApplication
                     {new Method<JsonMethodArgument,  JsonMethodResponse>("Ping", (arg) => { return new JsonMethodResponse(arg, @"{""output1"": ""pong"", ""output2"": ""from ping"" }"); } ) }
                });
 
-            var normalizeTemperatureModule = new NormalizeTemperatureModule();
+            var normalizeTemperatureModule = new NormalizeTemperatureModule(Container);
 
             Modules.Add(normalizeTemperatureModule);
             Modules.Add(readTemperature);
@@ -54,7 +58,10 @@ namespace ThermpostatEdgeApplication
             normalizeTemperatureModule.Subscribe(readTemperature.Output);
             Hub.Subscribe(normalizeTemperatureModule.Output, (msg) => { return new JsonMessage(msg.ToString()); });
 
-            return ApplicationInitializationResult.OK;
+            //setup startup depedencies
+            normalizeTemperatureModule.DependsOn(readTemperature);
+
+            return CompositionResult.OK;
         }
     }
 }

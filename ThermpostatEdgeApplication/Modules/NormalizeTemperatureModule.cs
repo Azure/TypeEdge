@@ -1,4 +1,7 @@
 ﻿using Microsoft.Azure.IoT.EdgeCompose;
+using Microsoft.Azure.IoT.EdgeCompose.Modules;
+using Microsoft.Azure.IoT.EdgeCompose.Modules.Methods;
+using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,15 +12,18 @@ namespace ThermpostatEdgeApplication
 {
     public class NormalizeTemperatureModule : Module<TemperatureModuleOutput, TemperatureModuleOutput, NormalizeTemperatureOptions>
     {
-        public override string Name => nameof(NormalizeTemperatureModule);
+        public NormalizeTemperatureModule(Container container)
+         : base(container)
+        {
+        }
 
-        protected override Func<NormalizeTemperatureOptions, Task<ModuleInitializationResult>> InitHandler =>
+        public override Func<NormalizeTemperatureOptions, Task<CreationResult>> CreateHandler =>
             async (config) =>
             {
                 //initialize user code of module
-                return ModuleInitializationResult.OK;
+                return CreationResult.OK;
             };
-        protected override Func<Upstream<TemperatureModuleOutput>, Task<ExecutionResult>> ExecuteHandler =>
+        public override Func<Upstream<TemperatureModuleOutput>, Task<ExecutionResult>> ExecuteHandler =>
             async (output) =>
             {
                 //the module long running loop code
@@ -29,23 +35,23 @@ namespace ThermpostatEdgeApplication
                 return ExecutionResult.OK;
             };
 
-        protected override Func<ModuleTwin, Upstream<TemperatureModuleOutput>, Task<ModuleTwinResult>> TwinUpdateHandler =>
+        public override Func<ModuleTwin, Upstream<TemperatureModuleOutput>, Task<TwinResult>> TwinUpdateHandler =>
             async (update, output) =>
             {
                 //twin handler
-                return ModuleTwinResult.OK;
+                return TwinResult.OK;
             };
 
-        protected override Func<TemperatureModuleOutput, Upstream<TemperatureModuleOutput>, Task<InputMessageCallbackResult>> IncomingMessageCallback =>
+        public override Func<TemperatureModuleOutput, Upstream<TemperatureModuleOutput>, Task<InputMessageCallbackResult>> IncomingMessageHandler =>
             async (msg, output) =>
             {
                 //input handler
                 return InputMessageCallbackResult.OK;
             };
 
-        protected override ModuleMethodCollection Methods =>
+        public override ModuleMethodCollection Methods =>
             new ModuleMethodCollection { { new Method<JsonMethodArgument, JsonMethodResponse>("Ping", (arg) => { return new JsonMethodResponse(arg, @"{""output1"": ""pong"", ""output2"": ""from ping"" }"); }) } };
 
-
+       
     }
 }

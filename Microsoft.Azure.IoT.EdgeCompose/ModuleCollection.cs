@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Azure.IoT.EdgeCompose.Modules;
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Azure.IoT.EdgeCompose

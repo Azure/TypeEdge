@@ -10,7 +10,8 @@ namespace ThermpostatEdgeApplication
             var edgeApp = new ThermostatApplication();
             await edgeApp.RunAsync();
 
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Press <ENTER> to exit..");
+            Console.ReadLine();
         }
     }
 }

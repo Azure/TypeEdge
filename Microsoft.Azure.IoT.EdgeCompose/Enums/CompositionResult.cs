@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Microsoft.Azure.IoT.EdgeCompose
 {
-    public enum ApplicationInitializationResult
+    public enum CompositionResult
     {
         OK, 
         Error
