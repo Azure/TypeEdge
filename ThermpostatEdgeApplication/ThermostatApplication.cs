@@ -1,8 +1,9 @@
-﻿using Microsoft.Azure.IoT.EdgeCompose;
+﻿using Autofac;
+using Microsoft.Azure.IoT.EdgeCompose;
 using Microsoft.Azure.IoT.EdgeCompose.Hubs;
 using Microsoft.Azure.IoT.EdgeCompose.Modules;
 using Microsoft.Azure.IoT.EdgeCompose.Modules.Methods;
-using StructureMap;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,12 +14,16 @@ namespace ThermpostatEdgeApplication
 {
     public class ThermostatApplication : IoTEdgeApplication
     {
+        public ThermostatApplication(string configFile)
+            :base(configFile)
+        {
+        }
+
         public override CompositionResult Compose()
         {
             //setup modules
             var readTemperature = new Module<TemperatureModuleInput, TemperatureModuleOutput, ReadTemperatureOptions>(
                "ReadTemperatureModule",
-               Container,
                async (config) =>
                {
                    //initialize the user code of the module
@@ -48,7 +53,7 @@ namespace ThermpostatEdgeApplication
                     {new Method<JsonMethodArgument,  JsonMethodResponse>("Ping", (arg) => { return new JsonMethodResponse(arg, @"{""output1"": ""pong"", ""output2"": ""from ping"" }"); } ) }
                });
 
-            var normalizeTemperatureModule = new NormalizeTemperatureModule(Container);
+            var normalizeTemperatureModule = new NormalizeTemperatureModule();
 
             Modules.Add(normalizeTemperatureModule);
             Modules.Add(readTemperature);

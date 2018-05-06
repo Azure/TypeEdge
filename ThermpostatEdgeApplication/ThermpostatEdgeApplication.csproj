@@ -10,4 +10,10 @@
     <ProjectReference Include="..\Microsoft.Azure.IoT.EdgeCompose\Microsoft.Azure.IoT.EdgeCompose.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings_thermostat.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

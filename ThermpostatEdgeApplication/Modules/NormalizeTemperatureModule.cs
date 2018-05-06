@@ -1,7 +1,7 @@
-﻿using Microsoft.Azure.IoT.EdgeCompose;
+﻿using Autofac;
+using Microsoft.Azure.IoT.EdgeCompose;
 using Microsoft.Azure.IoT.EdgeCompose.Modules;
 using Microsoft.Azure.IoT.EdgeCompose.Modules.Methods;
-using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,11 +12,6 @@ namespace ThermpostatEdgeApplication
 {
     public class NormalizeTemperatureModule : Module<TemperatureModuleOutput, TemperatureModuleOutput, NormalizeTemperatureOptions>
     {
-        public NormalizeTemperatureModule(Container container)
-         : base(container)
-        {
-        }
-
         public override Func<NormalizeTemperatureOptions, Task<CreationResult>> CreateHandler =>
             async (config) =>
             {
@@ -52,6 +47,6 @@ namespace ThermpostatEdgeApplication
         public override ModuleMethodCollection Methods =>
             new ModuleMethodCollection { { new Method<JsonMethodArgument, JsonMethodResponse>("Ping", (arg) => { return new JsonMethodResponse(arg, @"{""output1"": ""pong"", ""output2"": ""from ping"" }"); }) } };
 
-       
+
     }
 }
