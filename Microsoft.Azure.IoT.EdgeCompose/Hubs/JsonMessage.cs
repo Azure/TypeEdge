@@ -2,7 +2,7 @@
 
 namespace Microsoft.Azure.IoT.EdgeCompose.Hubs
 {
-    public class JsonMessage : IModuleMessage
+    public class JsonMessage : IEdgeMessage
     {
         private string JsonData;
 

@@ -4,13 +4,7 @@ using Microsoft.Azure.IoT.EdgeCompose.Modules;
 
 namespace ThermpostatEdgeApplication
 {
-    public class TemperatureModuleInput : IModuleMessage
+    public class TemperatureModuleInput : IEdgeMessage
     {
-        private JsonMessage msg;
-
-        public TemperatureModuleInput(JsonMessage msg)
-        {
-            this.msg = msg;
-        }
     }
 }

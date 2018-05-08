@@ -28,12 +28,9 @@ namespace Microsoft.Azure.IoT.EdgeCompose
         public ModuleCollection Modules { get; private set; }
 
 
-        public IoTEdgeApplication(string configFile)
+        public IoTEdgeApplication(IConfigurationRoot configuration)
         {
-            Configuration = new ConfigurationBuilder()
-                .AddJsonFile(configFile)
-                .AddEnvironmentVariables()
-                .Build();
+            Configuration = configuration;
 
             // add the framework services
             var services = new ServiceCollection().AddLogging();
@@ -54,6 +51,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose
             var builder = new ContainerBuilder();
             builder.Populate(services);
             builder.RegisterBuildCallback(c => { });
+
             var edgeDeviceConnectionString = Configuration.GetValue<string>(Constants.DeviceConnectionStringName);
 
             if (String.IsNullOrEmpty(edgeDeviceConnectionString))
@@ -85,7 +83,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose
 
             foreach (var module in Modules)
             {
-                module.RegisterOptions(builder, Configuration);
+                module.Create(Configuration);
             }
 
             IContainer container = builder.Build();
@@ -95,27 +93,18 @@ namespace Microsoft.Azure.IoT.EdgeCompose
 
         public async Task RunAsync()
         {
-            await CreateAsync();
-
-            await StartAsync();
-        }
-
-        private async Task CreateAsync()
-        {
             //configure all modules
             foreach (var module in Modules)
             {
-                await module.CreateAsync();
+                await module.InitAsync();
             }
-        }
-
-        private async Task StartAsync()
-        {
             //start all modules
             foreach (var module in Modules)
             {
-                await module.StartAsync();
+                await module.RunAsync();
             }
         }
+
+
     }
 }
