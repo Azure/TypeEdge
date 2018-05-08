@@ -36,6 +36,9 @@
     <None Update="Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="deviceconfig.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

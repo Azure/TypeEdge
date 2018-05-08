@@ -3,9 +3,9 @@
     public class Endpoint
     {
         public string Name { get; set; }
-        public IEdgeModule Module { get; set; }
+        public EdgeModule Module { get; set; }
 
-        public Endpoint(string name, IEdgeModule module)
+        public Endpoint(string name, EdgeModule module)
         {
             Name = name;
             Module = module;

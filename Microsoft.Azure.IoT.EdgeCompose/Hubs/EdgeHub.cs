@@ -17,7 +17,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Hubs
 
         private IConfigurationRoot HubServiceConfiguration { get; set; }
 
-        public override CreationResult Create(IConfigurationRoot configuration)
+        public override CreationResult Configure(IConfigurationRoot configuration)
         {
             HubServiceConfiguration = new ConfigurationBuilder()
                .AddJsonFile(Constants.ConfigFileName)
