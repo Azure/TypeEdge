@@ -34,7 +34,10 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
                     {
                         if (!prop.CanWrite)
                             throw new Exception($"{prop.Name} needs to be set dynamically, please define a setter.");
-                        prop.SetValue(this, Activator.CreateInstance(type.GetGenericTypeDefinition().MakeGenericType(type.GenericTypeArguments)));
+
+                        var name = $"{prop}/{prop.Name}";
+                        var value = Activator.CreateInstance(type.GetGenericTypeDefinition().MakeGenericType(type.GenericTypeArguments), name, this);
+                        prop.SetValue(this, value);
                     }
             }
 
@@ -66,6 +69,11 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
 
         public void DependsOn(IEdgeModule module)
         {
+        }
+
+        public async Task<PublishResult> PublishMessageAsync<T>(string outputName, T message) where T : IEdgeMessage
+        {
+            return PublishResult.OK;
         }
 
         /*

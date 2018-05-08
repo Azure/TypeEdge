@@ -3,9 +3,14 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IoT.EdgeCompose.Modules
 {
-    public class Input<T>
+    public class Input<T> : Endpoint
         where T : IEdgeMessage
     {
+        public Input(string name, IEdgeModule module) :
+          base(name, module)
+        {
+        }
+
         public void Subscribe(Output<T> output, Func<T, Task<MessageResult>> handler)
         {
         }

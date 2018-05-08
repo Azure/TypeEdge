@@ -3,11 +3,16 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IoT.EdgeCompose.Modules
 {
-    public class Output<T>
+    public class Output<T> : Endpoint
        where T : IEdgeMessage
     {
-        public void Publish(Func<T, Task<MessageResult>> handler)
+        public Output(string name, IEdgeModule module) :
+            base(name, module)
         {
+        }
+        public async Task<PublishResult> PublishAsync(T message)
+        {
+            return await Module.PublishMessageAsync(Name, message);
         }
     }
 }

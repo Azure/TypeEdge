@@ -93,6 +93,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose
 
         public async Task RunAsync()
         {
+            List<Task> tasks = new List<Task>();
             //configure all modules
             foreach (var module in Modules)
             {
@@ -101,8 +102,10 @@ namespace Microsoft.Azure.IoT.EdgeCompose
             //start all modules
             foreach (var module in Modules)
             {
-                await module.RunAsync();
+                tasks.Add(module.RunAsync());
             }
+
+            Task.WaitAll(tasks.ToArray());
         }
 
 

@@ -15,5 +15,6 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
         Task<PropertiesResult> PropertiesHandler(ModuleProperties newProps);
         Task<ExecutionResult> RunAsync();
         Task<TwinResult> TwinHandler(ModuleTwin newTwin);
+        Task<PublishResult> PublishMessageAsync<T>(string outputName, T message) where T : IEdgeMessage;
     }
 }
