@@ -1,13 +1,7 @@
-﻿using Autofac;
-using Microsoft.Azure.IoT.TypeEdge;
+﻿using Microsoft.Azure.IoT.TypeEdge;
 using Microsoft.Azure.IoT.TypeEdge.Hubs;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using ThermpostatEdgeApplication.Modules;
 
 namespace ThermpostatEdgeApplication
@@ -36,13 +30,12 @@ namespace ThermpostatEdgeApplication
                 if (temp.Scale == TemperatureScale.Celsius)
                     temp.Temperature = temp.Temperature * 9 / 5 + 32;
 
+                await normalizeTemperatureModule.NormalizedTemperature.PublishAsync(temp);
+
                 return MessageResult.OK;
             });
 
-            Hub.Upstream.Subscribe(normalizeTemperatureModule.NormalizedTemperature, async (temp) =>
-            {
-                return new JsonMessage(temp.ToString());
-            });
+            Hub.Upstream.Subscribe(normalizeTemperatureModule.NormalizedTemperature);
 
             //setup module startup depedencies
             normalizeTemperatureModule.DependsOn(temperatureModule);

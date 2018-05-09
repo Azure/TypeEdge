@@ -6,5 +6,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
     {
         IDictionary<string, string> Properties { get; set; }
         byte[] GetBytes();
+        void SetBytes(byte[] bytes);
     }
 }

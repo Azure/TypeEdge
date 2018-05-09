@@ -130,9 +130,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             string messageString = Encoding.UTF8.GetString(messageBytes);
             Console.WriteLine($"Received message: Body: [{messageString}]");
 
-            var input = Activator.CreateInstance(callback.MessageType);
+            var input = Activator.CreateInstance(callback.MessageType) as IEdgeMessage;
+            input.SetBytes(messageBytes);
+
             var invocationResult = callback.Handler.DynamicInvoke(input);
-            var result = ((Task<MessageResult>)invocationResult).Result;
+            var result = await ((Task<MessageResult>)invocationResult);
+
             if (result == MessageResult.OK)
                 return MessageResponse.Completed;
 
@@ -150,6 +153,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         public Input<JsonMessage> DefaultInput { get; set; }
         public Output<JsonMessage> DefaultOutput { get; set; }
 
+        public Output<DiagnosticsMessage> DiagnosticsOutput { get; set; }
+
+
         public void DependsOn(EdgeModule module)
         {
         }
@@ -166,17 +172,22 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             await IoTHubModuleClient.SendEventAsync(outputName, edgeMessage);
 
-            Console.WriteLine("Received message sent");
             return PublishResult.OK;
         }
 
         public void Subscribe<T>(string outName, string outRoute, string inName, string inRoute, Func<T, Task<MessageResult>> handler)
             where T : IEdgeMessage
         {
-            if(outRoute != "$downstream")
+            if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
             Subscriptions[inName] = new MessageCallback(inName, handler.GetMethodInfo(), handler, typeof(T));
         }
-        
+
+        public void Subscribe(string outName, string outRoute, string inName, string inRoute)
+        {
+            if (outRoute != "$downstream")
+                Routes.Add($"FROM {outRoute} INTO {inRoute}");
+        }
+
     }
 }

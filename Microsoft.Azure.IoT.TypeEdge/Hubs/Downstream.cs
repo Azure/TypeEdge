@@ -2,7 +2,7 @@
 
 namespace Microsoft.Azure.IoT.TypeEdge.Hubs
 {
-    public class Downstream<T> : Output<T>
+    public class Downstream<T> : Input<T>
         where T : IEdgeMessage
 
     {

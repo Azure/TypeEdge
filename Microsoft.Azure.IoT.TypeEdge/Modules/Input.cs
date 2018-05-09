@@ -16,10 +16,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         {
             Module.Subscribe(output.Name, output.RouteName, Name, RouteName, handler);
         }
-
-        public void Subscribe<O>(Output<O> output, Func<O, Task<T>> convert)
-            where O : IEdgeMessage
-        {
-        }
+        
     }
 }

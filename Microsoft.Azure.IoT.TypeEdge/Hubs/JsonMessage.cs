@@ -19,5 +19,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Hubs
         {
             return Encoding.UTF8.GetBytes(JsonData);
         }
+
+        public void SetBytes(byte[] bytes)
+        {
+            JsonData =  Encoding.UTF8.GetString(bytes);
+        }
     }
 }

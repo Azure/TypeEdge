@@ -16,5 +16,12 @@ namespace ThermpostatEdgeApplication
         {
             return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(this));
         }
+
+        public void SetBytes(byte[] bytes)
+        {
+            var obj = JsonConvert.DeserializeObject<TemperatureModuleInput>(Encoding.UTF8.GetString(bytes));
+            Properties = obj.Properties;
+            MyData = obj.MyData;
+        }
     }
 }
