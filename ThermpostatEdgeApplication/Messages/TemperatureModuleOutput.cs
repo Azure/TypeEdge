@@ -1,5 +1,5 @@
-﻿using Microsoft.Azure.IoT.EdgeCompose;
-using Microsoft.Azure.IoT.EdgeCompose.Modules;
+﻿using Microsoft.Azure.IoT.TypeEdge;
+using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;

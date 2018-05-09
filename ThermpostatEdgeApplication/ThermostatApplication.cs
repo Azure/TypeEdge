@@ -1,7 +1,7 @@
 ﻿using Autofac;
-using Microsoft.Azure.IoT.EdgeCompose;
-using Microsoft.Azure.IoT.EdgeCompose.Hubs;
-using Microsoft.Azure.IoT.EdgeCompose.Modules;
+using Microsoft.Azure.IoT.TypeEdge;
+using Microsoft.Azure.IoT.TypeEdge.Hubs;
+using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using ThermpostatEdgeApplication.Modules;
 
 namespace ThermpostatEdgeApplication
 {
-    public class ThermostatApplication : IoTEdgeApplication
+    public class ThermostatApplication : TypeEdgeApplication
     {
         public ThermostatApplication(IConfigurationRoot configuration)
             : base(configuration)

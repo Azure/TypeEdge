@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.IoT.EdgeCompose.Modules;
+﻿using Microsoft.Azure.IoT.TypeEdge.Modules;
 
 namespace ThermpostatEdgeApplication
 {

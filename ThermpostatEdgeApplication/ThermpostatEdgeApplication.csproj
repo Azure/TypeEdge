@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Azure.IoT.EdgeCompose\Microsoft.Azure.IoT.EdgeCompose.csproj" />
+    <ProjectReference Include="..\Microsoft.Azure.IoT.TypeEdge\Microsoft.Azure.IoT.TypeEdge.csproj" />
   </ItemGroup>
 
   <ItemGroup>
