@@ -10,10 +10,15 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Hubs
 {
     public class EdgeHub : EdgeModule
     {
+        public EdgeHub()
+        {
+            Upstream = new Upstream<JsonMessage>(this);
+            Downstream = new Downstream<JsonMessage>(this);
+        }
         public override string Name => Agent.Constants.EdgeHubModuleIdentityName;
 
-        public Input<JsonMessage> Upstream { get; set; }
-        public Output<JsonMessage> Downstream { get; set; }
+        public Upstream<JsonMessage> Upstream { get; set; }
+        public Downstream<JsonMessage> Downstream { get; set; }
 
         private IConfigurationRoot HubServiceConfiguration { get; set; }
 

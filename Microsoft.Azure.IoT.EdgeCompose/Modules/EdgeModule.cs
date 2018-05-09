@@ -20,8 +20,10 @@ using Agent = Microsoft.Azure.Devices.Edge.Agent.Core;
 
 namespace Microsoft.Azure.IoT.EdgeCompose.Modules
 {
-    public abstract class EdgeModule 
+    public abstract class EdgeModule
     {
+        internal List<string> Routes { get; set; }
+
         private string ConnectionString { get; set; }
         private DeviceClient IoTHubModuleClient { get; set; }
         private ITransportSettings[] TransportSettings { get; set; }
@@ -31,6 +33,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
         public EdgeModule()
         {
             Subscriptions = new Dictionary<string, MessageCallback>();
+            Routes = new List<string>();
 
             var props = GetType().GetProperties();
 
@@ -44,7 +47,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
                         if (!prop.CanWrite)
                             throw new Exception($"{prop.Name} needs to be set dynamically, please define a setter.");
 
-                        var name = $"{prop}/{prop.Name}";
+                        var name = $"{prop.Name}";
                         var value = Activator.CreateInstance(type.GetGenericTypeDefinition().MakeGenericType(type.GenericTypeArguments), name, this);
                         prop.SetValue(this, value);
                     }
@@ -175,10 +178,13 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
             return PublishResult.OK;
         }
 
-        public void Subscribe<T>(string name, Func<T, Task<MessageResult>> handler)
+        public void Subscribe<T>(string outName, string outRoute, string inName, string inRoute, Func<T, Task<MessageResult>> handler)
             where T : IEdgeMessage
         {
-            Subscriptions[name] = new MessageCallback(name, handler.GetMethodInfo(), handler, typeof(T));
+            if(outRoute != "$downstream")
+                Routes.Add($"FROM {outRoute} INTO {inRoute}");
+            Subscriptions[inName] = new MessageCallback(inName, handler.GetMethodInfo(), handler, typeof(T));
         }
+        
     }
 }

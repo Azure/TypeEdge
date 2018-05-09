@@ -27,10 +27,8 @@ namespace Microsoft.Azure.IoT.EdgeCompose
         public IConfigurationRoot Configuration { get; }
         public IContainer Container { get; private set; }
 
-
         public EdgeHub Hub { get; set; }
         public ModuleCollection Modules { get; private set; }
-
 
         public IoTEdgeApplication(IConfigurationRoot configuration)
         {
@@ -47,7 +45,6 @@ namespace Microsoft.Azure.IoT.EdgeCompose
 
             Container = BuildContainer(services);
         }
-
 
         IContainer BuildContainer(IServiceCollection services)
         {
@@ -67,7 +64,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose
 
             //configure the edge hub
 
-            
+
             Environment.SetEnvironmentVariable(HubService.Constants.SslCertEnvName, "edge-hub-server.cert.pfx");
             Environment.SetEnvironmentVariable(HubService.Constants.SslCertPathEnvName, Path.Combine(
                  Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
@@ -88,7 +85,6 @@ namespace Microsoft.Azure.IoT.EdgeCompose
                 Directory.CreateDirectory(hubStorageFolder);
 
             Environment.SetEnvironmentVariable("storageFolder", storageFolder);
-            Environment.SetEnvironmentVariable("IotHubConnectionString", iotHubConnectionString);
             #endregion
 
 
@@ -115,12 +111,13 @@ namespace Microsoft.Azure.IoT.EdgeCompose
                 .Build();
             Environment.SetEnvironmentVariable(Agent.Constants.EdgeHubConnectionStringKey, edgeConnectionString);
             Environment.SetEnvironmentVariable(Agent.Constants.IotHubConnectionStringKey, edgeConnectionString);
-            
+
             var edgeHubConfiguration = new ConfigurationBuilder()
                .AddEnvironmentVariables()
                .Build();
 
             Hub.InternalConfigure(edgeHubConfiguration);
+
 
             IContainer container = builder.Build();
             return container;
@@ -166,16 +163,24 @@ namespace Microsoft.Azure.IoT.EdgeCompose
                 var twinContent = new TwinContent();
                 config.ModuleContent["$edgeHub"] = twinContent;
 
+
+                var routes = new Dictionary<string, string>();
+                foreach (var route in Hub.Routes)
+                {
+                    routes[$"route{routes.Count}"] = route;
+                }
+                foreach (var module in Modules)
+                {
+                    foreach (var route in module.Routes)
+                    {
+                        routes[$"route{routes.Count}"] = route;
+                    }
+                }
+
                 var desiredProperties = new
                 {
                     schemaVersion = "1.0",
-                    routes = new Dictionary<string, string>
-                    {
-                        ["route1"] = "from /* INTO $upstream",
-                        ["route2"] = "from /modules/module1 INTO BrokeredEndpoint(\"/modules/module2/inputs/input1\")",
-                        ["route3"] = "from /modules/module2 INTO BrokeredEndpoint(\"/modules/module3/inputs/input1\")",
-                        ["route4"] = "from /modules/module3 INTO BrokeredEndpoint(\"/modules/module4/inputs/input1\")",
-                    },
+                    routes = routes,
                     storeAndForwardConfiguration = new
                     {
                         timeToLiveSecs = 20

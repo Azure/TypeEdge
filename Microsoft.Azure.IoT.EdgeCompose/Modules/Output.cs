@@ -10,6 +10,10 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
             base(name, module)
         {
         }
+        public override string RouteName => $"/modules/{this.Module.Name}/outputs/{Name}";
+
+        public string ModuleName { get { return Module.Name; } }
+
         public async Task<PublishResult> PublishAsync(T message)
         {
             return await Module.PublishAsync(Name, message);
