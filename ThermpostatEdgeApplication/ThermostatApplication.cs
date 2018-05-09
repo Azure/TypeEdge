@@ -28,7 +28,7 @@ namespace ThermpostatEdgeApplication
             Modules.Add(temperatureModule);
             Modules.Add(normalizeTemperatureModule);
 
-            //setup pub/sub
+            //setup the modules pub/sub
             temperatureModule.DefaultInput.Subscribe(Hub.Downstream, async (msg) => { return MessageResult.OK; });
 
             normalizeTemperatureModule.Temperature.Subscribe(temperatureModule.Temperature, async (temp) =>
@@ -44,7 +44,7 @@ namespace ThermpostatEdgeApplication
                 return new JsonMessage(temp.ToString());
             });
 
-            //setup startup depedencies
+            //setup module startup depedencies
             normalizeTemperatureModule.DependsOn(temperatureModule);
 
             return CompositionResult.OK;

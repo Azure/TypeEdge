@@ -69,10 +69,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
             if (!bypassCertVerification)
                 InstallCert();
 
-            Console.WriteLine("Connection String {0}", ConnectionString);
-
             MqttTransportSettings mqttSetting = new MqttTransportSettings(Devices.Client.TransportType.Mqtt_Tcp_Only);
-            // During dev you might want to bypass the cert verification. It is highly recommended to verify certs systematically in production
             if (bypassCertVerification)
             {
                 mqttSetting.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
@@ -125,23 +122,18 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
 
         private async Task<MessageResponse> SubscribedMessageHandler(Devices.Client.Message message, object userContext)
         {
-            var inputRoute = userContext as string;
-            if (string.IsNullOrEmpty(inputRoute))
-                throw new InvalidOperationException("UserContext doesn't contain a valid input route");
+            var callback = userContext as MessageCallback;
+            if (callback == null)
+                throw new InvalidOperationException("UserContext doesn't contain a valid MessageCallback");
 
             byte[] messageBytes = message.GetBytes();
             string messageString = Encoding.UTF8.GetString(messageBytes);
             Console.WriteLine($"Received message: Body: [{messageString}]");
 
-            var subscription = Subscriptions[inputRoute];
-
-            if (subscription == null)
-                throw new InvalidOperationException("No subscription found for this input route");
-
-            var input = Activator.CreateInstance(subscription.MessageType);
-            var result = await subscription.Handler(input);
-
-            if (result is MessageResult && ((MessageResult)result) == MessageResult.OK)
+            var input = Activator.CreateInstance(callback.MessageType);
+            var invocationResult = callback.Handler.DynamicInvoke(input);
+            var result = ((Task<MessageResult>)invocationResult).Result;
+            if (result == MessageResult.OK)
                 return MessageResponse.Completed;
 
             return MessageResponse.Abandoned;

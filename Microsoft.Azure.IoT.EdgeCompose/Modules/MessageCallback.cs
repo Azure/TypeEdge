@@ -8,7 +8,7 @@ namespace Microsoft.Azure.IoT.EdgeCompose.Modules
     {
         public string Name { get; set; }
         public MethodInfo MethodInfo { get; set; }
-        public dynamic Handler { get; set; }
+        public Delegate Handler { get; set; }
 
         public Type MessageType { get; set; }
 
