@@ -1,15 +1,15 @@
 ﻿using Microsoft.Azure.IoT.TypeEdge;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
-using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ThermostatApplication;
+using ThermostatApplication.Messages;
+using ThermostatApplication.Modules;
 
-namespace ThermpostatEdgeApplication.Modules
+namespace Modules
 {
-    public class TemperatureModule : EdgeModule
+    public class TemperatureModule : EdgeModule, ITemperatureModule
     {
         public Output<TemperatureModuleOutput> Temperature { get; set; }
 

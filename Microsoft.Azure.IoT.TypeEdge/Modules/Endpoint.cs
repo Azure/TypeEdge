@@ -7,7 +7,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
     {
         public string Name { get; set; }
         public abstract string RouteName { get; }
-        public EdgeModule Module { get; set; }
+        internal EdgeModule Module { get; set; }
 
         public Endpoint(string name, EdgeModule module)
         {

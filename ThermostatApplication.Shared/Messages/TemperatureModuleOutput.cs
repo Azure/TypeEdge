@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThermpostatEdgeApplication
+namespace ThermostatApplication.Messages
 {
     public class TemperatureModuleOutput : IEdgeMessage
     {

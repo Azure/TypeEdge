@@ -5,7 +5,7 @@ using Microsoft.Azure.IoT.TypeEdge.Hubs;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Newtonsoft.Json;
 
-namespace ThermpostatEdgeApplication
+namespace ThermostatApplication.Messages
 {
     public class TemperatureModuleInput : IEdgeMessage
     {

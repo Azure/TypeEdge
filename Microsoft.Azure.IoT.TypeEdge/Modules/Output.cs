@@ -12,7 +12,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         }
         public override string RouteName => $"/messages/modules/{this.Module.Name}/outputs/{Name}";
 
-        public string ModuleName { get { return Module.Name; } }
 
         public async Task<PublishResult> PublishAsync(T message)
         {

@@ -29,11 +29,13 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private ITransportSettings[] TransportSettings { get; set; }
 
         private Dictionary<string, MessageCallback> Subscriptions { get; set; }
+        public Upstream<JsonMessage> Upstream { get; set; }
 
         public EdgeModule()
         {
             Subscriptions = new Dictionary<string, MessageCallback>();
             Routes = new List<string>();
+            Upstream = new Upstream<JsonMessage>(this);
 
             var props = GetType().GetProperties();
 
@@ -56,6 +58,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         }
         public virtual string Name { get { return this.GetType().Name; } }
 
+        public virtual void ConfigureSubscriptions()
+        {
+        }
         public virtual CreationResult Configure(IConfigurationRoot configuration)
         {
             return CreationResult.OK;
@@ -154,7 +159,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         public Output<JsonMessage> DefaultOutput { get; set; }
 
         public Output<DiagnosticsMessage> DiagnosticsOutput { get; set; }
-
 
         public void DependsOn(EdgeModule module)
         {

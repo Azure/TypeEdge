@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThermpostatEdgeApplication", "ThermpostatEdgeApplication\ThermpostatEdgeApplication.csproj", "{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hub", "hub", "{34DAEE1A-E6E8-4059-9142-BF0170F3EAA8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.Amqp", "..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Amqp\Microsoft.Azure.Devices.Edge.Hub.Amqp.csproj", "{123E0E0F-3CAC-4095-B008-848F32A59C38}"
@@ -31,6 +29,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edg
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IoT.TypeEdge", "Microsoft.Azure.IoT.TypeEdge\Microsoft.Azure.IoT.TypeEdge.csproj", "{54587D56-7C22-4084-9321-84D57C2F6ECB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThermostatApplication", "ThermostatApplication", "{2E4AF4B3-04D0-4950-979B-B04052B8E20A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThermostatApplication.EdgeHost", "ThermostatApplication.EdgeHost\ThermostatApplication.EdgeHost.csproj", "{2C06F377-0612-431F-BA91-A2F5A561E789}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThermostatApplication.Shared", "ThermostatApplication.Shared\ThermostatApplication.Shared.csproj", "{CB2C4940-747F-4C45-9EA8-4C98F7F3AD41}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{40D0EFBC-3D80-42C8-9623-B9CAD4B96EFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemperatureModule", "TemperatureModule\TemperatureModule.csproj", "{2B79BE65-8725-42FE-9F63-BC1797080E70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NormalizeTemperatureModule", "NormalizeTemperatureModule\NormalizeTemperatureModule.csproj", "{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeCoverage|Any CPU = CodeCoverage|Any CPU
@@ -38,12 +48,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.CodeCoverage|Any CPU.ActiveCfg = Release|Any CPU
-		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.CodeCoverage|Any CPU.Build.0 = Release|Any CPU
-		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6E41A1D9-FD4D-43BD-932A-D88459C7F4E5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{123E0E0F-3CAC-4095-B008-848F32A59C38}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
 		{123E0E0F-3CAC-4095-B008-848F32A59C38}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
 		{123E0E0F-3CAC-4095-B008-848F32A59C38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -116,6 +120,30 @@ Global
 		{54587D56-7C22-4084-9321-84D57C2F6ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54587D56-7C22-4084-9321-84D57C2F6ECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54587D56-7C22-4084-9321-84D57C2F6ECB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C06F377-0612-431F-BA91-A2F5A561E789}.CodeCoverage|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C06F377-0612-431F-BA91-A2F5A561E789}.CodeCoverage|Any CPU.Build.0 = Debug|Any CPU
+		{2C06F377-0612-431F-BA91-A2F5A561E789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C06F377-0612-431F-BA91-A2F5A561E789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C06F377-0612-431F-BA91-A2F5A561E789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C06F377-0612-431F-BA91-A2F5A561E789}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB2C4940-747F-4C45-9EA8-4C98F7F3AD41}.CodeCoverage|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB2C4940-747F-4C45-9EA8-4C98F7F3AD41}.CodeCoverage|Any CPU.Build.0 = Debug|Any CPU
+		{CB2C4940-747F-4C45-9EA8-4C98F7F3AD41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB2C4940-747F-4C45-9EA8-4C98F7F3AD41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB2C4940-747F-4C45-9EA8-4C98F7F3AD41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB2C4940-747F-4C45-9EA8-4C98F7F3AD41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B79BE65-8725-42FE-9F63-BC1797080E70}.CodeCoverage|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B79BE65-8725-42FE-9F63-BC1797080E70}.CodeCoverage|Any CPU.Build.0 = Debug|Any CPU
+		{2B79BE65-8725-42FE-9F63-BC1797080E70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B79BE65-8725-42FE-9F63-BC1797080E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B79BE65-8725-42FE-9F63-BC1797080E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B79BE65-8725-42FE-9F63-BC1797080E70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.CodeCoverage|Any CPU.ActiveCfg = Debug|Any CPU
+		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.CodeCoverage|Any CPU.Build.0 = Debug|Any CPU
+		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -132,6 +160,11 @@ Global
 		{FADB4DA5-7927-4505-AE23-09481B221FED} = {34DAEE1A-E6E8-4059-9142-BF0170F3EAA8}
 		{6AF2C7B5-C749-47B0-BDE7-55F57C70E961} = {34DAEE1A-E6E8-4059-9142-BF0170F3EAA8}
 		{4765DE78-0E50-4F41-9603-8B598A56D4C4} = {34DAEE1A-E6E8-4059-9142-BF0170F3EAA8}
+		{2C06F377-0612-431F-BA91-A2F5A561E789} = {2E4AF4B3-04D0-4950-979B-B04052B8E20A}
+		{CB2C4940-747F-4C45-9EA8-4C98F7F3AD41} = {2E4AF4B3-04D0-4950-979B-B04052B8E20A}
+		{40D0EFBC-3D80-42C8-9623-B9CAD4B96EFF} = {2E4AF4B3-04D0-4950-979B-B04052B8E20A}
+		{2B79BE65-8725-42FE-9F63-BC1797080E70} = {40D0EFBC-3D80-42C8-9623-B9CAD4B96EFF}
+		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B} = {40D0EFBC-3D80-42C8-9623-B9CAD4B96EFF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {114E5850-267D-4B44-ACD5-91ACA382DDBC}

@@ -1,4 +1,4 @@
-﻿namespace ThermpostatEdgeApplication
+﻿namespace ThermostatApplication
 {
     public enum TemperatureScale
     {
