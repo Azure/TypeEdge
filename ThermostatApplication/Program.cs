@@ -6,7 +6,7 @@ using System;
 using System.Threading.Tasks;
 using ThermostatApplication.Modules;
 
-namespace ThermostatApplication.EdgeHost
+namespace ThermostatApplication
 {
     class Program
     {
@@ -16,13 +16,14 @@ namespace ThermostatApplication.EdgeHost
                 .AddJsonFile("appsettings_thermostat.json")
                 .Build();
 
-            var edgeApp = new Microsoft.Azure.IoT.TypeEdge.Host.TypeEdgeHost(configuration);
+            var host = new TypeEdgeHost(configuration);
 
-            edgeApp.RegisterModule<ITemperatureModule, TemperatureModule>();
-            edgeApp.RegisterModule<INormalizeTemperatureModule, NormalizeTemperatureModule>();
-            edgeApp.Build();
+            host.RegisterModule<ITemperatureModule, TemperatureModule>();
+            host.RegisterModule<INormalizeTemperatureModule, NormalizeTemperatureModule>();
 
-            await edgeApp.RunAsync();
+            host.Build();
+
+            await host.RunAsync();
 
             Console.WriteLine("Press <ENTER> to exit..");
             Console.ReadLine();
