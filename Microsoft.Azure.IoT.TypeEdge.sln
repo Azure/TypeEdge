@@ -43,6 +43,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IoT.TypeEdg
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThermostatApplication", "ThermostatApplication\ThermostatApplication.csproj", "{F8B81ADF-FA96-4E5B-95D9-D87B033EBBD9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{1CB9DC2B-746F-4773-ADBC-BB2C8C1C8B89}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Users\spyrosg\Downloads\nuget.exe = ..\..\..\..\Users\spyrosg\Downloads\nuget.exe
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeCoverage|Any CPU = CodeCoverage|Any CPU
