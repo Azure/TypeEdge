@@ -30,11 +30,22 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
         ContainerBuilder containerBuilder;
         ModuleCollection modules;
         EdgeHub hub;
+        TypeEdgeHostOptions options;
 
 
         public TypeEdgeHost(IConfigurationRoot configuration)
         {
             this.configuration = configuration;
+
+            options = new TypeEdgeHostOptions();
+            configuration.GetSection("TypeEdgeHost").Bind(options);
+
+            if (String.IsNullOrEmpty(options.IotHubConnectionString))
+                throw new Exception($"Missing IotHubConnectionString value in configuration");
+
+            if (String.IsNullOrEmpty(options.DeviceId))
+                throw new Exception($"Missing DeviceId value in configuration");
+
             this.containerBuilder = new ContainerBuilder();
             hub = new EdgeHub();
         }
@@ -54,22 +65,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             containerBuilder.RegisterType<_TModule>();
         }
 
-        public void Build()
-        {
-            //read the configuration first
-            var (iotHubConnectionString, deviceId) = ReadConfiguration();
-
-            //setup the container
-            BuildContainer();
-
-            this.modules = CreateModules();
-
-            var deviceSasKey = ProvisionDeviceAsync(iotHubConnectionString, deviceId, this.modules).Result;
-
-            ConfigureModules(iotHubConnectionString, deviceId);
-
-            BuildHub(iotHubConnectionString, deviceId, deviceSasKey);
-        }
 
         #region Build
         private void BuildContainer()
@@ -81,20 +76,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             container = containerBuilder.Build();
         }
 
-        private (string iotHubConnectionString, string deviceId) ReadConfiguration()
-        {
-            var iotHubConnectionString = configuration.GetValue<string>(Core.Constants.IotHubConnectionStringKey);
-            if (String.IsNullOrEmpty(iotHubConnectionString))
-                throw new Exception($"Missing {Core.Constants.IotHubConnectionStringKey} value in configuration");
-
-            var deviceId = configuration.GetValue<string>("DeviceId");
-            if (String.IsNullOrEmpty(deviceId))
-                throw new Exception($"Missing DeviceId value in configuration");
-
-            return (iotHubConnectionString, deviceId);
-        }
-
-        private void BuildHub(string iotHubConnectionString, string deviceId, string deviceSasKey)
+        private void BuildHub(string deviceSasKey)
         {
             //Calculate the Hub Enviroment Varialbes
             var currentLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -116,8 +98,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             Environment.SetEnvironmentVariable("storageFolder", storageFolder);
 
-            var csBuilder = IotHubConnectionStringBuilder.Create(iotHubConnectionString);
-            var edgeConnectionString = new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
+            var csBuilder = IotHubConnectionStringBuilder.Create(options.IotHubConnectionString);
+            var edgeConnectionString = new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, options.DeviceId)
                 .WithModuleId(Core.Constants.EdgeHubModuleName)
                 .WithModuleId(Core.Constants.EdgeHubModuleIdentityName)
                 .WithSharedAccessKey(deviceSasKey)
@@ -132,11 +114,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             hub.InternalConfigure(edgeHubConfiguration);
         }
 
-        private void ConfigureModules(string iotHubConnectionString, string deviceId)
+        private void ConfigureModules()
         {
             foreach (var module in this.modules)
             {
-                var moduleConnectionString = GetModuleConnectionStringAsync(iotHubConnectionString, deviceId, module.Name).Result;
+                var moduleConnectionString = GetModuleConnectionStringAsync(options.IotHubConnectionString, options.DeviceId, module.Name).Result;
 
                 Environment.SetEnvironmentVariable(Core.Constants.EdgeHubConnectionStringKey, moduleConnectionString);
 
@@ -165,20 +147,20 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             return modules;
         }
 
-        private async Task<string> ProvisionDeviceAsync(string iotHubConnectionString, string deviceId, ModuleCollection modules)
+        private async Task<string> ProvisionDeviceAsync()
         {
-            var csBuilder = IotHubConnectionStringBuilder.Create(iotHubConnectionString);
+            var csBuilder = IotHubConnectionStringBuilder.Create(options.IotHubConnectionString);
 
-            RegistryManager registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
+            RegistryManager registryManager = RegistryManager.CreateFromConnectionString(options.IotHubConnectionString);
             string sasKey = null;
             try
             {
-                var device = await registryManager.AddDeviceAsync(new Devices.Device(deviceId) { Capabilities = new Microsoft.Azure.Devices.Shared.DeviceCapabilities() { IotEdge = true } });
+                var device = await registryManager.AddDeviceAsync(new Devices.Device(options.DeviceId) { Capabilities = new Microsoft.Azure.Devices.Shared.DeviceCapabilities() { IotEdge = true } });
                 sasKey = device.Authentication.SymmetricKey.PrimaryKey;
             }
             catch (DeviceAlreadyExistsException)
             {
-                var device = await registryManager.GetDeviceAsync(deviceId);
+                var device = await registryManager.GetDeviceAsync(options.DeviceId);
                 sasKey = device.Authentication.SymmetricKey.PrimaryKey;
             }
 
@@ -203,7 +185,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
                     try
                     {
-                        await registryManager.AddModuleAsync(new Devices.Module(deviceId, module.Name));
+                        await registryManager.AddModuleAsync(new Devices.Module(options.DeviceId, module.Name));
                     }
                     catch (ModuleAlreadyExistsException)
                     {
@@ -239,7 +221,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 string patch = JsonConvert.SerializeObject(desiredProperties);
 
                 twinContent.TargetContent = new TwinCollection(patch);
-                await registryManager.ApplyConfigurationContentOnDeviceAsync(deviceId, config);
+                await registryManager.ApplyConfigurationContentOnDeviceAsync(options.DeviceId, config);
             }
             catch
             {
@@ -270,6 +252,21 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 .Build();
         }
         #endregion
+
+        public void Build()
+        {
+            //setup the container
+            BuildContainer();
+
+            this.modules = CreateModules();
+
+            var deviceSasKey = ProvisionDeviceAsync().Result;
+
+            ConfigureModules();
+
+            BuildHub(deviceSasKey);
+        }
+
 
         public async Task RunAsync()
         {

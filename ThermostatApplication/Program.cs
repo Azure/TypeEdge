@@ -14,6 +14,8 @@ namespace ThermostatApplication
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings_thermostat.json")
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
                 .Build();
 
             var host = new TypeEdgeHost(configuration);
