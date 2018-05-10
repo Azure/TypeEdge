@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.IoT.TypeEdge;
+using Microsoft.Azure.IoT.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using Modules;
 using System;
@@ -15,7 +16,7 @@ namespace ThermostatApplication.EdgeHost
                 .AddJsonFile("appsettings_thermostat.json")
                 .Build();
 
-            var edgeApp = new TypeEdgeApplication(configuration);
+            var edgeApp = new Microsoft.Azure.IoT.TypeEdge.Host.TypeEdgeHost(configuration);
 
             edgeApp.RegisterModule<ITemperatureModule, TemperatureModule>();
             edgeApp.RegisterModule<INormalizeTemperatureModule, NormalizeTemperatureModule>();

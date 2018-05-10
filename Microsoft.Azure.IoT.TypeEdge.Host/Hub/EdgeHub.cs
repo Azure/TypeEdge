@@ -6,7 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Agent = Microsoft.Azure.Devices.Edge.Agent.Core;
 
-namespace Microsoft.Azure.IoT.TypeEdge.Hubs
+namespace Microsoft.Azure.IoT.TypeEdge.Host.Hub
 {
     public class EdgeHub : EdgeModule
     {

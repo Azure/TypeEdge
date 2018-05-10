@@ -13,25 +13,31 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 using HubService = Microsoft.Azure.Devices.Edge.Hub.Service;
 using System.Reflection;
 using Microsoft.Azure.Devices;
-using System.Configuration;
-using Agent = Microsoft.Azure.Devices.Edge.Agent.Core;
 using Microsoft.Azure.Devices.Common.Exceptions;
 using Newtonsoft.Json;
 using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json.Linq;
 using System.Linq;
-using Autofac.Extras.DynamicProxy;
-using Castle.DynamicProxy;
-
-namespace Microsoft.Azure.IoT.TypeEdge
+using Microsoft.Azure.IoT.TypeEdge.Host.Hub;
+using Microsoft.Azure.Devices.Edge.Agent.Core;
+using Core = Microsoft.Azure.Devices.Edge.Agent.Core;
+namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
-    public class TypeEdgeApplication
+    public class TypeEdgeHost
     {
         IConfigurationRoot configuration;
         IContainer container;
         ContainerBuilder containerBuilder;
         ModuleCollection modules;
         EdgeHub hub;
+
+
+        public TypeEdgeHost(IConfigurationRoot configuration)
+        {
+            this.configuration = configuration;
+            this.containerBuilder = new ContainerBuilder();
+            hub = new EdgeHub();
+        }
 
         public void RegisterModule<_IModule, _TModule>()
             where _IModule : class
@@ -42,14 +48,12 @@ namespace Microsoft.Azure.IoT.TypeEdge
             containerBuilder.RegisterType<_TModule>().AsSelf().As<_IModule>();
         }
 
-
-        public TypeEdgeApplication(IConfigurationRoot configuration)
+        public void RegisterModule<_TModule>()
+            where _TModule : class
         {
-            this.configuration = configuration;
-            this.containerBuilder = new ContainerBuilder();
-            hub = new EdgeHub();
-
+            containerBuilder.RegisterType<_TModule>();
         }
+
         public void Build()
         {
             //read the configuration first
@@ -79,9 +83,9 @@ namespace Microsoft.Azure.IoT.TypeEdge
 
         private (string iotHubConnectionString, string deviceId) ReadConfiguration()
         {
-            var iotHubConnectionString = configuration.GetValue<string>(Agent.Constants.IotHubConnectionStringKey);
+            var iotHubConnectionString = configuration.GetValue<string>(Core.Constants.IotHubConnectionStringKey);
             if (String.IsNullOrEmpty(iotHubConnectionString))
-                throw new Exception($"Missing {Agent.Constants.IotHubConnectionStringKey} value in configuration");
+                throw new Exception($"Missing {Core.Constants.IotHubConnectionStringKey} value in configuration");
 
             var deviceId = configuration.GetValue<string>("DeviceId");
             if (String.IsNullOrEmpty(deviceId))
@@ -113,13 +117,13 @@ namespace Microsoft.Azure.IoT.TypeEdge
             Environment.SetEnvironmentVariable("storageFolder", storageFolder);
 
             var csBuilder = IotHubConnectionStringBuilder.Create(iotHubConnectionString);
-            var edgeConnectionString = new Agent.ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
-                .WithModuleId(Agent.Constants.EdgeHubModuleName)
-                .WithModuleId(Agent.Constants.EdgeHubModuleIdentityName)
+            var edgeConnectionString = new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
+                .WithModuleId(Core.Constants.EdgeHubModuleName)
+                .WithModuleId(Core.Constants.EdgeHubModuleIdentityName)
                 .WithSharedAccessKey(deviceSasKey)
                 .Build();
-            Environment.SetEnvironmentVariable(Agent.Constants.EdgeHubConnectionStringKey, edgeConnectionString);
-            Environment.SetEnvironmentVariable(Agent.Constants.IotHubConnectionStringKey, edgeConnectionString);
+            Environment.SetEnvironmentVariable(Core.Constants.EdgeHubConnectionStringKey, edgeConnectionString);
+            Environment.SetEnvironmentVariable(Core.Constants.IotHubConnectionStringKey, edgeConnectionString);
 
             var edgeHubConfiguration = new ConfigurationBuilder()
                .AddEnvironmentVariables()
@@ -134,7 +138,7 @@ namespace Microsoft.Azure.IoT.TypeEdge
             {
                 var moduleConnectionString = GetModuleConnectionStringAsync(iotHubConnectionString, deviceId, module.Name).Result;
 
-                Environment.SetEnvironmentVariable(Agent.Constants.EdgeHubConnectionStringKey, moduleConnectionString);
+                Environment.SetEnvironmentVariable(Core.Constants.EdgeHubConnectionStringKey, moduleConnectionString);
 
                 var moduleConfiguration = new ConfigurationBuilder()
                    .AddEnvironmentVariables()
@@ -160,7 +164,6 @@ namespace Microsoft.Azure.IoT.TypeEdge
             
             return modules;
         }
-
 
         private async Task<string> ProvisionDeviceAsync(string iotHubConnectionString, string deviceId, ModuleCollection modules)
         {
@@ -260,7 +263,7 @@ namespace Microsoft.Azure.IoT.TypeEdge
             {
                 throw;
             }
-            return new Agent.ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
+            return new Core.ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
                 .WithGatewayHostName(Environment.MachineName)
                 .WithModuleId(moduleName)
                 .WithSharedAccessKey(sasKey)

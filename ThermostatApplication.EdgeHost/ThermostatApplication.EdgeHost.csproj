@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj" />
     <ProjectReference Include="..\Microsoft.Azure.IoT.TypeEdge\Microsoft.Azure.IoT.TypeEdge.csproj" />
     <ProjectReference Include="..\NormalizeTemperatureModule\NormalizeTemperatureModule.csproj" />
     <ProjectReference Include="..\TemperatureModule\TemperatureModule.csproj" />

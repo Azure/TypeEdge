@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemperatureModule", "Temper
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NormalizeTemperatureModule", "NormalizeTemperatureModule\NormalizeTemperatureModule.csproj", "{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Azure.IoT.TypeEdge.Host", "Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj", "{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeCoverage|Any CPU = CodeCoverage|Any CPU
@@ -144,6 +146,12 @@ Global
 		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A55A00B6-BABA-414D-A38F-C4CAB4B9331B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.CodeCoverage|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.CodeCoverage|Any CPU.Build.0 = Debug|Any CPU
+		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
