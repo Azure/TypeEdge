@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThermostatApplication.Shared", "ThermostatApplication.Shared\ThermostatApplication.Shared.csproj", "{DD7A29AD-0125-4335-BDA1-41DD7586BD6D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThermostatApplication", "ThermostatApplication\ThermostatApplication.csproj", "{8CAC237D-EE55-481F-B08A-5B3F9DE2F43A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{8D822B22-E5A9-4165-B27B-458A70D2B44F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemperatureModule", "TemperatureModule\TemperatureModule.csproj", "{D24DFF2A-1783-45EC-B4D0-DB4C48864E01}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NormalizeTemperatureModule", "NormalizeTemperatureModule\NormalizeTemperatureModule.csproj", "{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD7A29AD-0125-4335-BDA1-41DD7586BD6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD7A29AD-0125-4335-BDA1-41DD7586BD6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD7A29AD-0125-4335-BDA1-41DD7586BD6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD7A29AD-0125-4335-BDA1-41DD7586BD6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CAC237D-EE55-481F-B08A-5B3F9DE2F43A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CAC237D-EE55-481F-B08A-5B3F9DE2F43A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CAC237D-EE55-481F-B08A-5B3F9DE2F43A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CAC237D-EE55-481F-B08A-5B3F9DE2F43A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D24DFF2A-1783-45EC-B4D0-DB4C48864E01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D24DFF2A-1783-45EC-B4D0-DB4C48864E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D24DFF2A-1783-45EC-B4D0-DB4C48864E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D24DFF2A-1783-45EC-B4D0-DB4C48864E01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D24DFF2A-1783-45EC-B4D0-DB4C48864E01} = {8D822B22-E5A9-4165-B27B-458A70D2B44F}
+		{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC} = {8D822B22-E5A9-4165-B27B-458A70D2B44F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E7BE10A1-BBA6-43BB-BC65-A9D38A168E00}
+	EndGlobalSection
+EndGlobal

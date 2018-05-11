@@ -1,6 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageId>Microsoft.Azure.IoT.TypeEdge</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>paloukari</Authors>
+    <Company>Microsoft</Company>
+    <PackageOutputPath>../build</PackageOutputPath>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Microsoft.Azure.IoT.TypeEdge</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoT.TypeEdge</RootNamespace>

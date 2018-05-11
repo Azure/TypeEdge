@@ -6,4 +6,4 @@
         public const string EdgeHubConnectionStringKey = "EdgeHubConnectionString";
 
     }
-}
+} 
