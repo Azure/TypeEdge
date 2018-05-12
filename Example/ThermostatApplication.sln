@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemperatureModule", "Temper
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NormalizeTemperatureModule", "NormalizeTemperatureModule\NormalizeTemperatureModule.csproj", "{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EF59CBB-28AB-42CB-B7EC-528D20F5CDAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

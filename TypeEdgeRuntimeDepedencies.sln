@@ -1,0 +1,108 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.Amqp", "..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Amqp\Microsoft.Azure.Devices.Edge.Hub.Amqp.csproj", "{123E0E0F-3CAC-4095-B008-848F32A59C38}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.CloudProxy", "..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.CloudProxy\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.csproj", "{8FE13603-2BC1-4FB0-A133-C3798142D34F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.Core", "..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Core\Microsoft.Azure.Devices.Edge.Hub.Core.csproj", "{D7C84729-E69C-4A38-918C-5779A1526944}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.Http", "..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Http\Microsoft.Azure.Devices.Edge.Hub.Http.csproj", "{79B9C8EB-90C8-44D9-ABA5-11D5E1D9A6E7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.Mqtt", "..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Mqtt\Microsoft.Azure.Devices.Edge.Hub.Mqtt.csproj", "{F730FC73-73CE-4F74-AD7A-B588ED6CD500}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.Service", "..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Service\Microsoft.Azure.Devices.Edge.Hub.Service.csproj", "{B4E19618-6684-44E0-B311-507072F7CC73}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Routing.Core", "..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Routing.Core\Microsoft.Azure.Devices.Routing.Core.csproj", "{E1AA7C66-0FF7-4460-9573-3A89823C82E1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Util", "..\..\..\internal\Azure-IoT-Edge-Core\edge-util\src\Microsoft.Azure.Devices.Edge.Util\Microsoft.Azure.Devices.Edge.Util.csproj", "{136C3FE6-B339-4BC1-ABE7-0CAF4E8B2207}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Storage", "..\..\..\internal\Azure-IoT-Edge-Core\edge-util\src\Microsoft.Azure.Devices.Edge.Storage\Microsoft.Azure.Devices.Edge.Storage.csproj", "{FADB4DA5-7927-4505-AE23-09481B221FED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Storage.RocksDb", "..\..\..\internal\Azure-IoT-Edge-Core\edge-util\src\Microsoft.Azure.Devices.Edge.Storage.RocksDb\Microsoft.Azure.Devices.Edge.Storage.RocksDb.csproj", "{6AF2C7B5-C749-47B0-BDE7-55F57C70E961}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Agent.Core", "..\..\..\internal\Azure-IoT-Edge-Core\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Core\Microsoft.Azure.Devices.Edge.Agent.Core.csproj", "{4765DE78-0E50-4F41-9603-8B598A56D4C4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		CodeCoverage|Any CPU = CodeCoverage|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{123E0E0F-3CAC-4095-B008-848F32A59C38}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{123E0E0F-3CAC-4095-B008-848F32A59C38}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{123E0E0F-3CAC-4095-B008-848F32A59C38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{123E0E0F-3CAC-4095-B008-848F32A59C38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{123E0E0F-3CAC-4095-B008-848F32A59C38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{123E0E0F-3CAC-4095-B008-848F32A59C38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FE13603-2BC1-4FB0-A133-C3798142D34F}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{8FE13603-2BC1-4FB0-A133-C3798142D34F}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{8FE13603-2BC1-4FB0-A133-C3798142D34F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FE13603-2BC1-4FB0-A133-C3798142D34F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FE13603-2BC1-4FB0-A133-C3798142D34F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FE13603-2BC1-4FB0-A133-C3798142D34F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7C84729-E69C-4A38-918C-5779A1526944}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{D7C84729-E69C-4A38-918C-5779A1526944}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{D7C84729-E69C-4A38-918C-5779A1526944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7C84729-E69C-4A38-918C-5779A1526944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7C84729-E69C-4A38-918C-5779A1526944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7C84729-E69C-4A38-918C-5779A1526944}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79B9C8EB-90C8-44D9-ABA5-11D5E1D9A6E7}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{79B9C8EB-90C8-44D9-ABA5-11D5E1D9A6E7}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{79B9C8EB-90C8-44D9-ABA5-11D5E1D9A6E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79B9C8EB-90C8-44D9-ABA5-11D5E1D9A6E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79B9C8EB-90C8-44D9-ABA5-11D5E1D9A6E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79B9C8EB-90C8-44D9-ABA5-11D5E1D9A6E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F730FC73-73CE-4F74-AD7A-B588ED6CD500}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{F730FC73-73CE-4F74-AD7A-B588ED6CD500}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{F730FC73-73CE-4F74-AD7A-B588ED6CD500}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F730FC73-73CE-4F74-AD7A-B588ED6CD500}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F730FC73-73CE-4F74-AD7A-B588ED6CD500}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F730FC73-73CE-4F74-AD7A-B588ED6CD500}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4E19618-6684-44E0-B311-507072F7CC73}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{B4E19618-6684-44E0-B311-507072F7CC73}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{B4E19618-6684-44E0-B311-507072F7CC73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4E19618-6684-44E0-B311-507072F7CC73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4E19618-6684-44E0-B311-507072F7CC73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4E19618-6684-44E0-B311-507072F7CC73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1AA7C66-0FF7-4460-9573-3A89823C82E1}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{E1AA7C66-0FF7-4460-9573-3A89823C82E1}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{E1AA7C66-0FF7-4460-9573-3A89823C82E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1AA7C66-0FF7-4460-9573-3A89823C82E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1AA7C66-0FF7-4460-9573-3A89823C82E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1AA7C66-0FF7-4460-9573-3A89823C82E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{136C3FE6-B339-4BC1-ABE7-0CAF4E8B2207}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{136C3FE6-B339-4BC1-ABE7-0CAF4E8B2207}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{136C3FE6-B339-4BC1-ABE7-0CAF4E8B2207}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{136C3FE6-B339-4BC1-ABE7-0CAF4E8B2207}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{136C3FE6-B339-4BC1-ABE7-0CAF4E8B2207}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{136C3FE6-B339-4BC1-ABE7-0CAF4E8B2207}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FADB4DA5-7927-4505-AE23-09481B221FED}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{FADB4DA5-7927-4505-AE23-09481B221FED}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{FADB4DA5-7927-4505-AE23-09481B221FED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FADB4DA5-7927-4505-AE23-09481B221FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FADB4DA5-7927-4505-AE23-09481B221FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FADB4DA5-7927-4505-AE23-09481B221FED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AF2C7B5-C749-47B0-BDE7-55F57C70E961}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{6AF2C7B5-C749-47B0-BDE7-55F57C70E961}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{6AF2C7B5-C749-47B0-BDE7-55F57C70E961}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AF2C7B5-C749-47B0-BDE7-55F57C70E961}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AF2C7B5-C749-47B0-BDE7-55F57C70E961}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AF2C7B5-C749-47B0-BDE7-55F57C70E961}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4765DE78-0E50-4F41-9603-8B598A56D4C4}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{4765DE78-0E50-4F41-9603-8B598A56D4C4}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{4765DE78-0E50-4F41-9603-8B598A56D4C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4765DE78-0E50-4F41-9603-8B598A56D4C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4765DE78-0E50-4F41-9603-8B598A56D4C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4765DE78-0E50-4F41-9603-8B598A56D4C4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {114E5850-267D-4B44-ACD5-91ACA382DDBC}
+	EndGlobalSection
+EndGlobal

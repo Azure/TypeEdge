@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  thermostatapplication:
+    image: ${DOCKER_REGISTRY}thermostatapplication
+    build:
+      context: .
+      dockerfile: ThermostatApplication/Dockerfile

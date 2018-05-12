@@ -25,7 +25,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
     public class TypeEdgeHost
     {
-        IConfigurationRoot configuration;
+        readonly IConfigurationRoot configuration;
         IContainer container;
         ContainerBuilder containerBuilder;
         ModuleCollection modules;
@@ -84,10 +84,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             Environment.SetEnvironmentVariable(HubService.Constants.SslCertEnvName,
                 "edge-hub-server.cert.pfx");
             Environment.SetEnvironmentVariable(HubService.Constants.SslCertPathEnvName,
-                Path.Combine(currentLocation, @"Certificates\edge-hub-server\cert\"));
+                Path.Combine(currentLocation, @"Certificates/edge-hub-server/cert"));
 
             Environment.SetEnvironmentVariable("EdgeModuleHubServerCAChainCertificateFile",
-                Path.Combine(currentLocation, @"Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem"));
+                Path.Combine(currentLocation, @"Certificates/edge-chain-ca/cert/edge-chain-ca.cert.pem"));
 
             var storageFolder = Path.Combine(currentLocation, @"Storage");
 
@@ -116,11 +116,13 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
         private void ConfigureModules()
         {
+            var currentLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             foreach (var module in this.modules)
             {
                 var moduleConnectionString = GetModuleConnectionStringAsync(options.IotHubConnectionString, options.DeviceId, module.Name).Result;
-
                 Environment.SetEnvironmentVariable(Core.Constants.EdgeHubConnectionStringKey, moduleConnectionString);
+                Environment.SetEnvironmentVariable(Core.Constants.EdgeModuleCaCertificateFileKey, 
+                    Path.Combine(currentLocation, @"Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem"));
 
                 var moduleConfiguration = new ConfigurationBuilder()
                    .AddEnvironmentVariables()
@@ -143,7 +145,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                     modules.Add(module);
                 }
             }
-            
+
             return modules;
         }
 
@@ -166,8 +168,14 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             try
             {
-                var config = JsonConvert.DeserializeObject<ConfigurationContent>(File.ReadAllText("deviceconfig.json"));
-                var modulesConfig = config.ModuleContent["$edgeAgent"].TargetContent["modules"] as JObject;
+                ConfigurationContent configurationContent;
+                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Azure.IoT.TypeEdge.Host.deviceconfig.json"))
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    var deviceconfig = reader.ReadToEnd();
+                    configurationContent = JsonConvert.DeserializeObject<ConfigurationContent>(deviceconfig);
+                }
+                var modulesConfig = configurationContent.ModuleContent["$edgeAgent"].TargetContent["modules"] as JObject;
                 foreach (var module in modules)
                 {
                     modulesConfig.Add(module.Name, JObject.FromObject(new
@@ -193,7 +201,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 }
 
                 var twinContent = new TwinContent();
-                config.ModuleContent["$edgeHub"] = twinContent;
+                configurationContent.ModuleContent["$edgeHub"] = twinContent;
 
 
                 var routes = new Dictionary<string, string>();
@@ -212,7 +220,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 var desiredProperties = new
                 {
                     schemaVersion = "1.0",
-                    routes = routes,
+                    routes,
                     storeAndForwardConfiguration = new
                     {
                         timeToLiveSecs = 20
@@ -221,7 +229,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 string patch = JsonConvert.SerializeObject(desiredProperties);
 
                 twinContent.TargetContent = new TwinCollection(patch);
-                await registryManager.ApplyConfigurationContentOnDeviceAsync(options.DeviceId, config);
+                await registryManager.ApplyConfigurationContentOnDeviceAsync(options.DeviceId, configurationContent);
             }
             catch
             {
@@ -270,9 +278,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
         public async Task RunAsync()
         {
-            List<Task> tasks = new List<Task>();
-
-            tasks.Add(hub.RunAsync());
+            List<Task> tasks = new List<Task>
+            {
+                hub.RunAsync()
+            };
             //start all modules
             foreach (var module in modules)
                 tasks.Add(module.InternalRunAsync());

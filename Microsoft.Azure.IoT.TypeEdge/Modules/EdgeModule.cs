@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Net.Security;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
@@ -18,7 +20,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private string connectionString;
         private DeviceClient ioTHubModuleClient;
         private ITransportSettings[] transportSettings;
-        private Dictionary<string, MessageCallback> subscriptions;
+        private readonly Dictionary<string, MessageCallback> subscriptions;
 
         public virtual string Name { get { return this.GetType().Name; } }
 
@@ -68,7 +70,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                 InstallCert();
 
             MqttTransportSettings mqttSetting = new MqttTransportSettings(Devices.Client.TransportType.Mqtt_Tcp_Only);
-            if (bypassCertVerification)
+            if (true)//bypassCertVerification)
             {
                 mqttSetting.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
             }
@@ -82,6 +84,13 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         {
             // Open a connection to the Edge runtime
             ioTHubModuleClient = DeviceClient.CreateFromConnectionString(connectionString, transportSettings);
+
+            ServicePointManager.ServerCertificateValidationCallback =
+                delegate (object s, X509Certificate certificate,
+                         X509Chain chain, SslPolicyErrors sslPolicyErrors)
+            {
+                return true;
+            };
             await ioTHubModuleClient.OpenAsync();
             Console.WriteLine("IoT Hub module client initialized.");
 
@@ -166,8 +175,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         }
         private async Task<MessageResponse> SubscribedMessageHandler(Devices.Client.Message message, object userContext)
         {
-            var callback = userContext as MessageCallback;
-            if (callback == null)
+            if (!(userContext is MessageCallback callback))
                 throw new InvalidOperationException("UserContext doesn't contain a valid MessageCallback");
 
             byte[] messageBytes = message.GetBytes();

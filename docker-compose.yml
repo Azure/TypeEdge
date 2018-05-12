@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  thermostatapplication:      
+    hostname: minint-egfehcf.redmond.corp.microsoft.com
+    image: ${DOCKER_REGISTRY}thermostatapplication
+    build:
+      context: .
+      dockerfile: Example/ThermostatApplication/Dockerfile
