@@ -28,7 +28,7 @@ COPY $EXE_DIR/ ./
 EXPOSE 8883/tcp
 EXPOSE 443/tcp
 
-
+ 
 WORKDIR /app
 
 FROM microsoft/dotnet:2.1-sdk AS build
@@ -50,4 +50,5 @@ RUN dotnet publish ThermostatApplication.csproj -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
+
 ENTRYPOINT ["dotnet", "ThermostatApplication.dll"]
