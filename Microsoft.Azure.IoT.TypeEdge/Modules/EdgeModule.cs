@@ -201,5 +201,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             }
         }
 
+        internal async Task ReportTwinAsync<T>(T twin) 
+            where T : IModuleTwin
+        {
+            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetProperies());
+        }
     }
 }

@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge\Microsoft.Azure.IoT.TypeEdge.csproj" />
-    <ProjectReference Include="..\ThermostatApplication.Shared\ThermostatApplication.Shared.csproj" />
+    <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
   </ItemGroup>
 
 </Project>

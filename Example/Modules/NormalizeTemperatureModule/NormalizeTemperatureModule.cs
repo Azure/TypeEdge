@@ -19,14 +19,17 @@ namespace Modules
             temperatureModuleProxy = proxy;
         }
 
-        public override void BuildSubscriptions() {
+        public override void BuildSubscriptions()
+        {
 
             Temperature.Subscribe(temperatureModuleProxy.Temperature, async (temp) =>
             {
                 if (temp.Scale == TemperatureScale.Celsius)
                     temp.Temperature = temp.Temperature * 9 / 5 + 32;
-
                 await NormalizedTemperature.PublishAsync(temp);
+
+                if (temp.Temperature > 30)
+                    await temperatureModuleProxy.Twin.Publish(new TemperatureTwin() { MaxLimit = 30 });
 
                 return MessageResult.OK;
             });
@@ -35,7 +38,8 @@ namespace Modules
 
             Twin.Subscribe(async (twin) =>
             {
-                Twin.Report(twin);
+                await Twin.ReportAsync(twin);
+
                 return TwinResult.OK;
             });
 

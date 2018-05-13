@@ -6,8 +6,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
     public class ModuleTwin<T>
         where T : IModuleTwin
     {
-        public string Name{ get; set; }
-        public EdgeModule Module { get; set; }
+        private string Name{ get; set; }
+        private EdgeModule Module { get; set; }
 
         public ModuleTwin(string name, EdgeModule module)
         {
@@ -20,7 +20,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             Module.SubscribeTwin(Name, handler);
         }
 
-        public void Report(T twin)
+        public async Task ReportAsync(T twin)
+        {
+            await Module.ReportTwinAsync(twin);
+        }
+
+        public Task Publish(T twin)
         {
             throw new NotImplementedException();
         }

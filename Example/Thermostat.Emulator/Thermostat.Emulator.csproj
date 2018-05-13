@@ -8,9 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj" />
-    <ProjectReference Include="..\NormalizeTemperatureModule\NormalizeTemperatureModule.csproj" />
-    <ProjectReference Include="..\TemperatureModule\TemperatureModule.csproj" />
-    <ProjectReference Include="..\ThermostatApplication.Shared\ThermostatApplication.Shared.csproj" />
+    <ProjectReference Include="..\Modules\NormalizeTemperatureModule\NormalizeTemperatureModule.csproj" />
+    <ProjectReference Include="..\Modules\TemperatureModule\TemperatureModule.csproj" />
+    <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -19,7 +19,7 @@ namespace Modules
         {
             while (true)
             {
-                await Temperature.PublishAsync(new TemperatureModuleOutput() { Scale = TemperatureScale.Celsius, Temperature = new Random().NextDouble() });
+                await Temperature.PublishAsync(new TemperatureModuleOutput() { Scale = TemperatureScale.Celsius, Temperature = new Random().NextDouble() * 100 });
                 Thread.Sleep(1000);
             }
             return await base.RunAsync();

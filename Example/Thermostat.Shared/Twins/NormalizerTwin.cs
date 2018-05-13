@@ -6,6 +6,12 @@ namespace ThermostatApplication.Twins
     public class NormalizerTwin : IModuleTwin
     {
         TwinCollection desiredProperties;
+
+        public TwinCollection GetProperies()
+        {
+            return this.desiredProperties;
+        }
+
         public void SetProperies(TwinCollection desiredProperties)
         {
             this.desiredProperties = desiredProperties;
