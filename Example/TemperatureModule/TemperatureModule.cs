@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
+using ThermostatApplication.Twins;
 
 namespace Modules
 {
     public class TemperatureModule : EdgeModule, ITemperatureModule
     {
         public Output<TemperatureModuleOutput> Temperature { get; set; }
+        public ModuleTwin<TemperatureTwin> Twin { get; set; }
 
         public override async Task<ExecutionResult> RunAsync()
         {

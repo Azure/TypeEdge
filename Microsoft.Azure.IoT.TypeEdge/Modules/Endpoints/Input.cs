@@ -14,7 +14,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         public override string RouteName => $"BrokeredEndpoint(\"/modules/{this.Module.Name}/inputs/{Name}\")";
         public virtual void Subscribe(Endpoint output, Func<T, Task<MessageResult>> handler)
         {
-            Module.Subscribe(output.Name, output.RouteName, Name, RouteName, handler);
+            Module.SubscribeRoute(output.Name, output.RouteName, Name, RouteName, handler);
         }
         
     }

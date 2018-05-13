@@ -2,6 +2,7 @@
 using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
+using ThermostatApplication.Twins;
 
 namespace Modules
 {
@@ -11,13 +12,14 @@ namespace Modules
 
         public Input<TemperatureModuleOutput> Temperature { get; set; }
         public Output<TemperatureModuleOutput> NormalizedTemperature { get; set; }
+        public ModuleTwin<NormalizerTwin> Twin { get; set; }
 
         public NormalizeTemperatureModule(ITemperatureModule proxy)
         {
             temperatureModuleProxy = proxy;
         }
 
-        public override void ConfigureSubscriptions() {
+        public override void BuildSubscriptions() {
 
             Temperature.Subscribe(temperatureModuleProxy.Temperature, async (temp) =>
             {
@@ -30,6 +32,13 @@ namespace Modules
             });
 
             Upstream.Subscribe(NormalizedTemperature);
+
+            Twin.Subscribe(async (twin) =>
+            {
+                Twin.Report(twin);
+                return TwinResult.OK;
+            });
+
         }
     }
 }

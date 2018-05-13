@@ -2,20 +2,18 @@
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoT.TypeEdge.Modules
+namespace Microsoft.Azure.IoT.TypeEdge
 {
-    public class MessageCallback
+    public class SubscriptionCallback
     {
         public string Name { get; set; }
-        public MethodInfo MethodInfo { get; set; }
         public Delegate Handler { get; set; }
 
         public Type MessageType { get; set; }
 
-        public MessageCallback(string name, MethodInfo methodInfo, Delegate handler, Type messageType)
+        public SubscriptionCallback(string name, Delegate handler, Type messageType)
         {
             this.Name = name;
-            this.MethodInfo = methodInfo;
             this.Handler = handler;
             MessageType = messageType;
         }

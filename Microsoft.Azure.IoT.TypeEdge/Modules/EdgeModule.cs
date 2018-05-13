@@ -1,7 +1,9 @@
 ﻿using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
+using Microsoft.Azure.Devices.Shared;
 using Microsoft.Azure.IoT.TypeEdge.Hubs;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,45 +22,52 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private string connectionString;
         private DeviceClient ioTHubModuleClient;
         private ITransportSettings[] transportSettings;
-        private readonly Dictionary<string, MessageCallback> subscriptions;
+        private SubscriptionCallback twinSubscription;
+        private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
 
         public virtual string Name { get { return this.GetType().Name; } }
-
         public Upstream<JsonMessage> Upstream { get; set; }
         public List<string> Routes { get; set; }
 
         public EdgeModule()
         {
-            subscriptions = new Dictionary<string, MessageCallback>();
+            routeSubscriptions = new Dictionary<string, SubscriptionCallback>();
+
             Routes = new List<string>();
             Upstream = new Upstream<JsonMessage>(this);
 
-            var props = GetType().GetProperties();
-
-            foreach (var prop in props)
-            {
-                var type = prop.PropertyType;
-
-                if (type.IsGenericType)
-                    if (type.GetGenericTypeDefinition() == typeof(Input<>) || type.GetGenericTypeDefinition() == typeof(Output<>))
-                    {
-                        if (!prop.CanWrite)
-                            throw new Exception($"{prop.Name} needs to be set dynamically, please define a setter.");
-
-                        var name = $"{prop.Name}";
-                        var value = Activator.CreateInstance(type.GetGenericTypeDefinition().MakeGenericType(type.GenericTypeArguments), name, this);
-                        prop.SetValue(this, value);
-                    }
-            }
+            CreateProperties();
 
         }
-
-        public virtual void ConfigureSubscriptions()
+        public virtual void BuildSubscriptions()
         {
         }
         public virtual CreationResult Configure(IConfigurationRoot configuration)
         {
             return CreationResult.OK;
+        }
+        public virtual Task<ExecutionResult> RunAsync()
+        {
+            return Task.FromResult(ExecutionResult.OK);
+        }
+        public async Task<ExecutionResult> InternalRunAsync()
+        {
+            // Open a connection to the Edge runtime
+            ioTHubModuleClient = DeviceClient.CreateFromConnectionString(connectionString, transportSettings);
+
+            await ioTHubModuleClient.OpenAsync();
+            Console.WriteLine("IoT Hub module client initialized.");
+
+            // Register callback to be called when a message is received by the module
+            foreach (var subscription in routeSubscriptions)
+            {
+                await ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, MessageHandler, subscription.Value);
+            }
+
+            if (twinSubscription != null)
+                await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, twinSubscription);
+
+            return await RunAsync();
         }
         public CreationResult InternalConfigure(IConfigurationRoot configuration)
         {
@@ -79,51 +88,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             return Configure(configuration);
         }
 
-
-        public async Task<ExecutionResult> InternalRunAsync()
-        {
-            // Open a connection to the Edge runtime
-            ioTHubModuleClient = DeviceClient.CreateFromConnectionString(connectionString, transportSettings);
-
-            ServicePointManager.ServerCertificateValidationCallback =
-                delegate (object s, X509Certificate certificate,
-                         X509Chain chain, SslPolicyErrors sslPolicyErrors)
-            {
-                return true;
-            };
-            await ioTHubModuleClient.OpenAsync();
-            Console.WriteLine("IoT Hub module client initialized.");
-
-            // Register callback to be called when a message is received by the module
-            foreach (var subscription in subscriptions)
-            {
-                await ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, SubscribedMessageHandler, subscription.Value);
-            }
-            return await RunAsync();
-        }
-        public virtual Task<ExecutionResult> RunAsync()
-        {
-            return Task.FromResult(ExecutionResult.OK);
-        }
-
-
-        public virtual Task<TwinResult> TwinHandler(ModuleTwin newTwin)
-        {
-            return Task.FromResult(TwinResult.OK);
-        }
-        public virtual Task<PropertiesResult> PropertiesHandler(ModuleProperties newProps)
-        {
-            return Task.FromResult(PropertiesResult.OK);
-        }
-        public Input<JsonMessage> DefaultInput { get; set; }
-        public Output<JsonMessage> DefaultOutput { get; set; }
-
-        public Output<DiagnosticsMessage> DiagnosticsOutput { get; set; }
-
-        public void DependsOn(EdgeModule module)
-        {
-        }
-
         internal async Task<PublishResult> PublishAsync<T>(string outputName, T message)
             where T : IEdgeMessage
         {
@@ -138,19 +102,57 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             return PublishResult.OK;
         }
-
-        internal void Subscribe<T>(string outName, string outRoute, string inName, string inRoute, Func<T, Task<MessageResult>> handler)
+        internal void SubscribeRoute<T>(string outName, string outRoute, string inName, string inRoute, Func<T, Task<MessageResult>> handler)
             where T : IEdgeMessage
         {
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
-            subscriptions[inName] = new MessageCallback(inName, handler.GetMethodInfo(), handler, typeof(T));
-        }
 
-        internal void Subscribe(string outName, string outRoute, string inName, string inRoute)
+            routeSubscriptions[inName] = new SubscriptionCallback(inName, handler, typeof(T));
+        }
+        internal void SubscribeRoute(string outName, string outRoute, string inName, string inRoute)
         {
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
+        }
+        internal void SubscribeTwin<T>(string name, Func<T, Task<TwinResult>> handler) where T : IModuleTwin
+        {
+            twinSubscription = new SubscriptionCallback(name, handler, typeof(T));
+        }
+
+        private async Task<MessageResponse> MessageHandler(Devices.Client.Message message, object userContext)
+        {
+            if (!(userContext is SubscriptionCallback callback))
+                throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
+
+            byte[] messageBytes = message.GetBytes();
+            string messageString = Encoding.UTF8.GetString(messageBytes);
+            Console.WriteLine($"Received message: Body: [{messageString}]");
+
+            var input = Activator.CreateInstance(callback.MessageType) as IEdgeMessage;
+            input.SetBytes(messageBytes);
+
+            var invocationResult = callback.Handler.DynamicInvoke(input);
+            var result = await ((Task<MessageResult>)invocationResult);
+
+            if (result == MessageResult.OK)
+                return MessageResponse.Completed;
+
+            return MessageResponse.Abandoned;
+        }
+        private async Task PropertyHandler(TwinCollection desiredProperties, object userContext)
+        {
+            if (!(userContext is SubscriptionCallback callback))
+                throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
+
+            Console.WriteLine("Desired property change:");
+            Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
+
+            var input = Activator.CreateInstance(callback.MessageType) as IModuleTwin;
+            input.SetProperies(desiredProperties);
+
+            var invocationResult = callback.Handler.DynamicInvoke(input);
+            var result = await ((Task<MessageResult>)invocationResult);
         }
         private void InstallCert()
         {
@@ -173,25 +175,30 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             Console.WriteLine("Added Cert: " + certPath);
             store.Close();
         }
-        private async Task<MessageResponse> SubscribedMessageHandler(Devices.Client.Message message, object userContext)
+        private void CreateProperties()
         {
-            if (!(userContext is MessageCallback callback))
-                throw new InvalidOperationException("UserContext doesn't contain a valid MessageCallback");
+            var props = GetType().GetProperties();
 
-            byte[] messageBytes = message.GetBytes();
-            string messageString = Encoding.UTF8.GetString(messageBytes);
-            Console.WriteLine($"Received message: Body: [{messageString}]");
+            foreach (var prop in props)
+            {
+                var type = prop.PropertyType;
 
-            var input = Activator.CreateInstance(callback.MessageType) as IEdgeMessage;
-            input.SetBytes(messageBytes);
+                if (!type.IsGenericType)
+                    continue;
 
-            var invocationResult = callback.Handler.DynamicInvoke(input);
-            var result = await ((Task<MessageResult>)invocationResult);
+                var genericDef = type.GetGenericTypeDefinition();
+                if (genericDef == typeof(Input<>)
+                    || genericDef == typeof(Output<>)
+                    || genericDef == typeof(ModuleTwin<>))
+                {
+                    if (!prop.CanWrite)
+                        throw new Exception($"{prop.Name} needs to be set dynamically, please define a setter.");
 
-            if (result == MessageResult.OK)
-                return MessageResponse.Completed;
-
-            return MessageResponse.Abandoned;
+                    var name = $"{prop.Name}";
+                    var value = Activator.CreateInstance(type.GetGenericTypeDefinition().MakeGenericType(type.GenericTypeArguments), name, this);
+                    prop.SetValue(this, value);
+                }
+            }
         }
 
     }

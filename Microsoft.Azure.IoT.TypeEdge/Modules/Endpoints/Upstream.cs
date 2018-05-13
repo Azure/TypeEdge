@@ -17,7 +17,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Hubs
         public void Subscribe<O>(Output<O> output)
             where O : IEdgeMessage
         {
-            Module.Subscribe(output.Name, output.RouteName, Name, RouteName);
+            Module.SubscribeRoute(output.Name, output.RouteName, Name, RouteName);
         }
     }
 }

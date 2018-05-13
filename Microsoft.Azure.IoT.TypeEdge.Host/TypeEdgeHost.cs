@@ -141,7 +141,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 {
                     var module = scope.Resolve(moduleType) as EdgeModule;
 
-                    module.ConfigureSubscriptions();
+                    module.BuildSubscriptions();
                     modules.Add(module);
                 }
             }
