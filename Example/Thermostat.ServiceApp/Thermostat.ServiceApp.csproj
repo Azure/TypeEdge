@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge\Microsoft.Azure.IoT.TypeEdge.csproj" />
+    <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Proxy\Microsoft.Azure.IoT.TypeEdge.Proxy.csproj" />
     <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
   </ItemGroup>
 

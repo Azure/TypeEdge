@@ -5,16 +5,19 @@ namespace ThermostatApplication.Twins
 {
     public class NormalizerTwin : IModuleTwin
     {
-        TwinCollection desiredProperties;
+        public TemperatureScale? Scale { get; set; }
 
-        public TwinCollection GetProperies()
+        public Twin GetTwin()
         {
-            return this.desiredProperties;
+            return new Twin(new TwinProperties()
+            {
+                Desired = new TwinCollection() { }
+            });
         }
 
-        public void SetProperies(TwinCollection desiredProperties)
+        public void SetTwin(Twin twin)
         {
-            this.desiredProperties = desiredProperties;
+
         }
     }
 }

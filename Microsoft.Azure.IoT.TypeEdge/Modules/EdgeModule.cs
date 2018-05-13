@@ -22,6 +22,20 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private string connectionString;
         private DeviceClient ioTHubModuleClient;
         private ITransportSettings[] transportSettings;
+
+        public virtual Task<T> PublishTwinAsync<T>(string name, T twin)
+            where T : IModuleTwin, new()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<T> GetTwinAsync<T>(string name)
+            where T : IModuleTwin, new()
+
+        {
+            throw new NotImplementedException();
+        }
+
         private SubscriptionCallback twinSubscription;
         private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
 
@@ -88,7 +102,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             return Configure(configuration);
         }
 
-        internal async Task<PublishResult> PublishAsync<T>(string outputName, T message)
+        internal async Task<PublishResult> PublishMessageAsync<T>(string outputName, T message)
             where T : IEdgeMessage
         {
             var edgeMessage = new Devices.Client.Message(message.GetBytes());
@@ -149,7 +163,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
 
             var input = Activator.CreateInstance(callback.MessageType) as IModuleTwin;
-            input.SetProperies(desiredProperties);
+            input.SetTwin(new Twin(new TwinProperties() { Desired = desiredProperties }));
 
             var invocationResult = callback.Handler.DynamicInvoke(input);
             var result = await ((Task<MessageResult>)invocationResult);
@@ -201,10 +215,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             }
         }
 
-        internal async Task ReportTwinAsync<T>(T twin) 
+        internal async Task ReportTwinAsync<T>(T twin)
             where T : IModuleTwin
         {
-            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetProperies());
+            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin().Properties.Reported);
         }
     }
 }

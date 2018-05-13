@@ -4,7 +4,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 {
     public interface IModuleTwin
     {
-        void SetProperies(TwinCollection desiredProperties);
-        TwinCollection GetProperies();
+        void SetTwin(Twin twin);
+        Twin GetTwin();
     }
 }

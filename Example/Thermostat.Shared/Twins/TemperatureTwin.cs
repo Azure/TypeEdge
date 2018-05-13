@@ -5,15 +5,19 @@ namespace ThermostatApplication.Twins
 {
     public class TemperatureTwin : IModuleTwin
     {
-        TwinCollection desiredProperties;
+        private Twin twin;
         public int MaxLimit { get; set; }
-        public TwinCollection GetProperies()
+
+        public Twin GetTwin()
         {
-            return this.desiredProperties;
+            //todo: set the properties
+            return twin;
         }
-        public void SetProperies(TwinCollection desiredProperties)
+
+        public void SetTwin(Twin twin)
         {
-            this.desiredProperties = desiredProperties;
+            //todo: set the properties
+            this.twin = twin;
         }
     }
 }

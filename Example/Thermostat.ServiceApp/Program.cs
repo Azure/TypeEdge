@@ -15,9 +15,11 @@ namespace Thermostat.ServiceApp
                 .AddEnvironmentVariables()
                 .Build();
 
-            var proxy = new TypeEdgeProxy(configuration["deviceConnectionString"]);
+            var module = TypeEdgeProxy.GetModuleProxy<ITemperatureModule>(configuration["IotHubConnectionString"], configuration["DeviceId"]);
 
-            var module = proxy.GetModuleProxy<ITemperatureModule>();
+            var twin = await module.Twin.GetAsync();
+            twin.MaxLimit++;
+            await module.Twin.PublishAsync(twin);
 
             Console.WriteLine("Press <ENTER> to exit..");
             Console.ReadLine();

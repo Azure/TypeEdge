@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 namespace Microsoft.Azure.IoT.TypeEdge.Modules
 {
     public class ModuleTwin<T>
-        where T : IModuleTwin
+        where T : IModuleTwin, new()
     {
-        private string Name{ get; set; }
+        private string Name { get; set; }
         private EdgeModule Module { get; set; }
 
         public ModuleTwin(string name, EdgeModule module)
@@ -25,9 +25,14 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             await Module.ReportTwinAsync(twin);
         }
 
-        public Task Publish(T twin)
+        public Task<T> PublishAsync(T twin)
         {
-            throw new NotImplementedException();
+            return Module.PublishTwinAsync(Name, twin);
+        }
+
+        public async Task<T> GetAsync()
+        {
+            return await Module.GetTwinAsync<T>(Name);
         }
     }
 }

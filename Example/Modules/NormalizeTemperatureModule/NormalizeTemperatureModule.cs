@@ -9,6 +9,7 @@ namespace Modules
     public class NormalizeTemperatureModule : EdgeModule, INormalizeTemperatureModule
     {
         ITemperatureModule temperatureModuleProxy;
+        TemperatureScale scale;
 
         public Input<TemperatureModuleOutput> Temperature { get; set; }
         public Output<TemperatureModuleOutput> NormalizedTemperature { get; set; }
@@ -24,12 +25,13 @@ namespace Modules
 
             Temperature.Subscribe(temperatureModuleProxy.Temperature, async (temp) =>
             {
-                if (temp.Scale == TemperatureScale.Celsius)
-                    temp.Temperature = temp.Temperature * 9 / 5 + 32;
+                if (temp.Scale != scale)
+                    if (scale == TemperatureScale.Celsius)
+                        temp.Temperature = temp.Temperature * 9 / 5 + 32;
                 await NormalizedTemperature.PublishAsync(temp);
 
                 if (temp.Temperature > 30)
-                    await temperatureModuleProxy.Twin.Publish(new TemperatureTwin() { MaxLimit = 30 });
+                    await temperatureModuleProxy.Twin.PublishAsync(new TemperatureTwin() { MaxLimit = 30 });
 
                 return MessageResult.OK;
             });
@@ -38,7 +40,8 @@ namespace Modules
 
             Twin.Subscribe(async (twin) =>
             {
-                await Twin.ReportAsync(twin);
+                if (twin.Scale.HasValue)
+                    await Twin.ReportAsync(new NormalizerTwin() { Scale = twin.Scale });
 
                 return TwinResult.OK;
             });

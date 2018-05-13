@@ -15,7 +15,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         public async Task<PublishResult> PublishAsync(T message)
         {
-            return await Module.PublishAsync(Name, message);
+            return await Module.PublishMessageAsync(Name, message);
         }
     }
 }
