@@ -1,23 +1,11 @@
 ﻿using Microsoft.Azure.Devices.Shared;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
+using System;
 
 namespace ThermostatApplication.Twins
 {
-    public class NormalizerTwin : IModuleTwin
+    public class NormalizerTwin : TypeModuleTwin
     {
         public TemperatureScale? Scale { get; set; }
-
-        public Twin GetTwin()
-        {
-            return new Twin(new TwinProperties()
-            {
-                Desired = new TwinCollection() { }
-            });
-        }
-
-        public void SetTwin(Twin twin)
-        {
-
-        }
     }
 }

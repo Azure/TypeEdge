@@ -3,21 +3,8 @@ using Microsoft.Azure.IoT.TypeEdge.Modules;
 
 namespace ThermostatApplication.Twins
 {
-    public class TemperatureTwin : IModuleTwin
+    public class TemperatureTwin : TypeModuleTwin
     {
-        private Twin twin;
-        public int MaxLimit { get; set; }
-
-        public Twin GetTwin()
-        {
-            //todo: set the properties
-            return twin;
-        }
-
-        public void SetTwin(Twin twin)
-        {
-            //todo: set the properties
-            this.twin = twin;
-        }
+        public int? MaxLimit { get; set; }
     }
 }

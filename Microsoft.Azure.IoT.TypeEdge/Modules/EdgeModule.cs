@@ -1,12 +1,14 @@
 ﻿using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Microsoft.Azure.Devices.Shared;
+using Microsoft.Azure.IoT.TypeEdge.Attributes;
 using Microsoft.Azure.IoT.TypeEdge.Hubs;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Reflection;
@@ -26,20 +28,33 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         public virtual Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : IModuleTwin, new()
         {
+            ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin().Properties.Reported);
             throw new NotImplementedException();
         }
 
-        public virtual Task<T> GetTwinAsync<T>(string name)
+        public virtual async Task<T> GetTwinAsync<T>(string name)
             where T : IModuleTwin, new()
 
         {
-            throw new NotImplementedException();
+            var typeTwin = Activator.CreateInstance<T>();
+            typeTwin.SetTwin(await ioTHubModuleClient.GetTwinAsync());
+            return typeTwin;
         }
 
         private SubscriptionCallback twinSubscription;
         private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
 
-        public virtual string Name { get { return this.GetType().Name; } }
+        public virtual string Name
+        {
+            get
+            {
+                var proxyInterface = GetType().GetInterfaces().SingleOrDefault(i => i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null);
+                var typeModule = proxyInterface.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
+                if (typeModule != null)
+                    return typeModule.Name;
+                return GetType().Name;
+            }
+        }
         public Upstream<JsonMessage> Upstream { get; set; }
         public List<string> Routes { get; set; }
 
@@ -70,7 +85,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             ioTHubModuleClient = DeviceClient.CreateFromConnectionString(connectionString, transportSettings);
 
             await ioTHubModuleClient.OpenAsync();
-            Console.WriteLine("IoT Hub module client initialized.");
+            Console.WriteLine($"IoT Hub module {Name} client initialized.");
 
             // Register callback to be called when a message is received by the module
             foreach (var subscription in routeSubscriptions)
@@ -114,6 +129,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             await ioTHubModuleClient.SendEventAsync(outputName, edgeMessage);
 
+            string messageString = Encoding.UTF8.GetString(message.GetBytes());
+            Console.WriteLine($"{Name}:Sent message: Body: [{messageString}]");
+
             return PublishResult.OK;
         }
         internal void SubscribeRoute<T>(string outName, string outRoute, string inName, string inRoute, Func<T, Task<MessageResult>> handler)
@@ -141,7 +159,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             byte[] messageBytes = message.GetBytes();
             string messageString = Encoding.UTF8.GetString(messageBytes);
-            Console.WriteLine($"Received message: Body: [{messageString}]");
+            Console.WriteLine($"{Name}:Received message: Body: [{messageString}]");
 
             var input = Activator.CreateInstance(callback.MessageType) as IEdgeMessage;
             input.SetBytes(messageBytes);
@@ -159,7 +177,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             if (!(userContext is SubscriptionCallback callback))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
-            Console.WriteLine("Desired property change:");
+            Console.WriteLine($"{Name}:Desired property change:");
             Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
 
             var input = Activator.CreateInstance(callback.MessageType) as IModuleTwin;
@@ -186,7 +204,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             X509Store store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadWrite);
             store.Add(new X509Certificate2(X509Certificate2.CreateFromCertFile(certPath)));
-            Console.WriteLine("Added Cert: " + certPath);
+            Console.WriteLine($"{Name}:Added Cert: " + certPath);
             store.Close();
         }
         private void CreateProperties()

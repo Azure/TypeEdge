@@ -21,6 +21,8 @@ using System.Linq;
 using Microsoft.Azure.IoT.TypeEdge.Host.Hub;
 using Microsoft.Azure.Devices.Edge.Agent.Core;
 using Core = Microsoft.Azure.Devices.Edge.Agent.Core;
+using Castle.DynamicProxy;
+
 namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
     public class TypeEdgeHost
@@ -54,9 +56,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             where _IModule : class
             where _TModule : class
         {
-            //containerBuilder.RegisterType<_TModule>();
-            //containerBuilder.RegisterInstance(new ProxyGenerator().CreateInterfaceProxyWithoutTarget<_IModule>(new ModuleProxy()) as _IModule);
-            containerBuilder.RegisterType<_TModule>().AsSelf().As<_IModule>();
+            containerBuilder.RegisterType<_TModule>();
+            containerBuilder.RegisterInstance(new ProxyGenerator()
+                .CreateInterfaceProxyWithoutTarget<_IModule>(new ModuleProxy<_IModule>()) as _IModule);
+            //containerBuilder.RegisterType<_TModule>().AsSelf().As<_IModule>();
         }
 
         public void RegisterModule<_TModule>()

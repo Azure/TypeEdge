@@ -1,18 +1,12 @@
 ﻿using Castle.DynamicProxy;
-using Microsoft.Azure.Devices;
-using Microsoft.Azure.Devices.Shared;
 using Microsoft.Azure.IoT.TypeEdge.Attributes;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
-using Newtonsoft.Json;
 using System;
-using System.Dynamic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
-namespace Microsoft.Azure.IoT.TypeEdge.Proxy
+namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
-    internal class ModuleProxy<T> : EdgeModule, IInterceptor
+    internal class ModuleProxy<T> : EdgeModule, IInterceptor 
         where T : class
     {
         public override string Name
@@ -28,30 +22,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
                 return typeof(T).Name;
             }
         }
-        private string connectionString;
-        private string deviceId;
-        private RegistryManager registryManager;
-        public ModuleProxy(string connectionString, string deviceId)
-        {
-            this.deviceId = deviceId;
-            this.connectionString = connectionString;
-            registryManager = RegistryManager.CreateFromConnectionString(connectionString);
-        }
-        public override async Task<Twin> GetTwinAsync<Twin>(string name)
-        {
-            var twin = await registryManager.GetTwinAsync(deviceId, Name);
-            var typeTwin = Activator.CreateInstance<Twin>();
-            typeTwin.SetTwin(twin);
-            return typeTwin;
-        }
-        public override async Task<_T> PublishTwinAsync<_T>(string name, _T typeTwin)
-        {
-            var twin = typeTwin.GetTwin();
-            var res = await registryManager.UpdateTwinAsync(deviceId, Name, twin, twin.ETag);
-            typeTwin.SetTwin(res);
-            return typeTwin;
-        }
-
         public void Intercept(IInvocation invocation)
         {
             if (invocation.Method.ReturnType.IsGenericType)
@@ -67,5 +37,4 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
             }
         }
     }
-
 }

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.Azure.Devices.Shared;
+using System;
 using System.Threading.Tasks;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Modules
 {
     public class ModuleTwin<T>
-        where T : IModuleTwin, new()
+        where T : TypeModuleTwin, new()
     {
         private string Name { get; set; }
         private EdgeModule Module { get; set; }

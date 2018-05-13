@@ -16,7 +16,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
         {
             var containerBuilder = new ContainerBuilder();
 
-            containerBuilder.RegisterInstance(new ProxyGenerator().CreateInterfaceProxyWithoutTarget<T>(new ModuleProxy(connectionString, deviceId)) as T);
+            containerBuilder.RegisterInstance(new ProxyGenerator().
+                CreateInterfaceProxyWithoutTarget<T>(new ModuleProxy<T>(connectionString, deviceId)) as T);
 
             var container = containerBuilder.Build();
 
