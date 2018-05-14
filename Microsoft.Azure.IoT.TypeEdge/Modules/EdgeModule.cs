@@ -16,6 +16,10 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Microsoft.Azure.IoT.TypeEdge.Host")]
+[assembly: InternalsVisibleTo("Microsoft.Azure.IoT.TypeEdge.Proxy")]
 
 namespace Microsoft.Azure.IoT.TypeEdge.Modules
 {
@@ -25,14 +29,13 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private DeviceClient ioTHubModuleClient;
         private ITransportSettings[] transportSettings;
 
-        public virtual Task<T> PublishTwinAsync<T>(string name, T twin)
+        internal virtual Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : IModuleTwin, new()
         {
-            ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin(name, false).Properties.Reported);
+            ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
             throw new NotImplementedException();
         }
-
-        public virtual async Task<T> GetTwinAsync<T>(string name)
+        internal virtual async Task<T> GetTwinAsync<T>(string name)
             where T : IModuleTwin, new()
 
         {
@@ -44,7 +47,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private readonly Dictionary<string, SubscriptionCallback> twinSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
 
-        public virtual string Name
+        internal virtual string Name
         {
             get
             {
@@ -55,8 +58,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                 return GetType().Name;
             }
         }
-        public Upstream<JsonMessage> Upstream { get; set; }
-        public List<string> Routes { get; set; }
+        protected Upstream<JsonMessage> Upstream { get; set; }
+        internal List<string> Routes { get; set; }
 
         public EdgeModule()
         {
@@ -69,18 +72,18 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             CreateProperties();
 
         }
-        public virtual void BuildSubscriptions()
+        public virtual Task<ExecutionResult> RunAsync()
         {
+            return Task.FromResult(ExecutionResult.OK);
         }
         public virtual CreationResult Configure(IConfigurationRoot configuration)
         {
             return CreationResult.OK;
         }
-        public virtual Task<ExecutionResult> RunAsync()
+        public virtual void BuildSubscriptions()
         {
-            return Task.FromResult(ExecutionResult.OK);
         }
-        public async Task<ExecutionResult> InternalRunAsync()
+        internal async Task<ExecutionResult> InternalRunAsync()
         {
             // Open a connection to the Edge runtime
             ioTHubModuleClient = DeviceClient.CreateFromConnectionString(connectionString, transportSettings);
@@ -100,7 +103,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             return await RunAsync();
         }
-        public CreationResult InternalConfigure(IConfigurationRoot configuration)
+        internal CreationResult InternalConfigure(IConfigurationRoot configuration)
         {
             connectionString = configuration.GetValue<string>(Constants.EdgeHubConnectionStringKey);
 
@@ -244,7 +247,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         internal async Task ReportTwinAsync<T>(string name, T twin)
             where T : IModuleTwin
         {
-            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin(name, false).Properties.Reported);
+            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
         }
     }
 }

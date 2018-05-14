@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageId>Microsoft.Azure.IoT.TypeEdge.Proxy</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>paloukari</Authors>
+    <Company>Microsoft</Company>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>../build</PackageOutputPath>
+    
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 

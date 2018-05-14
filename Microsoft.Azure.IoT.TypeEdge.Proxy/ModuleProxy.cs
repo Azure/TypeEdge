@@ -15,7 +15,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
     internal class ModuleProxy<T> : EdgeModule, IInterceptor
         where T : class
     {
-        public override string Name
+        private string connectionString;
+        private string deviceId;
+        private RegistryManager registryManager;
+
+        internal override string Name
         {
             get
             {
@@ -28,25 +32,23 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
                 return typeof(T).Name;
             }
         }
-        private string connectionString;
-        private string deviceId;
-        private RegistryManager registryManager;
+
         public ModuleProxy(string connectionString, string deviceId)
         {
             this.deviceId = deviceId;
             this.connectionString = connectionString;
             registryManager = RegistryManager.CreateFromConnectionString(connectionString);
         }
-        public override async Task<Twin> GetTwinAsync<Twin>(string name)
+        internal override async Task<_T> GetTwinAsync<_T>(string name)
         {
             var twin = await registryManager.GetTwinAsync(deviceId, Name);
-            var typeTwin = Activator.CreateInstance<Twin>();
+            var typeTwin = Activator.CreateInstance<_T>();
             typeTwin.SetTwin(name, twin);
             return typeTwin;
         }
-        public override async Task<_T> PublishTwinAsync<_T>(string name, _T typeTwin)
+        internal override async Task<_T> PublishTwinAsync<_T>(string name, _T typeTwin)
         {
-            var twin = typeTwin.GetTwin(name, true);
+            var twin = typeTwin.GetDesiredTwin(name);
             var res = await registryManager.UpdateTwinAsync(deviceId, Name, twin, twin.ETag);
             typeTwin.SetTwin(name, res);
             return typeTwin;
@@ -61,7 +63,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
                     || genericDef.IsAssignableFrom(typeof(Output<>))
                     || genericDef.IsAssignableFrom(typeof(ModuleTwin<>)))
                 {
-                    var value = Activator.CreateInstance(genericDef.MakeGenericType(invocation.Method.ReturnType.GenericTypeArguments), invocation.Method.Name.Replace("get_", ""), this);
+                    var value = Activator.CreateInstance(
+                        genericDef.MakeGenericType(invocation.Method.ReturnType.GenericTypeArguments),
+                        invocation.Method.Name.Replace("get_", ""), this);
                     invocation.ReturnValue = value;
                 }
             }

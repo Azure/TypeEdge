@@ -6,10 +6,10 @@ using System.Reflection;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
-    internal class ModuleProxy<T> : EdgeModule, IInterceptor 
+    internal class ModuleProxy<T> : EdgeModule, IInterceptor
         where T : class
     {
-        public override string Name
+        internal override string Name
         {
             get
             {

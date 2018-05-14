@@ -10,7 +10,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host.Hub
 {
     public class EdgeHub : EdgeModule
     {
-        public override string Name => Agent.Constants.EdgeHubModuleIdentityName;
+        internal override string Name => Agent.Constants.EdgeHubModuleIdentityName;
         private IConfigurationRoot HubServiceConfiguration { get; set; }
 
         public override CreationResult Configure(IConfigurationRoot configuration)

@@ -21,7 +21,17 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             //todo: verify the name
         }
-        public Twin GetTwin(string name, bool desired)
+        public Twin GetDesiredTwin(string name)
+        {
+            return GetTwin(name, true);
+        }
+
+        public Twin GetReportedTwin(string name)
+        {
+            return GetTwin(name, false);
+        }
+
+        private Twin GetTwin(string name, bool desired)
         {
             //todo: use the json serializer here
             Twin result = LastKnownTwin;

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Proxy
 {
-    public static class TypeEdgeProxy
+    public static class ProxyFactory
     {
         public static T GetModuleProxy<T>(string connectionString, string deviceId)
             where T : class

@@ -15,7 +15,9 @@ namespace Thermostat.ServiceApp
                 .AddEnvironmentVariables()
                 .Build();
 
-            var module = TypeEdgeProxy.GetModuleProxy<INormalizeTemperatureModule>(configuration["IotHubConnectionString"], configuration["DeviceId"]);
+            var module = ProxyFactory.GetModuleProxy<INormalizeTemperatureModule>(
+                configuration["IotHubConnectionString"], 
+                configuration["DeviceId"]);
 
             var twin = await module.Twin.GetAsync();
             twin.Scale = ThermostatApplication.TemperatureScale.Celsius;
