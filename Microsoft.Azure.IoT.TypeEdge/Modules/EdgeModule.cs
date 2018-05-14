@@ -29,6 +29,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private DeviceClient ioTHubModuleClient;
         private ITransportSettings[] transportSettings;
 
+        private readonly Dictionary<string, SubscriptionCallback> twinSubscriptions;
+        private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
+        private readonly Dictionary<string, MethodCallback> methodSubscriptions;
+
+        protected Upstream<JsonMessage> Upstream { get; set; }
         internal virtual Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : IModuleTwin, new()
         {
@@ -43,35 +48,41 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             typeTwin.SetTwin(name, await ioTHubModuleClient.GetTwinAsync());
             return typeTwin;
         }
-
-        private readonly Dictionary<string, SubscriptionCallback> twinSubscriptions;
-        private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
-
         internal virtual string Name
         {
             get
             {
-                var proxyInterface = GetType().GetInterfaces().SingleOrDefault(i => i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null);
+                var proxyInterface = GetProxyInterface();
                 var typeModule = proxyInterface.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
                 if (typeModule != null)
                     return typeModule.Name;
                 return GetType().Name;
             }
         }
-        protected Upstream<JsonMessage> Upstream { get; set; }
+
+        private Type GetProxyInterface()
+        {
+            return GetType().GetInterfaces().SingleOrDefault(i => i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null);
+        }
+
         internal List<string> Routes { get; set; }
 
         public EdgeModule()
         {
             routeSubscriptions = new Dictionary<string, SubscriptionCallback>();
             twinSubscriptions = new Dictionary<string, SubscriptionCallback>();
+            methodSubscriptions = new Dictionary<string, MethodCallback>();
 
             Routes = new List<string>();
             Upstream = new Upstream<JsonMessage>(this);
 
-            CreateProperties();
+            InstantiateProperties();
 
+            RegisterMethods();
         }
+
+
+
         public virtual Task<ExecutionResult> RunAsync()
         {
             return Task.FromResult(ExecutionResult.OK);
@@ -98,10 +109,38 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             }
 
             // Register callback to be called when a twin update is received by the module
-
             await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, twinSubscriptions);
 
+            foreach (var subscription in methodSubscriptions)
+            {
+                await ioTHubModuleClient.SetMethodHandlerAsync(subscription.Key, MethodCallback, subscription.Value);
+            }
             return await RunAsync();
+        }
+
+        private Task<MethodResponse> MethodCallback(MethodRequest methodRequest, object userContext)
+        {
+            if (!(userContext is MethodCallback callback))
+                throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
+
+            var paramValues = JsonConvert.DeserializeObject<object[]>(methodRequest.DataAsJson);
+
+            try
+            {
+                var paramTypes = callback.MethodInfo.GetParameters();
+
+                for (int i = 0; i < paramTypes.Length; i++)
+                    paramValues[i] = Convert.ChangeType(paramValues[i], paramTypes[i].ParameterType);
+
+                var res = callback.MethodInfo.Invoke(this, paramValues);
+                return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(res)), 200));
+            }
+            catch (Exception ex)
+            {
+                // Acknowlege the direct method call with a 400 error message
+                string result = "{\"result\":\"" + ex.Message + "\"}";
+                return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 400));
+            }
         }
         internal CreationResult InternalConfigure(IConfigurationRoot configuration)
         {
@@ -166,7 +205,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             string messageString = Encoding.UTF8.GetString(messageBytes);
             Console.WriteLine($"{Name}:Received message: Body: [{messageString}]");
 
-            var input = Activator.CreateInstance(callback.MessageType) as IEdgeMessage;
+            var input = Activator.CreateInstance(callback.Type) as IEdgeMessage;
             input.SetBytes(messageBytes);
 
             var invocationResult = callback.Handler.DynamicInvoke(input);
@@ -189,7 +228,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             {
                 if (desiredProperties.Contains($"___{callback.Key}"))
                 {
-                    var input = Activator.CreateInstance(callback.Value.MessageType) as IModuleTwin;
+                    var input = Activator.CreateInstance(callback.Value.Type) as IModuleTwin;
                     input.SetTwin(callback.Key, new Twin(new TwinProperties() { Desired = desiredProperties }));
 
                     var invocationResult = callback.Value.Handler.DynamicInvoke(input);
@@ -218,7 +257,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             Console.WriteLine($"{Name}:Added Cert: " + certPath);
             store.Close();
         }
-        private void CreateProperties()
+        private void InstantiateProperties()
         {
             var props = GetType().GetProperties();
 
@@ -240,6 +279,19 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                     var name = $"{prop.Name}";
                     var value = Activator.CreateInstance(type.GetGenericTypeDefinition().MakeGenericType(type.GenericTypeArguments), name, this);
                     prop.SetValue(this, value);
+                }
+            }
+        }
+
+        private void RegisterMethods()
+        {
+            var interfaceType = GetProxyInterface();
+            if (interfaceType != null)
+            {
+                var moduleMethods = GetType().GetInterfaceMap(interfaceType).TargetMethods.Where(e => !e.IsSpecialName);
+                foreach (var method in moduleMethods)
+                {
+                    methodSubscriptions[method.Name] = new MethodCallback(method.Name, method);
                 }
             }
         }

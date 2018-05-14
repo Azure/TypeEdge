@@ -15,7 +15,6 @@ namespace ThermostatApplication.Modules
         Output<TemperatureModuleOutput> Temperature { get; set; }                
         ModuleTwin<TemperatureTwin> Twin { get; set; }
 
-
-
+        bool ResetSensor(int sensitivity);
     }
 }

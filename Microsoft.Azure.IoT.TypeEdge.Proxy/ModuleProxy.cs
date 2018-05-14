@@ -15,9 +15,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
     internal class ModuleProxy<T> : EdgeModule, IInterceptor
         where T : class
     {
-        private string connectionString;
+        private string iotHubConnectionString;
         private string deviceId;
         private RegistryManager registryManager;
+        private static ServiceClient serviceClient;
 
         internal override string Name
         {
@@ -33,11 +34,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
             }
         }
 
-        public ModuleProxy(string connectionString, string deviceId)
+        public ModuleProxy(string iotHubConnectionString, string deviceId)
         {
             this.deviceId = deviceId;
-            this.connectionString = connectionString;
-            registryManager = RegistryManager.CreateFromConnectionString(connectionString);
+            this.iotHubConnectionString = iotHubConnectionString;
+            registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
+            serviceClient = ServiceClient.CreateFromConnectionString(iotHubConnectionString);
         }
         internal override async Task<_T> GetTwinAsync<_T>(string name)
         {
@@ -56,8 +58,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
 
         public void Intercept(IInvocation invocation)
         {
-            if (invocation.Method.ReturnType.IsGenericType)
+            if (invocation.Method.IsSpecialName && invocation.Method.ReturnType.IsGenericType)
             {
+                //known properties
                 var genericDef = invocation.Method.ReturnType.GetGenericTypeDefinition();
                 if (genericDef.IsAssignableFrom(typeof(Input<>))
                     || genericDef.IsAssignableFrom(typeof(Output<>))
@@ -68,6 +71,21 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
                         invocation.Method.Name.Replace("get_", ""), this);
                     invocation.ReturnValue = value;
                 }
+            }
+            else if (!invocation.Method.IsSpecialName)
+            {
+                //direct methods
+                var methodInvocation = new CloudToDeviceMethod(invocation.Method.Name) { ResponseTimeout = TimeSpan.FromSeconds(30) };
+                var paramData = JsonConvert.SerializeObject(invocation.Arguments);
+                methodInvocation.SetPayloadJson(paramData);
+
+                // Invoke the direct method asynchronously and get the response from the simulated device.
+                var response = serviceClient.InvokeDeviceMethodAsync(deviceId, Name, methodInvocation).Result;
+
+                if (response.Status == 200)
+                    invocation.ReturnValue = Convert.ChangeType(JsonConvert.DeserializeObject(response.GetPayloadAsJson()), invocation.Method.ReturnType);
+                else
+                    throw new Exception($"Direct method result Status:{response.Status}, {response.GetPayloadAsJson()}");
             }
         }
     }

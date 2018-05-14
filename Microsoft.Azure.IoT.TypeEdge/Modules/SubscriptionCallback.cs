@@ -6,16 +6,17 @@ namespace Microsoft.Azure.IoT.TypeEdge
 {
     public class SubscriptionCallback
     {
-        public string Name { get; set; }
-        public Delegate Handler { get; set; }
+        public string Name { get; private set; }
+        public Delegate Handler { get; private set; }
 
-        public Type MessageType { get; set; }
+        public Type Type { get; private set; }
 
-        public SubscriptionCallback(string name, Delegate handler, Type messageType)
+        public SubscriptionCallback(string name, Delegate handler, Type type)
         {
             this.Name = name;
             this.Handler = handler;
-            MessageType = messageType;
+            Type = type;
         }
+
     }
 }

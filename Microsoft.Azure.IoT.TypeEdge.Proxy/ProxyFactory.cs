@@ -11,13 +11,13 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
 {
     public static class ProxyFactory
     {
-        public static T GetModuleProxy<T>(string connectionString, string deviceId)
+        public static T GetModuleProxy<T>(string iotHubConnectionString, string deviceId)
             where T : class
         {
             var containerBuilder = new ContainerBuilder();
 
             containerBuilder.RegisterInstance(new ProxyGenerator().
-                CreateInterfaceProxyWithoutTarget<T>(new ModuleProxy<T>(connectionString, deviceId)) as T);
+                CreateInterfaceProxyWithoutTarget<T>(new ModuleProxy<T>(iotHubConnectionString, deviceId)) as T);
 
             var container = containerBuilder.Build();
 
