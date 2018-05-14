@@ -6,6 +6,6 @@ namespace ThermostatApplication.Twins
 {
     public class NormalizerTwin : TypeModuleTwin
     {
-        public TemperatureScale? Scale { get; set; }
+        public TemperatureScale Scale { get; set; }
     }
 }

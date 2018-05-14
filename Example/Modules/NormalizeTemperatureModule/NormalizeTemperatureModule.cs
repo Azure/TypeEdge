@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using ThermostatApplication;
@@ -27,10 +28,7 @@ namespace Modules
         public override async Task<ExecutionResult> RunAsync()
         {
             var twin = await Twin.GetAsync();
-            if (twin.Scale.HasValue)
-                scale = twin.Scale.Value;
-            else
-                scale = TemperatureScale.Fahrenheit;
+            scale = twin.Scale;
 
             return ExecutionResult.OK;
         }
@@ -54,11 +52,8 @@ namespace Modules
 
             Twin.Subscribe(async (twin) =>
             {
-                if (twin.Scale.HasValue)
-                {
-                    scale = twin.Scale.Value;
-                    await Twin.ReportAsync(twin);
-                }
+                scale = twin.Scale;
+                await Twin.ReportAsync(twin);
                 return TwinResult.OK;
             });
 

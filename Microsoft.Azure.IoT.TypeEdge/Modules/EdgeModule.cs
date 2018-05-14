@@ -28,7 +28,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         public virtual Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : IModuleTwin, new()
         {
-            ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin().Properties.Reported);
+            ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin(false).Properties.Reported);
             throw new NotImplementedException();
         }
 
@@ -184,7 +184,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             input.SetTwin(new Twin(new TwinProperties() { Desired = desiredProperties }));
 
             var invocationResult = callback.Handler.DynamicInvoke(input);
-            var result = await ((Task<MessageResult>)invocationResult);
+            var result = await ((Task<TwinResult>)invocationResult);
         }
         private void InstallCert()
         {
@@ -236,7 +236,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         internal async Task ReportTwinAsync<T>(T twin)
             where T : IModuleTwin
         {
-            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin().Properties.Reported);
+            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin(false).Properties.Reported);
         }
     }
 }

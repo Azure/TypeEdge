@@ -46,7 +46,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
         }
         public override async Task<_T> PublishTwinAsync<_T>(string name, _T typeTwin)
         {
-            var twin = typeTwin.GetTwin();
+            var twin = typeTwin.GetTwin(true);
             var res = await registryManager.UpdateTwinAsync(deviceId, Name, twin, twin.ETag);
             typeTwin.SetTwin(res);
             return typeTwin;
