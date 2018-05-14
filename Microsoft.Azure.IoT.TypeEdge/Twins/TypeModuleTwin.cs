@@ -10,7 +10,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
     public abstract class TypeModuleTwin : IModuleTwin
     {
         public Twin LastKnownTwin { get; set; }
-        public void SetTwin(Twin twin)
+        public void SetTwin(string name, Twin twin)
         {
             LastKnownTwin = twin;
 
@@ -19,38 +19,32 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             JsonConvert.PopulateObject(twin.Properties.Desired.ToJson(), this, settings);
 
-            //foreach (var prop in GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
-            //{
-            //    if (twin.Properties.Desired.Contains(prop.Name))
-            //    {
-            //        var targetType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-
-            //        var value = (targetType == null) ? null : Convert.ChangeType(twin.Properties.Desired[prop.Name], targetType);
-
-            //        prop.SetValue(this, value, null);
-
-            //    }
-            //}
+            //todo: verify the name
         }
-        public Twin GetTwin(bool desired)
+        public Twin GetTwin(string name, bool desired)
         {
             //todo: use the json serializer here
             Twin result = LastKnownTwin;
-
+            TwinCollection properties = null;
             if (result == null)
                 if (desired)
                     result = new Twin() { Properties = new TwinProperties() { Desired = new TwinCollection() } };
                 else
                     result = new Twin() { Properties = new TwinProperties() { Reported = new TwinCollection() } };
 
+            if (desired)
+                properties = result.Properties.Desired;
+            else
+                properties = result.Properties.Reported;
+
             foreach (var prop in GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
             {
                 if (prop.GetValue(this) != null)
-                    if (desired)
-                        result.Properties.Desired[prop.Name] = Convert.ChangeType(prop.GetValue(this), typeof(string));
-                    else
-                        result.Properties.Reported[prop.Name] = Convert.ChangeType(prop.GetValue(this), typeof(string));
+                    properties[prop.Name] = Convert.ChangeType(prop.GetValue(this), typeof(string));
             }
+
+            properties[$"___{name}"] = true;
+
             return result;
         }
     }

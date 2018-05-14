@@ -28,7 +28,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         public virtual Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : IModuleTwin, new()
         {
-            ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin(false).Properties.Reported);
+            ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin(name, false).Properties.Reported);
             throw new NotImplementedException();
         }
 
@@ -37,11 +37,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         {
             var typeTwin = Activator.CreateInstance<T>();
-            typeTwin.SetTwin(await ioTHubModuleClient.GetTwinAsync());
+            typeTwin.SetTwin(name, await ioTHubModuleClient.GetTwinAsync());
             return typeTwin;
         }
 
-        private SubscriptionCallback twinSubscription;
+        private readonly Dictionary<string, SubscriptionCallback> twinSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
 
         public virtual string Name
@@ -61,6 +61,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         public EdgeModule()
         {
             routeSubscriptions = new Dictionary<string, SubscriptionCallback>();
+            twinSubscriptions = new Dictionary<string, SubscriptionCallback>();
 
             Routes = new List<string>();
             Upstream = new Upstream<JsonMessage>(this);
@@ -93,8 +94,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                 await ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, MessageHandler, subscription.Value);
             }
 
-            if (twinSubscription != null)
-                await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, twinSubscription);
+            // Register callback to be called when a twin update is received by the module
+
+            await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, twinSubscriptions);
 
             return await RunAsync();
         }
@@ -149,7 +151,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         }
         internal void SubscribeTwin<T>(string name, Func<T, Task<TwinResult>> handler) where T : IModuleTwin
         {
-            twinSubscription = new SubscriptionCallback(name, handler, typeof(T));
+            twinSubscriptions[name] = new SubscriptionCallback(name, handler, typeof(T));
         }
 
         private async Task<MessageResponse> MessageHandler(Devices.Client.Message message, object userContext)
@@ -174,17 +176,23 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         }
         private async Task PropertyHandler(TwinCollection desiredProperties, object userContext)
         {
-            if (!(userContext is SubscriptionCallback callback))
+            if (!(userContext is Dictionary<string, SubscriptionCallback> callbacks))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
             Console.WriteLine($"{Name}:Desired property change:");
             Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
 
-            var input = Activator.CreateInstance(callback.MessageType) as IModuleTwin;
-            input.SetTwin(new Twin(new TwinProperties() { Desired = desiredProperties }));
+            foreach (var callback in callbacks)
+            {
+                if (desiredProperties.Contains($"___{callback.Key}"))
+                {
+                    var input = Activator.CreateInstance(callback.Value.MessageType) as IModuleTwin;
+                    input.SetTwin(callback.Key, new Twin(new TwinProperties() { Desired = desiredProperties }));
 
-            var invocationResult = callback.Handler.DynamicInvoke(input);
-            var result = await ((Task<TwinResult>)invocationResult);
+                    var invocationResult = callback.Value.Handler.DynamicInvoke(input);
+                    var result = await ((Task<TwinResult>)invocationResult);
+                }
+            }
         }
         private void InstallCert()
         {
@@ -233,10 +241,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             }
         }
 
-        internal async Task ReportTwinAsync<T>(T twin)
+        internal async Task ReportTwinAsync<T>(string name, T twin)
             where T : IModuleTwin
         {
-            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin(false).Properties.Reported);
+            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetTwin(name, false).Properties.Reported);
         }
     }
 }

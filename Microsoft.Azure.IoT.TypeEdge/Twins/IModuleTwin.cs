@@ -5,7 +5,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
     public interface IModuleTwin
     {
         Twin LastKnownTwin { get; set; }
-        Twin GetTwin(bool desired);
-        void SetTwin(Twin twin);
+        Twin GetTwin(string name, bool desired);
+        void SetTwin(string name, Twin twin);
     }
 }

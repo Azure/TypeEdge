@@ -13,7 +13,6 @@ namespace Modules
     {
         //memory state
         TemperatureScale scale;
-
         ITemperatureModule temperatureModuleProxy;
 
         public Input<TemperatureModuleOutput> Temperature { get; set; }
@@ -41,9 +40,6 @@ namespace Modules
                     if (scale == TemperatureScale.Celsius)
                         temp.Temperature = temp.Temperature * 9 / 5 + 32;
                 await NormalizedTemperature.PublishAsync(temp);
-
-                //if (temp.Temperature > 30)
-                //    await temperatureModuleProxy.Twin.PublishAsync(new TemperatureTwin() { MaxLimit = 30 });
 
                 return MessageResult.OK;
             });

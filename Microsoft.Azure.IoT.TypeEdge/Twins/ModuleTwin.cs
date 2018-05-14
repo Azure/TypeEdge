@@ -23,7 +23,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         public async Task ReportAsync(T twin)
         {
-            await Module.ReportTwinAsync(twin);
+            await Module.ReportTwinAsync(Name, twin);
         }
 
         public Task<T> PublishAsync(T twin)

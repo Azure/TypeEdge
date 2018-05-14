@@ -41,14 +41,14 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
         {
             var twin = await registryManager.GetTwinAsync(deviceId, Name);
             var typeTwin = Activator.CreateInstance<Twin>();
-            typeTwin.SetTwin(twin);
+            typeTwin.SetTwin(name, twin);
             return typeTwin;
         }
         public override async Task<_T> PublishTwinAsync<_T>(string name, _T typeTwin)
         {
-            var twin = typeTwin.GetTwin(true);
+            var twin = typeTwin.GetTwin(name, true);
             var res = await registryManager.UpdateTwinAsync(deviceId, Name, twin, twin.ETag);
-            typeTwin.SetTwin(res);
+            typeTwin.SetTwin(name, res);
             return typeTwin;
         }
 
