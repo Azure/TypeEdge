@@ -33,7 +33,7 @@ namespace Modules
         }
 
         public override void BuildSubscriptions()
-        {
+        {            
             Temperature.Subscribe(temperatureModuleProxy.Temperature, async (temp) =>
             {
                 if (temp.Scale != scale)

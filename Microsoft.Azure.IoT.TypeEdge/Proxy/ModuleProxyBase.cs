@@ -6,20 +6,24 @@ using System.Reflection;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
-    internal class ModuleProxy<T> : EdgeModule, IInterceptor
-        where T : class
+    internal class ModuleProxyBase : EdgeModule, IInterceptor
     {
+        readonly Type type;
+        public ModuleProxyBase(Type type)
+        {
+            this.type = type;
+        }
         internal override string Name
         {
             get
             {
-                var typeModule = typeof(T).GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
+                var typeModule = type.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
                 if (typeModule != null && typeModule.Name != null)
                     return typeModule.Name;
 
-                if (typeof(T).IsInterface)
-                    return typeof(T).Name.TrimStart('I');
-                return typeof(T).Name;
+                if (type.IsInterface)
+                    return type.Name.TrimStart('I');
+                return type.Name;
             }
         }
         public void Intercept(IInvocation invocation)

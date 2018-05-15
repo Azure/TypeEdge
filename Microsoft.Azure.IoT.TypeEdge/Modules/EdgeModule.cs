@@ -17,6 +17,11 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.DependencyInjection;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Castle.DynamicProxy;
+using Microsoft.Azure.IoT.TypeEdge.Host;
 
 [assembly: InternalsVisibleTo("Microsoft.Azure.IoT.TypeEdge.Host")]
 [assembly: InternalsVisibleTo("Microsoft.Azure.IoT.TypeEdge.Proxy")]
@@ -52,19 +57,13 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         {
             get
             {
-                var proxyInterface = GetProxyInterface();
+                var proxyInterface = GetType().GetProxyInterface();
                 var typeModule = proxyInterface.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
                 if (typeModule != null)
                     return typeModule.Name;
                 return GetType().Name;
             }
         }
-
-        private Type GetProxyInterface()
-        {
-            return GetType().GetInterfaces().SingleOrDefault(i => i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null);
-        }
-
         internal List<string> Routes { get; set; }
 
         public EdgeModule()
@@ -82,7 +81,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         }
 
 
-
+       
         public virtual Task<ExecutionResult> RunAsync()
         {
             return Task.FromResult(ExecutionResult.OK);
@@ -285,7 +284,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         private void RegisterMethods()
         {
-            var interfaceType = GetProxyInterface();
+            var interfaceType = GetType().GetProxyInterface();
             if (interfaceType != null)
             {
                 var moduleMethods = GetType().GetInterfaceMap(interfaceType).TargetMethods.Where(e => !e.IsSpecialName);

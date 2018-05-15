@@ -59,7 +59,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             containerBuilder.RegisterType<_TModule>();
             containerBuilder.RegisterInstance(new ProxyGenerator()
                 .CreateInterfaceProxyWithoutTarget<_IModule>(new ModuleProxy<_IModule>()) as _IModule);
-            //containerBuilder.RegisterType<_TModule>().AsSelf().As<_IModule>();
         }
 
         public void RegisterModule<_TModule>()
