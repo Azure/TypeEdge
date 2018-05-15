@@ -38,7 +38,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
         private readonly Dictionary<string, MethodCallback> methodSubscriptions;
 
-        protected Upstream<JsonMessage> Upstream { get; set; }
+        
         internal virtual Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : IModuleTwin, new()
         {
@@ -73,7 +73,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             methodSubscriptions = new Dictionary<string, MethodCallback>();
 
             Routes = new List<string>();
-            Upstream = new Upstream<JsonMessage>(this);
+            
 
             InstantiateProperties();
 

@@ -27,6 +27,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
     public class TypeEdgeHost
     {
+        public Upstream<JsonMessage> Upstream { get; set; }
+
         readonly IConfigurationRoot configuration;
         IContainer container;
         ContainerBuilder containerBuilder;
@@ -50,6 +52,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             this.containerBuilder = new ContainerBuilder();
             hub = new EdgeHub();
+
+            Upstream = new Upstream<JsonMessage>(hub);
         }
 
         public void RegisterModule<_IModule, _TModule>()
@@ -207,16 +211,18 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
 
                 var routes = new Dictionary<string, string>();
-                foreach (var route in hub.Routes)
-                {
-                    routes[$"route{routes.Count}"] = route;
-                }
+              
                 foreach (var module in this.modules)
                 {
                     foreach (var route in module.Routes)
                     {
                         routes[$"route{routes.Count}"] = route;
                     }
+                }
+
+                foreach (var route in hub.Routes)
+                {
+                    routes[$"route{routes.Count}"] = route;
                 }
 
                 var desiredProperties = new
@@ -289,6 +295,15 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 tasks.Add(module.InternalRunAsync());
 
             await Task.WhenAll(tasks.ToArray());
+        }
+
+        public T GetProxy<T>()
+            where T:class
+        {
+            var cb = new ContainerBuilder();
+                cb.RegisterInstance(new ProxyGenerator()
+                .CreateInterfaceProxyWithoutTarget<T>(new ModuleProxy<T>()) as T);
+            return cb.Build().Resolve<T>();
         }
     }
 }

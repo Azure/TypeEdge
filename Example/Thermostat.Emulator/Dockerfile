@@ -28,27 +28,24 @@ COPY $EXE_DIR/ ./
 EXPOSE 8883/tcp
 EXPOSE 443/tcp
 
- 
-WORKDIR /app
 
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
-COPY Example/ThermostatApplication/ThermostatApplication.csproj Example/ThermostatApplication/
-COPY Example/ThermostatApplication.Shared/ThermostatApplication.Shared.csproj Example/ThermostatApplication.Shared/
+COPY Example/Thermostat.Emulator/Thermostat.Emulator.csproj Example/Thermostat.Emulator/
+COPY Example/Thermostat.Shared/Thermostat.Shared.csproj Example/Thermostat.Shared/
 COPY Microsoft.Azure.IoT.TypeEdge/Microsoft.Azure.IoT.TypeEdge.csproj Microsoft.Azure.IoT.TypeEdge/
 COPY Microsoft.Azure.IoT.TypeEdge.Host/Microsoft.Azure.IoT.TypeEdge.Host.csproj Microsoft.Azure.IoT.TypeEdge.Host/
-COPY Example/TemperatureModule/TemperatureModule.csproj Example/TemperatureModule/
-COPY Example/NormalizeTemperatureModule/NormalizeTemperatureModule.csproj Example/NormalizeTemperatureModule/
-RUN dotnet restore Example/ThermostatApplication/ThermostatApplication.csproj
+COPY Example/Modules/NormalizeTemperatureModule/NormalizeTemperatureModule.csproj Example/Modules/NormalizeTemperatureModule/
+COPY Example/Modules/TemperatureModule/TemperatureModule.csproj Example/Modules/TemperatureModule/
+RUN dotnet restore Example/Thermostat.Emulator/Thermostat.Emulator.csproj
 COPY . .
-WORKDIR /src/Example/ThermostatApplication
-RUN dotnet build ThermostatApplication.csproj -c Release -o /app
+WORKDIR /src/Example/Thermostat.Emulator
+RUN dotnet build Thermostat.Emulator.csproj -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish ThermostatApplication.csproj -c Release -o /app
+RUN dotnet publish Thermostat.Emulator.csproj -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-
-ENTRYPOINT ["dotnet", "ThermostatApplication.dll"]
+ENTRYPOINT ["dotnet", "Thermostat.Emulator.dll"]

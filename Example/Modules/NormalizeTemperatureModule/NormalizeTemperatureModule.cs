@@ -44,8 +44,6 @@ namespace Modules
                 return MessageResult.OK;
             });
 
-            Upstream.Subscribe(NormalizedTemperature);
-
             Twin.Subscribe(async (twin) =>
             {
                 scale = twin.Scale;
