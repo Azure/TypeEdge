@@ -173,7 +173,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             await ioTHubModuleClient.SendEventAsync(outputName, edgeMessage);
 
             string messageString = Encoding.UTF8.GetString(message.GetBytes());
-            Console.WriteLine($"{Name}:Sent message: Body: [{messageString}]");
+            Console.WriteLine($">>>>>>{Name}: message: Body: [{messageString}]");
 
             return PublishResult.OK;
         }
@@ -202,7 +202,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             byte[] messageBytes = message.GetBytes();
             string messageString = Encoding.UTF8.GetString(messageBytes);
-            Console.WriteLine($"{Name}:Received message: Body: [{messageString}]");
+            Console.WriteLine($"<<<<<<{Name}:message: Body: [{messageString}]");
 
             var input = Activator.CreateInstance(callback.Type) as IEdgeMessage;
             input.SetBytes(messageBytes);

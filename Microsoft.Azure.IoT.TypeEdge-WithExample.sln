@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thermostat.Emulator", "Exam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thermostat.ServiceApp", "Example\Thermostat.ServiceApp\Thermostat.ServiceApp.csproj", "{286CDAA1-5410-4322-AC1C-F35A83CDA63D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Azure.IoT.TypeEdge.Proxy", "Microsoft.Azure.IoT.TypeEdge.Proxy\Microsoft.Azure.IoT.TypeEdge.Proxy.csproj", "{E738845B-4D98-4CB9-BDA4-F83193FE81B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IoT.TypeEdge.Proxy", "Microsoft.Azure.IoT.TypeEdge.Proxy\Microsoft.Azure.IoT.TypeEdge.Proxy.csproj", "{E738845B-4D98-4CB9-BDA4-F83193FE81B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,6 +92,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F2FF1756-9AAF-411B-8B54-3829EAC21515} = {C865B730-A5A7-4738-9F6E-CBC7AA306467}
+		{8275D850-82CD-4204-A4BE-C8EC3095E703} = {C865B730-A5A7-4738-9F6E-CBC7AA306467}
 		{48302C68-971D-414F-A29D-742F79415D74} = {F2FF1756-9AAF-411B-8B54-3829EAC21515}
 		{30A335A6-47C9-435A-BA23-50988EAF2C33} = {F2FF1756-9AAF-411B-8B54-3829EAC21515}
 		{45F97F43-7C75-49B8-8525-7F0E9C7B9FB7} = {C865B730-A5A7-4738-9F6E-CBC7AA306467}

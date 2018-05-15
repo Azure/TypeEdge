@@ -193,7 +193,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                         settings = new
                         {
                             image = "devimage",
-                            createOptions = $" -e __MODULE_NAME='{module.Name}' "
+                            createOptions = $" -e {Microsoft.Azure.IoT.TypeEdge.Constants.ModuleNameConfigName}='{module.Name}' "
                         }
                     }));
 

@@ -10,7 +10,7 @@ namespace Modules
     {
         public static async Task Main(string[] args)
         {
-            await Startup.Main(args);
+            await Startup.DockerEntryPoint(args);
         }
     }
 }
