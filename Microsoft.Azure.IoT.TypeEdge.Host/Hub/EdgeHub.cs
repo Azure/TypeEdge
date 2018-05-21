@@ -16,7 +16,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host.Hub
         public override CreationResult Configure(IConfigurationRoot configuration)
         {
             HubServiceConfiguration = new ConfigurationBuilder()
-               .AddJsonFile(Constants.ConfigFileName)
                .AddEnvironmentVariables()
                .Build();
 

@@ -35,7 +35,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                     || genericDef.IsAssignableFrom(typeof(Output<>))
                     || genericDef.IsAssignableFrom(typeof(ModuleTwin<>)))
                 {
-                    var value = Activator.CreateInstance(genericDef.MakeGenericType(invocation.Method.ReturnType.GenericTypeArguments), invocation.Method.Name.Replace("get_", ""), this);
+                    var value = Activator.CreateInstance(
+                        genericDef.MakeGenericType(invocation.Method.ReturnType.GenericTypeArguments), 
+                        invocation.Method.Name.Replace("get_", ""), this);
                     invocation.ReturnValue = value;
                 }
             }

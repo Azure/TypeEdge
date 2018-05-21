@@ -1,18 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.0.2" />
+    <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
+    <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
     <ProjectReference Include="..\Modules\NormalizeTemperatureModule\NormalizeTemperatureModule.csproj" />
     <ProjectReference Include="..\Modules\TemperatureModule\TemperatureModule.csproj" />
     <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <None Update="appsettings_thermostat.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

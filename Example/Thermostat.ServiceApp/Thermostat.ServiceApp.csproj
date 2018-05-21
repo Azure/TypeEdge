@@ -1,13 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Proxy\Microsoft.Azure.IoT.TypeEdge.Proxy.csproj" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Proxy" Version="0.0.2" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Proxy\Microsoft.Azure.IoT.TypeEdge.Proxy.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
     <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
   </ItemGroup>
 

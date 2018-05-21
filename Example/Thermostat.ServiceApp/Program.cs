@@ -18,31 +18,19 @@ namespace Thermostat.ServiceApp
                     .AddEnvironmentVariables()
                     .Build();
 
-            TestDirectMethods(configuration);
-            //await TestTwins(configuration);
-
-            Console.WriteLine("Press <ENTER> to exit..");
-            Console.ReadLine();
-        }
-
-        private static async Task TestTwins(IConfigurationRoot configuration)
-        {
-            var normalizer = ProxyFactory.GetModuleProxy<INormalizeTemperatureModule>(
-                            configuration["IotHubConnectionString"],
+            ProxyFactory.Configure(configuration["IotHubConnectionString"],
                             configuration["DeviceId"]);
+
+            var normalizer = ProxyFactory.GetModuleProxy<INormalizeTemperatureModule>();
 
             var twin = await normalizer.Twin.GetAsync();
             twin.Scale = ThermostatApplication.TemperatureScale.Celsius;
             await normalizer.Twin.PublishAsync(twin);
-        }
 
-        private static void TestDirectMethods(IConfigurationRoot configuration)
-        {
-            var temeprature = ProxyFactory.GetModuleProxy<ITemperatureModule>(
-                            configuration["IotHubConnectionString"],
-                            configuration["DeviceId"]);
+            var result = ProxyFactory.GetModuleProxy<ITemperatureModule>().ResetSensor(10);
 
-            var result = temeprature.ResetSensor(10);
+            Console.WriteLine("Press <ENTER> to exit..");
+            Console.ReadLine();
         }
     }
 }

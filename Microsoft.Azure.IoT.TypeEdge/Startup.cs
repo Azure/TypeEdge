@@ -16,8 +16,8 @@ using System.Threading.Tasks;
 namespace Microsoft.Azure.IoT.TypeEdge
 {
     public static class Startup
-    {
-        public static async Task Main(string[] args)
+    { 
+        public static async Task DockerEntryPoint(string[] args)
         {
             var services = new ServiceCollection().AddLogging();
             var containerBuilder = new ContainerBuilder();
@@ -30,11 +30,16 @@ namespace Microsoft.Azure.IoT.TypeEdge
                .Build();
 
 
-            var moduleName = configuration.GetValue<string>("moduleName");
+            var moduleName = configuration.GetValue<string>(Constants.ModuleNameConfigName);
 
+            //todo: throw or warn here?
             if (string.IsNullOrEmpty(moduleName))
-                throw new ArgumentException($"No moduleName in arguments");
-
+            {
+                Console.WriteLine($"WARN:No {Constants.ModuleNameConfigName} in configuration. ");
+                Console.WriteLine("Exiting...");
+                return;
+                //throw new ArgumentException($"No moduleName in arguments");
+            }
             var (moduleType, moduleInterface) = GetModuleTypes(moduleName);
 
             if (moduleType == null)
@@ -47,9 +52,7 @@ namespace Microsoft.Azure.IoT.TypeEdge
                 i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null).Select(e => e.ParameterType);
 
             var proxyGenerator = new ProxyGenerator();
-            moduleDepedencyTypes.Select(e =>
-           containerBuilder.RegisterInstance(
-               proxyGenerator.CreateInterfaceProxyWithoutTarget(e, new ModuleProxyBase(e))));
+            moduleDepedencyTypes.Select(e =>containerBuilder.RegisterInstance(proxyGenerator.CreateInterfaceProxyWithoutTarget(e, new ModuleProxyBase(e))));
 
             var container = containerBuilder.Build();
 

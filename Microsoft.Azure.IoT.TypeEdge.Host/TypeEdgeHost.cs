@@ -10,21 +10,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
-using HubService = Microsoft.Azure.Devices.Edge.Hub.Service;
+using HubService = Microsoft.Azure.Devices.Edge.Hub.Service; 
 using System.Reflection;
-using Microsoft.Azure.Devices;
+using Microsoft.Azure.Devices;   
 using Microsoft.Azure.Devices.Common.Exceptions;
 using Newtonsoft.Json;
 using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json.Linq;
 using System.Linq;
 using Microsoft.Azure.IoT.TypeEdge.Host.Hub;
-using Microsoft.Azure.Devices.Edge.Agent.Core;
+using Microsoft.Azure.Devices.Edge.Agent.Core;  
 using Core = Microsoft.Azure.Devices.Edge.Agent.Core;
 using Castle.DynamicProxy;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Host
-{
+{ 
     public class TypeEdgeHost
     {
         public Upstream<JsonMessage> Upstream { get; set; }
@@ -85,7 +85,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
         private void BuildHub(string deviceSasKey)
         {
             //Calculate the Hub Enviroment Varialbes
-            var currentLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             Environment.SetEnvironmentVariable(HubService.Constants.SslCertEnvName,
                 "edge-hub-server.cert.pfx");
@@ -122,7 +122,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
         private void ConfigureModules()
         {
-            var currentLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             foreach (var module in this.modules)
             {
                 var moduleConnectionString = GetModuleConnectionStringAsync(options.IotHubConnectionString, options.DeviceId, module.Name).Result;
@@ -167,23 +167,23 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 sasKey = device.Authentication.SymmetricKey.PrimaryKey;
             }
             catch (DeviceAlreadyExistsException)
-            {
+            { 
                 var device = await registryManager.GetDeviceAsync(options.DeviceId);
                 sasKey = device.Authentication.SymmetricKey.PrimaryKey;
-            }
-
-            try
+            } 
+               
+            try 
             {
-                ConfigurationContent configurationContent;
+                ConfigurationContent configurationContent; 
                 using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Microsoft.Azure.IoT.TypeEdge.Host.deviceconfig.json"))
-                using (StreamReader reader = new StreamReader(stream))
+                using (StreamReader reader = new StreamReader(stream)) 
                 {
                     var deviceconfig = reader.ReadToEnd();
                     configurationContent = JsonConvert.DeserializeObject<ConfigurationContent>(deviceconfig);
                 }
                 var modulesConfig = configurationContent.ModuleContent["$edgeAgent"].TargetContent["modules"] as JObject;
                 foreach (var module in modules)
-                {
+                {   
                     modulesConfig.Add(module.Name, JObject.FromObject(new
                     {
                         version = "1.0",
@@ -192,8 +192,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                         restartPolicy = "on-failure",
                         settings = new
                         {
-                            image = "devimage",
-                            createOptions = $" -e __MODULE_NAME='{module.Name}' "
+                            image = module.Name.ToLower(),
+                            createOptions = "{\"Env\":[\"" + Microsoft.Azure.IoT.TypeEdge.Constants.ModuleNameConfigName + "=" + module.Name + "\"]}"
                         }
                     }));
 

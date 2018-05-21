@@ -18,8 +18,7 @@ namespace ThermostatApplication
                 .AddCommandLine(args)
                 .Build();
 
-            var host = new TypeEdgeHost(configuration);
-
+            var host = new TypeEdgeHost(configuration); 
             
             host.RegisterModule<ITemperatureModule, TemperatureModule>();
             host.RegisterModule<INormalizeTemperatureModule, NormalizeTemperatureModule>();
