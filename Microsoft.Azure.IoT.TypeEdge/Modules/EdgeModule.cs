@@ -169,7 +169,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                 {
                     edgeMessage.Properties.Add(prop.Key, prop.Value);
                 }
-
+            
             await ioTHubModuleClient.SendEventAsync(outputName, edgeMessage);
 
             string messageString = Encoding.UTF8.GetString(message.GetBytes());

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Microsoft.Azure.IoT.TypeEdge
 {
     public static class Startup
-    {
+    { 
         public static async Task DockerEntryPoint(string[] args)
         {
             var services = new ServiceCollection().AddLogging();

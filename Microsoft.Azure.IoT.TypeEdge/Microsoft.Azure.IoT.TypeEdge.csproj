@@ -1,16 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <PackageId>Microsoft.Azure.IoT.TypeEdge</PackageId>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>paloukari</Authors>
     <Company>Microsoft</Company>
-    <PackageOutputPath>../build</PackageOutputPath>
+    <PackageOutputPath>../Example/build</PackageOutputPath>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Microsoft.Azure.IoT.TypeEdge</AssemblyName>
     <RootNamespace>Microsoft.Azure.IoT.TypeEdge</RootNamespace>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,12 +28,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="appsettings_compose.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

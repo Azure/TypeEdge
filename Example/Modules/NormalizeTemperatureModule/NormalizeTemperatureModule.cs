@@ -50,7 +50,6 @@ namespace Modules
                 await Twin.ReportAsync(twin);
                 return TwinResult.OK;
             });
-
         }
     }
 }

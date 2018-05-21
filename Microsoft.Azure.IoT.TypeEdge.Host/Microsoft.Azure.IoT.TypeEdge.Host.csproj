@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <PackageId>Microsoft.Azure.IoT.TypeEdge.Host</PackageId>
@@ -7,71 +7,43 @@
     <Company>Microsoft</Company>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageOutputPath>../build</PackageOutputPath>
+    <PackageOutputPath>../Example/build</PackageOutputPath>
 
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+
+    <NuspecFile>.nuspec</NuspecFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="deviceconfig.json" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="..\..\..\..\internal\Azure-IoT-Edge-Core\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Service\appsettings_hub.json" Link="appsettings_hub.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="deviceconfig.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Devices.Edge.Agent.Core" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.Devices.Edge.Hub.Service" Version="1.0.0" />
-    <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
+    <PackageReference Include="Microsoft.Azure.Devices.Edge.Hub.Service" Version="1.0.0">
+      <ExcludeAssets>contentFiles</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
+
 
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.Azure.IoT.TypeEdge\Microsoft.Azure.IoT.TypeEdge.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Certificates\edge-agent-ca\cert\edge-agent-ca.cert.pem">
+    <Content Include="appsettings_hub.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\edge-agent-ca\private\edge-agent-ca.key.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\edge-device-ca\cert\edge-device-ca.cert.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\edge-device-ca\private\edge-device-ca.key.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\edge-hub-server\cert\edge-hub-server.cert.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Certificates\edge-hub-server\private\edge-hub-server.key.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Scripts\linux\generate-cert.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Dockerfile">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-  </Target>
-
+  <ItemGroup>
+    <EmbeddedResource Include="deviceconfig.json" />
+  </ItemGroup>
 </Project>

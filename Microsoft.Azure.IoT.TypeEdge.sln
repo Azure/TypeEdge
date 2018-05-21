@@ -7,11 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IoT.TypeEdg
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IoT.TypeEdge.Host", "Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj", "{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IoT.TypeEdge.Proxy", "Microsoft.Azure.IoT.TypeEdge.Proxy\Microsoft.Azure.IoT.TypeEdge.Proxy.csproj", "{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeCoverage|Any CPU = CodeCoverage|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		TemplateDevelopment|Any CPU = TemplateDevelopment|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{54587D56-7C22-4084-9321-84D57C2F6ECB}.CodeCoverage|Any CPU.ActiveCfg = Debug|Any CPU
@@ -20,12 +23,24 @@ Global
 		{54587D56-7C22-4084-9321-84D57C2F6ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54587D56-7C22-4084-9321-84D57C2F6ECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54587D56-7C22-4084-9321-84D57C2F6ECB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54587D56-7C22-4084-9321-84D57C2F6ECB}.TemplateDevelopment|Any CPU.ActiveCfg = TemplateDevelopment|Any CPU
+		{54587D56-7C22-4084-9321-84D57C2F6ECB}.TemplateDevelopment|Any CPU.Build.0 = TemplateDevelopment|Any CPU
 		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.CodeCoverage|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.CodeCoverage|Any CPU.Build.0 = Debug|Any CPU
 		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.TemplateDevelopment|Any CPU.ActiveCfg = TemplateDevelopment|Any CPU
+		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}.TemplateDevelopment|Any CPU.Build.0 = TemplateDevelopment|Any CPU
+		{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}.CodeCoverage|Any CPU.ActiveCfg = TemplateDevelopment|Any CPU
+		{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}.CodeCoverage|Any CPU.Build.0 = TemplateDevelopment|Any CPU
+		{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}.TemplateDevelopment|Any CPU.ActiveCfg = TemplateDevelopment|Any CPU
+		{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}.TemplateDevelopment|Any CPU.Build.0 = TemplateDevelopment|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

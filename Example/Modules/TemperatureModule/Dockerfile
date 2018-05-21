@@ -3,12 +3,12 @@ WORKDIR /app
 
 FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
-COPY Example/Modules/TemperatureModule/TemperatureModule.csproj Example/Modules/TemperatureModule/
-COPY Microsoft.Azure.IoT.TypeEdge/Microsoft.Azure.IoT.TypeEdge.csproj Microsoft.Azure.IoT.TypeEdge/
-COPY Example/Thermostat.Shared/Thermostat.Shared.csproj Example/Thermostat.Shared/
-RUN dotnet restore Example/Modules/TemperatureModule/TemperatureModule.csproj
+COPY build build
+COPY Modules/TemperatureModule/TemperatureModule.csproj Modules/TemperatureModule/
+COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
+RUN dotnet restore Modules/TemperatureModule/TemperatureModule.csproj -s /src/build -s https://api.nuget.org/v3/index.json
 COPY . .
-WORKDIR /src/Example/Modules/TemperatureModule
+WORKDIR /src/Modules/TemperatureModule
 RUN dotnet build TemperatureModule.csproj -c Release -o /app
  
 FROM build AS publish
