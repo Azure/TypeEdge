@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Microsoft.Azure.IoT.TypeEdge.Host</id>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <authors>paloukari</authors>
     <owners>paloukari</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -16,7 +16,6 @@
     </dependencies>
     <contentFiles>
       <files include="build/Config/appsettings_hub.json" buildAction="None" copyToOutput="true"/>
-      <files include="build/Docker/Dockerfile" buildAction="None" />
       <files include="build/Certificates/edge-chain-ca/cert/edge-chain-ca.cert.pem" buildAction="None" copyToOutput="true" />
       <files include="build/Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem" buildAction="None" copyToOutput="true" />
       <files include="build/Certificates/edge-hub-server/cert/edge-hub-server.cert.pfx" buildAction="None" copyToOutput="true" />
@@ -31,7 +30,6 @@
     <file src="Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" target="build\Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" />
     
     <file src="appsettings_hub.json" target="build\Config\appsettings_hub.json" />
-    <file src="Dockerfile" target="build\Docker\Dockerfile" />
     
   </files>
 </package>
