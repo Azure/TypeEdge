@@ -13,7 +13,7 @@ namespace TypeEdgeProxy
             Console.ReadLine();
 
             var configuration = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings_thermostat.json")
+                    .AddJsonFile("appsettings.json")
                     .AddEnvironmentVariables()
                     .Build();
 
