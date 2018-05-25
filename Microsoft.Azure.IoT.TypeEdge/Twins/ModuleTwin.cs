@@ -1,20 +1,21 @@
-﻿using Microsoft.Azure.Devices.Shared;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge.Modules;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Enums;
 
-namespace Microsoft.Azure.IoT.TypeEdge.Modules
+namespace Microsoft.Azure.IoT.TypeEdge.Twins
 {
     public class ModuleTwin<T>
         where T : TypeModuleTwin, new()
     {
-        private string Name { get; set; }
-        private EdgeModule Module { get; set; }
-
         public ModuleTwin(string name, EdgeModule module)
         {
             Module = module;
             Name = name;
         }
+
+        private string Name { get; }
+        private EdgeModule Module { get; }
 
         public virtual void Subscribe(Func<T, Task<TwinResult>> handler)
         {

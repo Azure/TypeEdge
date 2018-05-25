@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using ThermostatApplication;
@@ -12,41 +11,41 @@ namespace Modules
     public class NormalizeTemperatureModule : EdgeModule, INormalizeTemperatureModule
     {
         //memory state
-        TemperatureScale scale;
-        ITemperatureModule temperatureModuleProxy;
+        private TemperatureScale _scale;
+        private readonly ITemperatureModule _temperatureModuleProxy;
+
+        public NormalizeTemperatureModule(ITemperatureModule proxy)
+        {
+            _temperatureModuleProxy = proxy;
+        }
 
         public Input<TemperatureModuleOutput> Temperature { get; set; }
         public Output<TemperatureModuleOutput> NormalizedTemperature { get; set; }
         public ModuleTwin<NormalizerTwin> Twin { get; set; }
 
-        public NormalizeTemperatureModule(ITemperatureModule proxy)
-        {
-            temperatureModuleProxy = proxy;
-        }
-
         public override async Task<ExecutionResult> RunAsync()
         {
             var twin = await Twin.GetAsync();
-            scale = twin.Scale;
+            _scale = twin.Scale;
 
             return ExecutionResult.OK;
         }
 
         public override void BuildSubscriptions()
-        {            
-            Temperature.Subscribe(temperatureModuleProxy.Temperature, async (temp) =>
+        {
+            Temperature.Subscribe(_temperatureModuleProxy.Temperature, async temp =>
             {
-                if (temp.Scale != scale)
-                    if (scale == TemperatureScale.Celsius)
+                if (temp.Scale != _scale)
+                    if (_scale == TemperatureScale.Celsius)
                         temp.Temperature = temp.Temperature * 9 / 5 + 32;
                 await NormalizedTemperature.PublishAsync(temp);
 
                 return MessageResult.OK;
             });
 
-            Twin.Subscribe(async (twin) =>
+            Twin.Subscribe(async twin =>
             {
-                scale = twin.Scale;
+                _scale = twin.Scale;
                 await Twin.ReportAsync(twin);
                 return TwinResult.OK;
             });

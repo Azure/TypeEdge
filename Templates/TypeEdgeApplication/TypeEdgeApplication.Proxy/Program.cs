@@ -1,25 +1,25 @@
-﻿using Microsoft.Azure.IoT.TypeEdge.Proxy;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge.Proxy;
+using Microsoft.Extensions.Configuration;
 using TypeEdgeApplication.Shared;
 
 namespace TypeEdgeApplication.Proxy
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             Console.WriteLine("Press <ENTER> to start..");
             Console.ReadLine();
 
             var configuration = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json")
-                    .AddEnvironmentVariables()
-                    .Build();
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
 
             ProxyFactory.Configure(configuration["IotHubConnectionString"],
-                            configuration["DeviceId"]);
+                configuration["DeviceId"]);
 
             //TODO: Get your module proxies by contract
             var proxy = ProxyFactory.GetModuleProxy<ITypeEdgeModule1>();

@@ -1,6 +1,8 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge.Modules;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge;
+using Microsoft.Azure.IoT.TypeEdge.Modules;
 using TypeEdgeApplication.Shared;
 using TypeEdgeApplication.Shared.Messages;
 using TypeEdgeApplication.Shared.Twins;
@@ -14,7 +16,7 @@ namespace TypeEdgeApplication.Modules
 
         public bool ResetModule(int sensorThreshold)
         {
-            System.Console.WriteLine($"New sensor threshold:{sensorThreshold}");
+            Console.WriteLine($"New sensor threshold:{sensorThreshold}");
             return true;
         }
 
@@ -22,9 +24,10 @@ namespace TypeEdgeApplication.Modules
         {
             while (true)
             {
-                await Output.PublishAsync(new TypeEdgeModule1Output() { Data = new System.Random().NextDouble().ToString() });
-                System.Threading.Thread.Sleep(1000);
+                await Output.PublishAsync(new TypeEdgeModule1Output {Data = new Random().NextDouble().ToString()});
+                Thread.Sleep(1000);
             }
+
             return await base.RunAsync();
         }
     }

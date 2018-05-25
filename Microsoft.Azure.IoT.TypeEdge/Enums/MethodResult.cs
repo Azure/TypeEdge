@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Azure.IoT.TypeEdge.Enums
 {
-    public enum ExecutionResult
+    public enum MethodResult
     {
         Ok,
         Error

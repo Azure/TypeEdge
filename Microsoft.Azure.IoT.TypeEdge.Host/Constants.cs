@@ -2,7 +2,5 @@
 {
     internal class Constants
     {
-        
-
     }
-}         
+}

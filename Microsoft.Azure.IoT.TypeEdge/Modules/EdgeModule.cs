@@ -1,27 +1,24 @@
-﻿using Microsoft.Azure.Devices.Client;
-using Microsoft.Azure.Devices.Client.Transport.Mqtt;
-using Microsoft.Azure.Devices.Shared;
-using Microsoft.Azure.IoT.TypeEdge.Attributes;
-using Microsoft.Azure.IoT.TypeEdge.Hubs;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Security;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using Microsoft.Extensions.DependencyInjection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Castle.DynamicProxy;
-using Microsoft.Azure.IoT.TypeEdge.Host;
+using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.Devices.Client.Transport.Mqtt;
+using Microsoft.Azure.Devices.Shared;
+using Microsoft.Azure.IoT.TypeEdge.Attributes;
+using Microsoft.Azure.IoT.TypeEdge.Enums;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Enums;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+using Microsoft.Azure.IoT.TypeEdge.Twins;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("Microsoft.Azure.IoT.TypeEdge.Host")]
 [assembly: InternalsVisibleTo("Microsoft.Azure.IoT.TypeEdge.Proxy")]
@@ -30,90 +27,93 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 {
     public abstract class EdgeModule
     {
-        private string connectionString;
-        private DeviceClient ioTHubModuleClient;
-        private ITransportSettings[] transportSettings;
+        private readonly Dictionary<string, MethodCallback> _methodSubscriptions;
+        private readonly Dictionary<string, SubscriptionCallback> _routeSubscriptions;
 
-        private readonly Dictionary<string, SubscriptionCallback> twinSubscriptions;
-        private readonly Dictionary<string, SubscriptionCallback> routeSubscriptions;
-        private readonly Dictionary<string, MethodCallback> methodSubscriptions;
+        private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
+        private string _connectionString;
+        private DeviceClient _ioTHubModuleClient;
+        private ITransportSettings[] _transportSettings;
 
-        
-        internal virtual Task<T> PublishTwinAsync<T>(string name, T twin)
-            where T : IModuleTwin, new()
+        protected EdgeModule()
         {
-            ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
-            throw new NotImplementedException();
-        }
-        internal virtual async Task<T> GetTwinAsync<T>(string name)
-            where T : IModuleTwin, new()
-
-        {
-            var typeTwin = Activator.CreateInstance<T>();
-            typeTwin.SetTwin(name, await ioTHubModuleClient.GetTwinAsync());
-            return typeTwin;
-        }
-        internal virtual string Name
-        {
-            get
-            {
-                var proxyInterface = GetType().GetProxyInterface();
-                var typeModule = proxyInterface.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
-                if (typeModule != null)
-                    return typeModule.Name;
-                return GetType().Name;
-            }
-        }
-        internal List<string> Routes { get; set; }
-
-        public EdgeModule()
-        {
-            routeSubscriptions = new Dictionary<string, SubscriptionCallback>();
-            twinSubscriptions = new Dictionary<string, SubscriptionCallback>();
-            methodSubscriptions = new Dictionary<string, MethodCallback>();
+            _routeSubscriptions = new Dictionary<string, SubscriptionCallback>();
+            _twinSubscriptions = new Dictionary<string, SubscriptionCallback>();
+            _methodSubscriptions = new Dictionary<string, MethodCallback>();
 
             Routes = new List<string>();
-            
+
 
             InstantiateProperties();
 
             RegisterMethods();
         }
 
+        internal virtual string Name
+        {
+            get
+            {
+                var proxyInterface = GetType().GetProxyInterface();
+                var typeModule =
+                    proxyInterface.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
+                if (typeModule != null)
+                    return typeModule.Name;
+                return GetType().Name;
+            }
+        }
 
-       
+        internal List<string> Routes { get; set; }
+
+
+        internal virtual Task<T> PublishTwinAsync<T>(string name, T twin)
+            where T : IModuleTwin, new()
+        {
+            _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
+            throw new NotImplementedException();
+        }
+
+        internal virtual async Task<T> GetTwinAsync<T>(string name)
+            where T : IModuleTwin, new()
+
+        {
+            var typeTwin = Activator.CreateInstance<T>();
+            typeTwin.SetTwin(name, await _ioTHubModuleClient.GetTwinAsync());
+            return typeTwin;
+        }
+
+
         public virtual Task<ExecutionResult> RunAsync()
         {
-            return Task.FromResult(ExecutionResult.OK);
+            return Task.FromResult(ExecutionResult.Ok);
         }
+
         public virtual CreationResult Configure(IConfigurationRoot configuration)
         {
-            return CreationResult.OK;
+            return CreationResult.Ok;
         }
+
         public virtual void BuildSubscriptions()
         {
         }
+
         internal async Task<ExecutionResult> InternalRunAsync()
         {
             // Open a connection to the Edge runtime
-            ioTHubModuleClient = DeviceClient.CreateFromConnectionString(connectionString, transportSettings);
+            _ioTHubModuleClient = DeviceClient.CreateFromConnectionString(_connectionString, _transportSettings);
 
-            await ioTHubModuleClient.OpenAsync();
+            await _ioTHubModuleClient.OpenAsync();
             Console.WriteLine($"IoT Hub module {Name} client initialized.");
 
             // Register callback to be called when a message is received by the module
-            foreach (var subscription in routeSubscriptions)
-            {
-                await ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, MessageHandler, subscription.Value);
-            }
+            foreach (var subscription in _routeSubscriptions)
+                await _ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, MessageHandler,
+                    subscription.Value);
 
             // Register callback to be called when a twin update is received by the module
-            await ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, twinSubscriptions);
+            await _ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, _twinSubscriptions);
 
-            foreach (var subscription in methodSubscriptions)
-            {
-                await ioTHubModuleClient.SetMethodHandlerAsync(subscription.Key, MethodCallback, subscription.Value);
-            }
+            foreach (var subscription in _methodSubscriptions)
+                await _ioTHubModuleClient.SetMethodHandlerAsync(subscription.Key, MethodCallback, subscription.Value);
             return await RunAsync();
         }
 
@@ -128,34 +128,34 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             {
                 var paramTypes = callback.MethodInfo.GetParameters();
 
-                for (int i = 0; i < paramTypes.Length; i++)
+                for (var i = 0; i < paramTypes.Length; i++)
                     paramValues[i] = Convert.ChangeType(paramValues[i], paramTypes[i].ParameterType);
 
                 var res = callback.MethodInfo.Invoke(this, paramValues);
-                return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(res)), 200));
+                return Task.FromResult(
+                    new MethodResponse(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(res)), 200));
             }
             catch (Exception ex)
             {
                 // Acknowlege the direct method call with a 400 error message
-                string result = "{\"result\":\"" + ex.Message + "\"}";
+                var result = "{\"result\":\"" + ex.Message + "\"}";
                 return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 400));
             }
         }
+
         internal CreationResult InternalConfigure(IConfigurationRoot configuration)
         {
-            connectionString = configuration.GetValue<string>(Constants.EdgeHubConnectionStringKey);
+            _connectionString = configuration.GetValue<string>(Constants.EdgeHubConnectionStringKey);
 
             // Cert verification is not yet fully functional when using Windows OS for the container
-            bool bypassCertVerification = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            var bypassCertVerification = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             if (!bypassCertVerification)
                 InstallCert();
 
-            MqttTransportSettings mqttSetting = new MqttTransportSettings(Devices.Client.TransportType.Mqtt_Tcp_Only);
-            if (true)//bypassCertVerification)
-            {
+            var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
+            if (true) //bypassCertVerification)
                 mqttSetting.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-            }
-            transportSettings = new ITransportSettings[] { mqttSetting };
+            _transportSettings = new ITransportSettings[] {mqttSetting};
 
             return Configure(configuration);
         }
@@ -163,58 +163,59 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         internal async Task<PublishResult> PublishMessageAsync<T>(string outputName, T message)
             where T : IEdgeMessage
         {
-            var edgeMessage = new Devices.Client.Message(message.GetBytes());
+            var edgeMessage = new Message(message.GetBytes());
             if (message.Properties != null)
                 foreach (var prop in edgeMessage.Properties)
-                {
                     edgeMessage.Properties.Add(prop.Key, prop.Value);
-                }
-            
-            await ioTHubModuleClient.SendEventAsync(outputName, edgeMessage);
 
-            string messageString = Encoding.UTF8.GetString(message.GetBytes());
+            await _ioTHubModuleClient.SendEventAsync(outputName, edgeMessage);
+
+            var messageString = Encoding.UTF8.GetString(message.GetBytes());
             Console.WriteLine($">>>>>>{Name}: message: Body: [{messageString}]");
 
-            return PublishResult.OK;
+            return PublishResult.Ok;
         }
-        internal void SubscribeRoute<T>(string outName, string outRoute, string inName, string inRoute, Func<T, Task<MessageResult>> handler)
+
+        internal void SubscribeRoute<T>(string outName, string outRoute, string inName, string inRoute,
+            Func<T, Task<MessageResult>> handler)
             where T : IEdgeMessage
         {
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
 
-            routeSubscriptions[inName] = new SubscriptionCallback(inName, handler, typeof(T));
+            _routeSubscriptions[inName] = new SubscriptionCallback(inName, handler, typeof(T));
         }
+
         internal void SubscribeRoute(string outName, string outRoute, string inName, string inRoute)
         {
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
         }
+
         internal void SubscribeTwin<T>(string name, Func<T, Task<TwinResult>> handler) where T : IModuleTwin
         {
-            twinSubscriptions[name] = new SubscriptionCallback(name, handler, typeof(T));
+            _twinSubscriptions[name] = new SubscriptionCallback(name, handler, typeof(T));
         }
 
-        private async Task<MessageResponse> MessageHandler(Devices.Client.Message message, object userContext)
+        private async Task<MessageResponse> MessageHandler(Message message, object userContext)
         {
             if (!(userContext is SubscriptionCallback callback))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
-            byte[] messageBytes = message.GetBytes();
-            string messageString = Encoding.UTF8.GetString(messageBytes);
+            var messageBytes = message.GetBytes();
+            var messageString = Encoding.UTF8.GetString(messageBytes);
             Console.WriteLine($"<<<<<<{Name}:message: Body: [{messageString}]");
 
-            var input = Activator.CreateInstance(callback.Type) as IEdgeMessage;
+            if (!(Activator.CreateInstance(callback.Type) is IEdgeMessage input))
+                return MessageResponse.Abandoned;
             input.SetBytes(messageBytes);
 
             var invocationResult = callback.Handler.DynamicInvoke(input);
-            var result = await ((Task<MessageResult>)invocationResult);
+            var result = await (Task<MessageResult>) invocationResult;
 
-            if (result == MessageResult.OK)
-                return MessageResponse.Completed;
-
-            return MessageResponse.Abandoned;
+            return result == MessageResult.Ok ? MessageResponse.Completed : MessageResponse.Abandoned;
         }
+
         private async Task PropertyHandler(TwinCollection desiredProperties, object userContext)
         {
             if (!(userContext is Dictionary<string, SubscriptionCallback> callbacks))
@@ -224,38 +225,40 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
 
             foreach (var callback in callbacks)
-            {
                 if (desiredProperties.Contains($"___{callback.Key}"))
                 {
                     var input = Activator.CreateInstance(callback.Value.Type) as IModuleTwin;
-                    input.SetTwin(callback.Key, new Twin(new TwinProperties() { Desired = desiredProperties }));
+                    input.SetTwin(callback.Key, new Twin(new TwinProperties {Desired = desiredProperties}));
 
                     var invocationResult = callback.Value.Handler.DynamicInvoke(input);
-                    var result = await ((Task<TwinResult>)invocationResult);
+                    var result = await (Task<TwinResult>) invocationResult;
                 }
-            }
         }
+
         private void InstallCert()
         {
-            string certPath = Environment.GetEnvironmentVariable("EdgeModuleCACertificateFile");
+            var certPath = Environment.GetEnvironmentVariable("EdgeModuleCACertificateFile");
             if (string.IsNullOrWhiteSpace(certPath))
             {
                 // We cannot proceed further without a proper cert file
                 Console.WriteLine($"Missing path to certificate collection file: {certPath}");
                 throw new InvalidOperationException("Missing path to certificate file.");
             }
-            else if (!File.Exists(certPath))
+
+            if (!File.Exists(certPath))
             {
                 // We cannot proceed further without a proper cert file
                 Console.WriteLine($"Missing path to certificate collection file: {certPath}");
                 throw new InvalidOperationException("Missing certificate file.");
             }
-            X509Store store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
+
+            var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadWrite);
-            store.Add(new X509Certificate2(X509Certificate2.CreateFromCertFile(certPath)));
+            store.Add(new X509Certificate2(X509Certificate.CreateFromCertFile(certPath)));
             Console.WriteLine($"{Name}:Added Cert: " + certPath);
             store.Close();
         }
+
         private void InstantiateProperties()
         {
             var props = GetType().GetProperties();
@@ -276,7 +279,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                         throw new Exception($"{prop.Name} needs to be set dynamically, please define a setter.");
 
                     var name = $"{prop.Name}";
-                    var value = Activator.CreateInstance(type.GetGenericTypeDefinition().MakeGenericType(type.GenericTypeArguments), name, this);
+                    var value = Activator.CreateInstance(
+                        type.GetGenericTypeDefinition().MakeGenericType(type.GenericTypeArguments), name, this);
                     prop.SetValue(this, value);
                 }
             }
@@ -289,16 +293,14 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             {
                 var moduleMethods = GetType().GetInterfaceMap(interfaceType).TargetMethods.Where(e => !e.IsSpecialName);
                 foreach (var method in moduleMethods)
-                {
-                    methodSubscriptions[method.Name] = new MethodCallback(method.Name, method);
-                }
+                    _methodSubscriptions[method.Name] = new MethodCallback(method.Name, method);
             }
         }
 
         internal async Task ReportTwinAsync<T>(string name, T twin)
             where T : IModuleTwin
         {
-            await ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
+            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Microsoft.Azure.IoT.TypeEdge;
-using Microsoft.Azure.IoT.TypeEdge.Hubs;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Newtonsoft.Json;
 

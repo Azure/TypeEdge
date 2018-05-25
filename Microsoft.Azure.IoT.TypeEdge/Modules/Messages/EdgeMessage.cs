@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Microsoft.Azure.IoT.TypeEdge.Modules
+namespace Microsoft.Azure.IoT.TypeEdge.Modules.Messages
 {
     public interface IEdgeMessage
     {

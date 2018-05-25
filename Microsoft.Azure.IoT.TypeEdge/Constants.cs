@@ -6,4 +6,4 @@
         public const string EdgeHubConnectionStringKey = "EdgeHubConnectionString";
         public const string ModuleNameConfigName = "ModuleName";
     }
-} 
+}

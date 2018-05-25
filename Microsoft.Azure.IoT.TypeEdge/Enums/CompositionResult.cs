@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Microsoft.Azure.IoT.TypeEdge
+﻿namespace Microsoft.Azure.IoT.TypeEdge.Enums
 {
     public enum CompositionResult
     {
-        OK, 
+        Ok,
         Error
     }
 }

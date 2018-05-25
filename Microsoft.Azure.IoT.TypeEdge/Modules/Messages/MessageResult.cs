@@ -1,8 +1,8 @@
-﻿namespace Microsoft.Azure.IoT.TypeEdge.Modules
+﻿namespace Microsoft.Azure.IoT.TypeEdge.Modules.Messages
 {
     public enum MessageResult
     {
-        OK, 
+        Ok,
         Error
     }
 }

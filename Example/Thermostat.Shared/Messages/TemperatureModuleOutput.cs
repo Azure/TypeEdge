@@ -1,9 +1,7 @@
-﻿using Microsoft.Azure.IoT.TypeEdge;
+﻿using System.Collections.Generic;
+using System.Text;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ThermostatApplication.Messages
 {

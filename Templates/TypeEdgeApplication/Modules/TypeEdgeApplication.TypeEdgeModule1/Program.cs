@@ -1,9 +1,9 @@
-﻿using Microsoft.Azure.IoT.TypeEdge;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge;
 
 namespace TypeEdgeModule1
 {
-    class Program
+    internal class Program
     {
         public static async Task Main(string[] args)
         {

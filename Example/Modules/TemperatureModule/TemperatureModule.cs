@@ -1,8 +1,8 @@
-﻿using Microsoft.Azure.IoT.TypeEdge;
-using Microsoft.Azure.IoT.TypeEdge.Modules;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge;
+using Microsoft.Azure.IoT.TypeEdge.Modules;
 using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
@@ -25,9 +25,14 @@ namespace Modules
         {
             while (true)
             {
-                await Temperature.PublishAsync(new TemperatureModuleOutput() { Scale = TemperatureScale.Celsius, Temperature = new Random().NextDouble() * 100 });
+                await Temperature.PublishAsync(new TemperatureModuleOutput
+                {
+                    Scale = TemperatureScale.Celsius,
+                    Temperature = new Random().NextDouble() * 100
+                });
                 Thread.Sleep(1000);
             }
+
             return await base.RunAsync();
         }
     }
