@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
+using TypeEdgeApplication.Shared;
 
-namespace TypeEdgeProxy
+namespace TypeEdgeApplication.Proxy
 {
     class Program
     {
@@ -21,7 +22,7 @@ namespace TypeEdgeProxy
                             configuration["DeviceId"]);
 
             //TODO: Get your module proxies by contract
-            //var result = ProxyFactory.GetModuleProxy<ITemperatureModule>().ResetSensor(10);
+            var proxy = ProxyFactory.GetModuleProxy<ITypeEdgeModule1>();
 
             Console.WriteLine("Press <ENTER> to exit..");
             Console.ReadLine();

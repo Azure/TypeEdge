@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Spyros Garyfallos",
+  "classifications": [ "TypeEdge", "Azure", "IoT", "Edge", "Application" ],
+  "name": "Type Edge Application",
+  "identity": "TypeEdge.Application.CSharp",
+  "groupIdentity": "TypeEdgeApplication",
+  "shortName": "typeedgeapp",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "TypeEdgeApplication",
+  "preferNameDirectory": true,
+  "symbols": {
+    "module1Name": {
+      "type": "parameter",
+      "defaultValue": "Module1",
+      "replaces": "TypeEdgeModule1",
+      "fileRename": "TypeEdgeModule1"
+    },
+    "module2Name": {
+      "type": "parameter",
+      "defaultValue": "Module2",
+      "replaces": "TypeEdgeModule2",
+      "fileRename": "TypeEdgeModule2"
+    },
+    "connectionString": {
+      "type": "parameter",
+      "defaultValue": "PUT YOUR IOT HUB OWNER CONNECTION STRING HERE",
+      "replaces": "CONNECTION_STRING"
+    }
+  }
+}

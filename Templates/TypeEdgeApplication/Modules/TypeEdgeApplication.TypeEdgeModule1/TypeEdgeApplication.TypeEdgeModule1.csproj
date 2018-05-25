@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.0" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge" Version="0.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\TypeEdgeApplication.Shared\TypeEdgeApplication.Shared.csproj" />
   </ItemGroup>
 
 </Project>
