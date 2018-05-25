@@ -12,9 +12,6 @@
       <Link>Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)Docker\Dockerfile">
-      <Link>Dockerfile</Link>      
-    </None>
     <None Include="$(MSBuildThisFileDirectory)Config\appsettings_hub.json">
       <Link>appsettings_hub.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

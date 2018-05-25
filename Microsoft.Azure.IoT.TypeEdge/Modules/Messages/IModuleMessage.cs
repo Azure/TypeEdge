@@ -1,8 +1,10 @@
-﻿namespace Microsoft.Azure.IoT.TypeEdge.Modules
+﻿using Microsoft.Azure.Devices.Client;
+
+namespace Microsoft.Azure.IoT.TypeEdge.Modules.Messages
 {
     public interface IModuleMessage
     {
-        IModuleMessage FromMessage(Devices.Client.Message message);
+        IModuleMessage FromMessage(Message message);
         string ToJson();
     }
 }

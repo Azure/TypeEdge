@@ -1,8 +1,8 @@
-﻿namespace Microsoft.Azure.IoT.TypeEdge
+﻿namespace Microsoft.Azure.IoT.TypeEdge.Enums
 {
     public enum PublishResult
     {
-        OK, 
+        Ok,
         Error
     }
 }

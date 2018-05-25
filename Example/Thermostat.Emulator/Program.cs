@@ -1,16 +1,15 @@
-﻿using Microsoft.Azure.IoT.TypeEdge;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using Modules;
-using System;
-using System.Threading.Tasks;
 using ThermostatApplication.Modules;
 
 namespace ThermostatApplication
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings_thermostat.json")
@@ -18,8 +17,8 @@ namespace ThermostatApplication
                 .AddCommandLine(args)
                 .Build();
 
-            var host = new TypeEdgeHost(configuration); 
-            
+            var host = new TypeEdgeHost(configuration);
+
             host.RegisterModule<ITemperatureModule, TemperatureModule>();
             host.RegisterModule<INormalizeTemperatureModule, NormalizeTemperatureModule>();
 

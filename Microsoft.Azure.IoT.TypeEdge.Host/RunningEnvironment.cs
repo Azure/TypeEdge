@@ -2,10 +2,10 @@
 {
     public enum RunningEnvironment
     {
-        InMemory, 
+        InMemory,
         LocalContainer,
         RemoteContainer,
-        LocalDevice, 
+        LocalDevice,
         RemoteDevice
     }
-}  
+}

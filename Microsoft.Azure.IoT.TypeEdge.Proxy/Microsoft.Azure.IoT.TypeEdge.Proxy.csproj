@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Microsoft.Azure.IoT.TypeEdge.Proxy</PackageId>
-    <Version>0.0.2</Version>
+    <Version>0.1.0</Version>
     <Authors>paloukari</Authors>
     <Company>Microsoft</Company>
 

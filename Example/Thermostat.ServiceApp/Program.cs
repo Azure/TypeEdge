@@ -1,30 +1,31 @@
-﻿using Microsoft.Azure.IoT.TypeEdge.Proxy;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge.Proxy;
+using Microsoft.Extensions.Configuration;
+using ThermostatApplication;
 using ThermostatApplication.Modules;
 
 namespace Thermostat.ServiceApp
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             Console.WriteLine("Press <ENTER> to start..");
             Console.ReadLine();
 
             var configuration = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings_thermostat.json")
-                    .AddEnvironmentVariables()
-                    .Build();
+                .AddJsonFile("appsettings_thermostat.json")
+                .AddEnvironmentVariables()
+                .Build();
 
             ProxyFactory.Configure(configuration["IotHubConnectionString"],
-                            configuration["DeviceId"]);
+                configuration["DeviceId"]);
 
             var normalizer = ProxyFactory.GetModuleProxy<INormalizeTemperatureModule>();
 
             var twin = await normalizer.Twin.GetAsync();
-            twin.Scale = ThermostatApplication.TemperatureScale.Celsius;
+            twin.Scale = TemperatureScale.Celsius;
             await normalizer.Twin.PublishAsync(twin);
 
             var result = ProxyFactory.GetModuleProxy<ITemperatureModule>().ResetSensor(10);

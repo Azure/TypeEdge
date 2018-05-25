@@ -1,20 +1,17 @@
-﻿using System;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
-namespace Microsoft.Azure.IoT.TypeEdge
+namespace Microsoft.Azure.IoT.TypeEdge.Modules
 {
     public class MethodCallback
     {
-        public string Name { get; private set; }
-
-        public MethodInfo MethodInfo { get; private set; }
-
         public MethodCallback(string name, MethodInfo methodInfo)
         {
-            this.Name = name;
+            Name = name;
             MethodInfo = methodInfo;
         }
 
+        public string Name { get; }
+
+        public MethodInfo MethodInfo { get; }
     }
 }

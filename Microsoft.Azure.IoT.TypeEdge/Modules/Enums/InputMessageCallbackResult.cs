@@ -1,8 +1,8 @@
-﻿namespace Microsoft.Azure.IoT.TypeEdge.Modules
+﻿namespace Microsoft.Azure.IoT.TypeEdge.Modules.Enums
 {
     public enum InputMessageCallbackResult
     {
-        OK, 
+        Ok,
         Error
     }
 }

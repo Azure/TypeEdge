@@ -1,11 +1,5 @@
 ﻿using Autofac;
 using Castle.DynamicProxy;
-using Microsoft.Azure.IoT.TypeEdge.Modules;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Proxy
 {
@@ -13,13 +7,15 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
     {
         public static string IotHubConnectionString { get; set; }
         public static string DeviceId { get; set; }
+
         public static T GetModuleProxy<T>(string iotHubConnectionString, string deviceId)
             where T : class
         {
             var containerBuilder = new ContainerBuilder();
 
-            containerBuilder.RegisterInstance(new ProxyGenerator().
-                CreateInterfaceProxyWithoutTarget<T>(new ModuleProxy<T>(iotHubConnectionString, deviceId)) as T);
+            containerBuilder.RegisterInstance(
+                new ProxyGenerator().CreateInterfaceProxyWithoutTarget<T>(new Proxy<T>(iotHubConnectionString,
+                    deviceId)));
 
             var container = containerBuilder.Build();
 
@@ -31,8 +27,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
         {
             var containerBuilder = new ContainerBuilder();
 
-            containerBuilder.RegisterInstance(new ProxyGenerator().
-                CreateInterfaceProxyWithoutTarget<T>(new ModuleProxy<T>(IotHubConnectionString, DeviceId)) as T);
+            containerBuilder.RegisterInstance(
+                new ProxyGenerator().CreateInterfaceProxyWithoutTarget<T>(
+                    new Proxy<T>(IotHubConnectionString,
+                    DeviceId)));
 
             var container = containerBuilder.Build();
 

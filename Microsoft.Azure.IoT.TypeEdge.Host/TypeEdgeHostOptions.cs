@@ -1,7 +1,4 @@
 ﻿using Serilog.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
@@ -12,4 +9,3 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
         public LogEventLevel RuntimeLogLevel { get; set; }
     }
 }
-        
