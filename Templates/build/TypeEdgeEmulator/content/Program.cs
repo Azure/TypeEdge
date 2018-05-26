@@ -1,20 +1,20 @@
-﻿using Microsoft.Azure.IoT.TypeEdge.Host;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge.Host;
+using Microsoft.Extensions.Configuration;
 
 namespace TypeEdgeEmulator
 {
-    class Program
+    internal class Program
     {
         public static async Task Main(string[] args)
         {
             //TODO: Set your IoT Hub iothubowner connection string in appsettings.json
             var configuration = new ConfigurationBuilder()
-               .AddJsonFile("appsettings.json")
-               .AddEnvironmentVariables()
-               .AddCommandLine(args)
-               .Build();
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
+                .Build();
 
             var host = new TypeEdgeHost(configuration);
 

@@ -1,10 +1,13 @@
 ﻿using System;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+using Microsoft.Azure.IoT.TypeEdge.Twins;
 using TypeEdgeApplication.Shared;
 using TypeEdgeApplication.Shared.Messages;
 using TypeEdgeApplication.Shared.Twins;
 
-namespace TypeEdgeApplication.Modules
+namespace Modules
 {
     public class TypeEdgeModule2 : EdgeModule, ITypeEdgeModule2
     {
@@ -28,7 +31,7 @@ namespace TypeEdgeApplication.Modules
                     Data = msg.Data,
                     Metadata = DateTime.UtcNow.ToShortTimeString()
                 });
-                return MessageResult.OK;
+                return MessageResult.Ok;
             });
         }
     }

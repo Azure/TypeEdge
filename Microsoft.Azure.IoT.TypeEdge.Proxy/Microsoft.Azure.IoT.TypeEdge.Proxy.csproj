@@ -7,7 +7,7 @@
     <Company>Microsoft</Company>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageOutputPath>../Example/build</PackageOutputPath>
+    <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
     
     <TargetFramework>netcoreapp2.1</TargetFramework>
     

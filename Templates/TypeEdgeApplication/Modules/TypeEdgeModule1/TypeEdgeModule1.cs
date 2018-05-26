@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge;
+using Microsoft.Azure.IoT.TypeEdge.Enums;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.IoT.TypeEdge.Twins;
 using TypeEdgeApplication.Shared;
 using TypeEdgeApplication.Shared.Messages;
 using TypeEdgeApplication.Shared.Twins;
 
-namespace TypeEdgeApplication.Modules
+namespace Modules
 {
     public class TypeEdgeModule1 : EdgeModule, ITypeEdgeModule1
     {

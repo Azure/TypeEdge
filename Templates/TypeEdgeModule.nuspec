@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>TypeEdge.Module</id>
-        <version>0.1.0</version>
+        <version>0.1.2</version>
         <description>Creates a new Azure IoT Edge Module project for TypeEdge, a strongly typed Azure IoT Edge framework</description>
         <authors>paloukari</authors>
     	<owners>paloukari</owners>

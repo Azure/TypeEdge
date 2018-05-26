@@ -1,15 +1,14 @@
-﻿using Microsoft.Azure.IoT.TypeEdge.Modules;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+using Newtonsoft.Json;
 
 namespace Shared.Messages
 {
     public class TypeEdgeModuleOutput : IEdgeMessage
     {
-        public IDictionary<string, string> Properties { get; set; }
-
         public string Data { get; set; }
+        public IDictionary<string, string> Properties { get; set; }
 
         public byte[] GetBytes()
         {
