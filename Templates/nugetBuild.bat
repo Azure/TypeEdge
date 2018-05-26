@@ -49,4 +49,4 @@ nuget.exe pack build\TypeEdgeProxy
 nuget.exe pack build\TypeEdgeModule
 nuget.exe pack build\TypeEdgeApplication
 
-move /Y *.nupkg ..\Example\build 
+move /Y *.nupkg ..\..\TypeEdgeNuGets 

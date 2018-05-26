@@ -5,7 +5,7 @@
     <Version>0.1.0</Version>
     <Authors>paloukari</Authors>
     <Company>Microsoft</Company>
-    <PackageOutputPath>../Example/build</PackageOutputPath>
+    <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <TargetFramework>netcoreapp2.1</TargetFramework>

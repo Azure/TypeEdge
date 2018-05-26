@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Modules\TypeEdgeApplication.TypeEdgeModule1\TypeEdgeApplication.TypeEdgeModule1.csproj" />
-    <ProjectReference Include="..\Modules\TypeEdgeApplication.TypeEdgeModule2\TypeEdgeApplication.TypeEdgeModule2.csproj" />
+    <ProjectReference Include="..\Modules\TypeEdgeModule1\TypeEdgeModule1.csproj" />
+    <ProjectReference Include="..\Modules\TypeEdgeModule2\TypeEdgeModule2.csproj" />
     <ProjectReference Include="..\TypeEdgeApplication.Shared\TypeEdgeApplication.Shared.csproj" />
   </ItemGroup>
 
