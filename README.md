@@ -60,7 +60,7 @@ Here is the quickest way to get started with TypeEdge. This quick start will cre
     dotnet new -i TypeEdge.Application::*
     ```
 
-    >Note: If you already installed the template and you want to **update to a newer template version**, you need to clear the dotnet http and template cache
+    >**Note:** If you already installed the template and you want to **update to a newer template version**, you need to clear the dotnet http and template cache
     ```
     dotnet nuget locals http-cache --clear
     dotnet new --debug:reinit
@@ -73,20 +73,26 @@ Here is the quickest way to get started with TypeEdge. This quick start will cre
     ```
     dotnet new typeedgeapp -n Thermostat -m1 SensorModule -m2 PreprocessorModule -cs "YOUR_IOTHUBOWNER_CONNECTION"
     ```
-2. Build:
+
+1. Open in VS Code/Visual Studio 2017 and hit F5:
+
+    ```
+    cd Thermostat
+    code .
+    ```
+
+    > Note: you can build and run with no IDE, simply by executing the following
     ```
     dotnet build Thermostat
-    ```
-3. Run:
-    ```
     cd Thermostat\Thermostat.Emulator
     dotnet run
     ```
 
+
     > Note: You should now see the Edge Hub starting up.. 
 ![](images/IoTEdge.png) .. and the messages flowing in .. ![](images/messages.png)
 
-    > Congratulations! You just created your first TypeEdge application. Continue reading bellow to learn how to deploy this application to an IoT Device
+**Congratulations!** You just created your first TypeEdge application. Continue reading bellow to learn how to deploy this application to an IoT Device
 
 ## How it works
 

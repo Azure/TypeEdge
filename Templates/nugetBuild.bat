@@ -1,3 +1,5 @@
+echo off
+set version=%1
 rd /s /q build
 mkdir build
 cd build
@@ -44,9 +46,16 @@ xcopy TypeEdgeProxy build\TypeEdgeProxy\content /s /e /EXCLUDE:list-of-excluded-
 xcopy TypeEdgeModule build\TypeEdgeModule\content /s /e /EXCLUDE:list-of-excluded-files.txt
 xcopy TypeEdgeApplication build\TypeEdgeApplication\content /s /e /EXCLUDE:list-of-excluded-files.txt
 
-nuget.exe pack build\TypeEdgeEmulator
-nuget.exe pack build\TypeEdgeProxy
-nuget.exe pack build\TypeEdgeModule
-nuget.exe pack build\TypeEdgeApplication
+nuget.exe pack build\TypeEdgeEmulator -Version %version%
+nuget.exe pack build\TypeEdgeProxy -Version %version%
+nuget.exe pack build\TypeEdgeModule -Version %version%
+nuget.exe pack build\TypeEdgeApplication -Version %version%
 
 move /Y *.nupkg ..\..\TypeEdgeNuGets 
+
+nuget.exe push ..\..\TypeEdgeNuGets\*%version%.nupkg -ApiKey VSTS
+
+dotnet nuget locals http-cache --clear
+dotnet new --debug:reinit
+
+dotnet new -i TypeEdge.Application::*
