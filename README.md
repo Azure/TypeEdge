@@ -142,8 +142,7 @@ public class SensorModule : EdgeModule, ISensorModule
 } 
 ```
 </details>
-
-
+<br><br>
 A **TypeEdge** module can override any of the virtual methods of the base class ``EdgeModule``. As demonstrated in the above example, the ``RunAsync`` method is used for implementing long running loops, typically useful for modules that read sensor values. Another virtual method is ``Configure``, which can be used to read custom module configuration during startup. Finally, the ``BuildSubscriptions`` is used to define handlers to incoming messages.
 
 The complete ``EdgeModule`` definition is:
