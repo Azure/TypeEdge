@@ -32,7 +32,7 @@ To setup your development environment for **TypeEdge** you will need to:
     
     To add the feed to your machine you will need your git credentials or a personal access token. TO get your git credentials, navigate to the [VSTS repo](https://msblox-03.visualstudio.com/csetypescript) and under **"clone to your computer"** section, click **"Generate Git Credentials"**
 
-    Then, add your credentials to the command bellow and run it.
+    Then, **add your credentials to the command bellow** and run it.
 
     ```
     nuget.exe sources Add -Name "private-typeedge-feed" -Source "https://msblox-03.pkgs.visualstudio.com/_packaging/private-nuget-feed/nuget/v3/index.json" -UserName USERNAME -Password PASSWORD
@@ -53,9 +53,9 @@ Here is the quickest way to get started with TypeEdge. This quick start will cre
     dotnet new -i TypeEdge.Application::*
     ```
 
-    > If you already installed the template and you want to update to a newer version, you need to clear the dotnet http and template cache
+    >Note: If you already installed the template and you want to **update to a newer template version**, you need to clear the dotnet http and template cache
     ```
-    dotnet nuget locals http-cache --clear 
+    dotnet nuget locals http-cache --clear
     dotnet new --debug:reinit
     ```
 2. Copy the **iothubowner connection string** from your development Azure **IoT Hub**.
@@ -112,6 +112,9 @@ bool ResetModule(int sensorThreshold);
 
 After describing the module behavior and structure with an interface, the next step is to implement this interface. This is effectively the code that will run in the **TypeEdge** module. Below is an implementation example of the above interface:
 
+<details>
+  <summary>Click to see the full SensorModule implementation code</summary>
+
 ```cs
 public class SensorModule : EdgeModule, ISensorModule
 {
@@ -138,6 +141,8 @@ public class SensorModule : EdgeModule, ISensorModule
     }
 } 
 ```
+</details>
+
 
 A **TypeEdge** module can override any of the virtual methods of the base class ``EdgeModule``. As demonstrated in the above example, the ``RunAsync`` method is used for implementing long running loops, typically useful for modules that read sensor values. Another virtual method is ``Configure``, which can be used to read custom module configuration during startup. Finally, the ``BuildSubscriptions`` is used to define handlers to incoming messages.
 
@@ -182,6 +187,9 @@ In this example, the ``PreprocessorModule's`` input called ``Input``, subscribes
 
 The complete code of the template's ``PreprocessorModule`` is:
 
+<details>
+  <summary>Click to see the full PreprocessorModule implementation code</summary>
+
 ```cs
 public class PreprocessorModule : EdgeModule, IPreprocessorModule
 {
@@ -210,6 +218,8 @@ public class PreprocessorModule : EdgeModule, IPreprocessorModule
     }
 }
 ```
+</details>
+
 
 ### Emulator
 The emulator references the Runtime bits achieve the emulation. Under the hood, the emulator starts a console application that hosts the Edge Hub  and all referenced modules. It will also provision a new Edge device to your designated IoT Hub (by the iothubowner connection string). This device will contain a fully functional deployment configuration, ready to be used to an actual device deployment.
@@ -226,6 +236,10 @@ host.Upstream.Subscribe(host.GetProxy<IPreprocessorModule>().Output);
 ```
 
 Below is the complete template emulator code for reference.
+
+
+<details>
+  <summary>Click to see the full emulator code</summary>
 
 ```cs
 public static async Task Main(string[] args)
@@ -254,6 +268,8 @@ public static async Task Main(string[] args)
     Console.ReadLine();
 }
 ```
+
+</details>
 
 ### Proxy
 **TypeEdge**  adds functionality also for service application development (cloud side application). This template will create a Proxy project, useful for cloud side interaction with the TypeEdge application. It also leverages the interfaces as the way to create a strongly typed proxy client. The code to call a direct method of a TypeEdge module from the could side is literally one line:
