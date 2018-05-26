@@ -11,6 +11,10 @@ Specifically:
 
 ## Development Environment Setup
 
+<details>
+  <summary>
+  <b>Important:</b> If you just landed to this repo,<b> make sure you setup your environment first before continuing </b></summary>
+
 To setup your development environment for **TypeEdge** you will need to:
 
  1. **Install [Docker](https://docs.docker.com/engine/installation/)** 
@@ -44,6 +48,9 @@ To setup your development environment for **TypeEdge** you will need to:
     nuget.exe sources Add -Name "RocksDB ARM" -Source "https://www.myget.org/F/rocksdb-native-arm/api/v3/index.json"
     ```
 These steps will get you  ready to build your first TypeEdge application.
+
+</details>
+<br>
 
 ## QuickStart
 Here is the quickest way to get started with TypeEdge. This quick start will create an IoT Edge solution with two modules and run it in the IoT Edge  emulator:
@@ -113,7 +120,7 @@ bool ResetModule(int sensorThreshold);
 After describing the module behavior and structure with an interface, the next step is to implement this interface. This is effectively the code that will run in the **TypeEdge** module. Below is an implementation example of the above interface:
 
 <details>
-  <summary>Click to see the full SensorModule implementation code</summary>
+  <summary>Click to see the full <b>SensorModule</b> implementation code</summary>
 
 ```cs
 public class SensorModule : EdgeModule, ISensorModule
@@ -142,7 +149,7 @@ public class SensorModule : EdgeModule, ISensorModule
 } 
 ```
 </details>
-<br><br>
+<br>
 A **TypeEdge** module can override any of the virtual methods of the base class ``EdgeModule``. As demonstrated in the above example, the ``RunAsync`` method is used for implementing long running loops, typically useful for modules that read sensor values. Another virtual method is ``Configure``, which can be used to read custom module configuration during startup. Finally, the ``BuildSubscriptions`` is used to define handlers to incoming messages.
 
 The complete ``EdgeModule`` definition is:
@@ -187,7 +194,7 @@ In this example, the ``PreprocessorModule's`` input called ``Input``, subscribes
 The complete code of the template's ``PreprocessorModule`` is:
 
 <details>
-  <summary>Click to see the full PreprocessorModule implementation code</summary>
+  <summary>Click to see the full <b>PreprocessorModule</b> implementation code</summary>
 
 ```cs
 public class PreprocessorModule : EdgeModule, IPreprocessorModule
@@ -238,7 +245,7 @@ Below is the complete template emulator code for reference.
 
 
 <details>
-  <summary>Click to see the full emulator code</summary>
+  <summary>Click to see the full <b>emulator</b> code</summary>
 
 ```cs
 public static async Task Main(string[] args)
