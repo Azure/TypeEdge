@@ -6,6 +6,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
     {
         public string IotHubConnectionString { get; set; }
         public string DeviceId { get; set; }
-        public LogEventLevel RuntimeLogLevel { get; set; }
+        public LogEventLevel? RuntimeLogLevel { get; set; }
+
+        public bool? PrintDeploymentJson { get; set; }
     }
 }

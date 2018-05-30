@@ -1,6 +1,12 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge.Enums;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Enums;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+using Microsoft.Azure.IoT.TypeEdge.Twins;
 using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
@@ -25,29 +31,36 @@ namespace Modules
 
         public override async Task<ExecutionResult> RunAsync()
         {
+            while (true)
+            {
+                Console.WriteLine("Temporary loop");
+                Thread.Sleep(1000);
+            }
+
             var twin = await Twin.GetAsync();
             _scale = twin.Scale;
 
-            return ExecutionResult.OK;
+            return ExecutionResult.Ok;
         }
 
         public override void BuildSubscriptions()
         {
             Temperature.Subscribe(_temperatureModuleProxy.Temperature, async temp =>
             {
+                Console.WriteLine("New Message in NormalizeTemperatureModule.");
                 if (temp.Scale != _scale)
                     if (_scale == TemperatureScale.Celsius)
                         temp.Temperature = temp.Temperature * 9 / 5 + 32;
                 await NormalizedTemperature.PublishAsync(temp);
 
-                return MessageResult.OK;
+                return MessageResult.Ok;
             });
 
             Twin.Subscribe(async twin =>
             {
                 _scale = twin.Scale;
                 await Twin.ReportAsync(twin);
-                return TwinResult.OK;
+                return TwinResult.Ok;
             });
         }
     }

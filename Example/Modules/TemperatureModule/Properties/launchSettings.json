@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TemperatureModule": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ModuleName": "Temperature"
+      }
+    }
+  }
+}

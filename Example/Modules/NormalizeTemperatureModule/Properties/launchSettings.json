@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "NormalizeTemperatureModule": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ModuleName": "NormalizeTemperature"
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Microsoft.Azure.IoT.TypeEdge</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.23</Version>
     <Authors>paloukari</Authors>
     <Company>Microsoft</Company>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>

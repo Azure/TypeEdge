@@ -43,10 +43,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             Routes = new List<string>();
 
-
             InstantiateProperties();
-
-            RegisterMethods();
         }
 
         internal virtual string Name
@@ -54,9 +51,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             get
             {
                 var proxyInterface = GetType().GetProxyInterface();
-                var typeModule =
-                    proxyInterface.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
-                if (typeModule != null)
+                if (proxyInterface.GetCustomAttribute(typeof(TypeModuleAttribute), true) is TypeModuleAttribute typeModule)
                     return typeModule.Name;
                 return GetType().Name;
             }
@@ -98,29 +93,42 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         internal async Task<ExecutionResult> InternalRunAsync()
         {
+
+            RegisterMethods();
+
             // Open a connection to the Edge runtime
             _ioTHubModuleClient = DeviceClient.CreateFromConnectionString(_connectionString, _transportSettings);
 
             await _ioTHubModuleClient.OpenAsync();
-            Console.WriteLine($"IoT Hub module {Name} client initialized.");
+            Console.WriteLine($"{Name}:IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
             foreach (var subscription in _routeSubscriptions)
+            {
                 await _ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, MessageHandler,
                     subscription.Value);
+
+                Console.WriteLine($"{Name}:MessageHandler set for {subscription.Key}");
+            }
 
             // Register callback to be called when a twin update is received by the module
             await _ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, _twinSubscriptions);
 
             foreach (var subscription in _methodSubscriptions)
+            {
                 await _ioTHubModuleClient.SetMethodHandlerAsync(subscription.Key, MethodCallback, subscription.Value);
+                Console.WriteLine($"{Name}:MethodCallback set for{subscription.Key}");
+            }
+
+            Console.WriteLine($"{Name}:Running RunAsync..");
             return await RunAsync();
         }
 
         private Task<MethodResponse> MethodCallback(MethodRequest methodRequest, object userContext)
         {
+            Console.WriteLine($"{Name}:MethodCallback called");
             if (!(userContext is MethodCallback callback))
-                throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
+                throw new InvalidOperationException($"{Name}:UserContext doesn't contain a valid SubscriptionCallback");
 
             var paramValues = JsonConvert.DeserializeObject<object[]>(methodRequest.DataAsJson);
 
@@ -145,6 +153,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         internal CreationResult InternalConfigure(IConfigurationRoot configuration)
         {
+            Console.WriteLine($"{Name}:InternalConfigure called");
             _connectionString = configuration.GetValue<string>(Constants.EdgeHubConnectionStringKey);
 
             // Cert verification is not yet fully functional when using Windows OS for the container
@@ -155,7 +164,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
             if (true) //bypassCertVerification)
                 mqttSetting.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-            _transportSettings = new ITransportSettings[] {mqttSetting};
+            _transportSettings = new ITransportSettings[] { mqttSetting };
 
             return Configure(configuration);
         }
@@ -163,6 +172,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         internal async Task<PublishResult> PublishMessageAsync<T>(string outputName, T message)
             where T : IEdgeMessage
         {
+            Console.WriteLine($"{Name}:PublishMessageAsync called");
             var edgeMessage = new Message(message.GetBytes());
             if (message.Properties != null)
                 foreach (var prop in edgeMessage.Properties)
@@ -180,6 +190,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             Func<T, Task<MessageResult>> handler)
             where T : IEdgeMessage
         {
+            Console.WriteLine($"{Name}:SubscribeRoute called");
+
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
 
@@ -188,17 +200,23 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         internal void SubscribeRoute(string outName, string outRoute, string inName, string inRoute)
         {
+            Console.WriteLine($"{Name}:SubscribeRoute called");
+
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
         }
 
         internal void SubscribeTwin<T>(string name, Func<T, Task<TwinResult>> handler) where T : IModuleTwin
         {
+            Console.WriteLine($"{Name}:SubscribeTwin called");
+
             _twinSubscriptions[name] = new SubscriptionCallback(name, handler, typeof(T));
         }
 
         private async Task<MessageResponse> MessageHandler(Message message, object userContext)
         {
+            Console.WriteLine($"{Name}:MessageHandler called");
+
             if (!(userContext is SubscriptionCallback callback))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
@@ -207,17 +225,23 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             Console.WriteLine($"<<<<<<{Name}:message: Body: [{messageString}]");
 
             if (!(Activator.CreateInstance(callback.Type) is IEdgeMessage input))
+            {
+                Console.WriteLine($"{Name}:Abandoned Message");
                 return MessageResponse.Abandoned;
+            }
+
             input.SetBytes(messageBytes);
 
             var invocationResult = callback.Handler.DynamicInvoke(input);
-            var result = await (Task<MessageResult>) invocationResult;
+            var result = await (Task<MessageResult>)invocationResult;
 
             return result == MessageResult.Ok ? MessageResponse.Completed : MessageResponse.Abandoned;
         }
 
         private async Task PropertyHandler(TwinCollection desiredProperties, object userContext)
         {
+            Console.WriteLine($"{Name}:PropertyHandler called");
+
             if (!(userContext is Dictionary<string, SubscriptionCallback> callbacks))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
@@ -227,11 +251,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             foreach (var callback in callbacks)
                 if (desiredProperties.Contains($"___{callback.Key}"))
                 {
-                    var input = Activator.CreateInstance(callback.Value.Type) as IModuleTwin;
-                    input.SetTwin(callback.Key, new Twin(new TwinProperties {Desired = desiredProperties}));
+                    if (!(Activator.CreateInstance(callback.Value.Type) is IModuleTwin input))
+                        continue;
+                    input.SetTwin(callback.Key, new Twin(new TwinProperties { Desired = desiredProperties }));
 
                     var invocationResult = callback.Value.Handler.DynamicInvoke(input);
-                    var result = await (Task<TwinResult>) invocationResult;
+                    await (Task<TwinResult>)invocationResult;
                 }
         }
 
@@ -288,18 +313,22 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         private void RegisterMethods()
         {
+            Console.WriteLine($"{Name}:RegisterMethods called");
             var interfaceType = GetType().GetProxyInterface();
-            if (interfaceType != null)
-            {
-                var moduleMethods = GetType().GetInterfaceMap(interfaceType).TargetMethods.Where(e => !e.IsSpecialName);
-                foreach (var method in moduleMethods)
-                    _methodSubscriptions[method.Name] = new MethodCallback(method.Name, method);
-            }
+
+            if (interfaceType == null)
+                return;
+
+            var moduleMethods = GetType().GetInterfaceMap(interfaceType).TargetMethods.Where(e => !e.IsSpecialName);
+            foreach (var method in moduleMethods)
+                _methodSubscriptions[method.Name] = new MethodCallback(method.Name, method);
         }
 
         internal async Task ReportTwinAsync<T>(string name, T twin)
             where T : IModuleTwin
         {
+            Console.WriteLine($"{Name}:ReportTwinAsync called");
+
             await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
         }
     }
