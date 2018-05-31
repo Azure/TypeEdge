@@ -11,6 +11,10 @@
     "connectionString": {
       "longName": "connection-string",
       "shortName": "cs"
+    },
+    "containerRegistry": {
+      "longName": "container-registry",
+      "shortName": "cr"
     }
   }
 }

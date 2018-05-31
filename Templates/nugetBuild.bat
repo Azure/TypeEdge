@@ -30,6 +30,9 @@ dotnet build TypeEdgeApplication
 dotnet build TypeEdgeModule
 dotnet build TypeEdgeProxy
 
+dotnet nuget locals http-cache --clear
+dotnet new --debug:reinit
+
 dotnet new --install TypeEdgeModule
 dotnet new --install TypeEdgeApplication
 dotnet new --install TypeEdgeProxy
