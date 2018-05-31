@@ -37,7 +37,7 @@ Here is the quickest way to get started with **TypeEdge**. In this quick start y
     > The **iothubowner** is required because TypeEdge needs to provision a new device with the generated deployment configuration. 
 
 1. Create a new IoT TypeEdge application:
-    > You can choose the TypeEdge application and modules names of this template. In the example bellow, the application is called **Thermostat**, and the two modules are called **SensorModule** and **PreprocessorModule**. These names will be used as class names, so **Pascal casing** is suggested.
+    > You can choose the TypeEdge application and modules names of this template. In the example below, the application is called **Thermostat**, and the two modules are called **SensorModule** and **PreprocessorModule**. These names will be used as class names, so **Pascal casing** is suggested.
     ```
     dotnet new typeedgeapp -n Thermostat -m1 SensorModule -m2 PreprocessorModule -cs "YOUR_IOTHUBOWNER_CONNECTION" -cr YOUR_CONTAINER_REGISTRY
     ```
@@ -45,7 +45,7 @@ Here is the quickest way to get started with **TypeEdge**. In this quick start y
 
 1. Temporary step:
     
-    Navigate inside the root folder to add the private packages source.  Then, **add your git credentials to the command bellow** and run it. This will download nuget.exe and add the private packages source in your solution. 
+    Navigate inside the root folder to add the private packages source.  Then, **add your git credentials to the command below** and run it. This will download nuget.exe and add the private packages source in your solution. 
     ```
     cd Thermostat
     addPrivateSource.bat USERNAME PASSWORD
@@ -68,7 +68,7 @@ Here is the quickest way to get started with **TypeEdge**. In this quick start y
 
 **Congratulations!** 
 
-You just created your first **TypeEdge** application. Continue reading bellow to learn how to deploy this application to an IoT Device, or take the time to understand [how it works](#how).
+You just created your first **TypeEdge** application. Continue reading below to learn how to deploy this application to an IoT Device, or take the time to understand [how it works](#how).
 
 ## Device Deployment
 
@@ -131,7 +131,7 @@ public interface ISensorModule
 This module has a strongly typed output called ***Output*** and the messages type is ***SensorModuleOutput***. Similarly, it has a module twin called ***Twin*** with type ***SensorModuleTwin***
 > Note: **TypeEdge** allows you to define multiple twin properties to enable partial twin updates
 
-Finally, this module has a method that can be invoked directly with the bellow method signature:
+Finally, this module has a method that can be invoked directly with the below method signature:
 
 ```cs
 bool ResetModule(int sensorThreshold);
@@ -187,7 +187,7 @@ public abstract class EdgeModule
 ### Module Subscriptions
 **TypeEdge** uses the pub/sub pattern for all module I/O, except for the direct methods. This means that a module can subscribe to other module outputs, and publish messages to their inputs. To do this, a reference to the module interface definition is required. **TypeEdge** uses dependency injection to determine the referenced modules. 
 
-Bellow, is the constructor of the second module included in the application template called ``PreprocessorModule``, that references the ``SensorModule`` via its interface.
+Below, is the constructor of the second module included in the application template called ``PreprocessorModule``, that references the ``SensorModule`` via its interface.
 
 ```cs
 public PreprocessorModule(ISensorModule proxy)
