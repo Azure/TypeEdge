@@ -11,56 +11,24 @@ Specifically:
 
 ## Development Environment Setup
 
-<details>
-  <summary>
-  <b>Important:</b> If you just landed to this repo,<b> make sure you setup your environment first before continuing </b></summary>
 
-To setup your development environment for **TypeEdge** you will need to:
-
- 1. **Install [Docker](https://docs.docker.com/engine/installation/)** 
- 2. **Install the latest [.NET Core](https://github.com/dotnet/core/blob/master/release-notes/download-archive.md)**
-    > ***Important note***: **TypeEdge** requires **.NET Core 2.1.0-Preview2** and above, you can check your version by typing: 
-    ```cmd
-    dotnet --version
-    ```
-    > *As of 05/25/2018, the latest .NET Core release is [this](https://github.com/dotnet/core/blob/master/release-notes/download-archives/2.1.0-rc1-download.md)*
-
- 1. **Install your favorite IDE ([VS Code](https://code.visualstudio.com/download) or [VS 2017](https://www.visualstudio.com/downloads/))**
+Make sure you have [Docker](https://docs.docker.com/engine/installation/), the latest [.NET Core SDK](https://github.com/dotnet/core/blob/master/release-notes/download-archive.md) and your git credentials to login [here](https://msblox-03.visualstudio.com/csetypescript)
 
     
-1. **Temporary step - private NuGet packages**:
-    
-    Temporarily, and until GA, the required NuGet packages will be distributed through [this](https://msblox-03.pkgs.visualstudio.com/_packaging/private-nuget-feed/nuget/v3/index.json) private NuGet feed. After GA, these packages will be available in the www.nuget.org.
-    
-    > ***Important note:*** Only MS FTE have access to this NuGet feed. To add the feed to your machine wide configuration just once. This is required because of the way dotnet templates at the moment work.  
-    
-    To add the feed to your machine you will need your git credentials or a personal access token. TO get your git credentials, navigate to the [VSTS repo](https://msblox-03.visualstudio.com/csetypescript) and under **"clone to your computer"** section, click **"Generate Git Credentials"**
-
-    Then, **add your credentials to the command bellow** and run it.
-
-    ```
-    nuget.exe sources Add -Name "private-typeedge-feed" -Source "https://msblox-03.pkgs.visualstudio.com/_packaging/private-nuget-feed/nuget/v3/index.json" -UserName USERNAME -Password PASSWORD
-    ```
-    You can download the latest nuget.exe from [here](https://dist.nuget.org/win-x86-commandline/latest/nuget.exe)
-
-    You'll also need to add the RocksDB ARM repo:
-    ```
-    nuget.exe sources Add -Name "RocksDB ARM" -Source "https://www.myget.org/F/rocksdb-native-arm/api/v3/index.json"
-    ```
-These steps will get you  ready to build your first TypeEdge application.
-
-</details>
-<br>
+**Temporary step - private NuGet credentials**:
+        Temporarily the required IoT Edge Runtime NuGet packages will be unofficially distributed through [this](https://msblox-03.pkgs.visualstudio.com/_packaging/private-nuget-feed/nuget/v3/index.json) private NuGet feed.
+        
+> ***Important note:*** Only MS FTE have access to this NuGet feed. You will need to add the feed to your solution in a next step. Make sure you know your git credentials. To get your git credentials, navigate to the [VSTS repo](https://msblox-03.visualstudio.com/csetypescript) and under **"clone to your computer"** section, click **"Generate Git Credentials"**.
 
 ## QuickStart
-Here is the quickest way to get started with TypeEdge. This quick start will create an IoT Edge solution with two modules and run it in the IoT Edge  emulator:
+Here is the quickest way to get started with **TypeEdge**. This quick start will create an IoT Edge solution with two modules, and run it in the IoT Edge emulator:
 
 1. Install the TypeEdge .NET Core solution template. Just type:
     ```
-    dotnet new -i TypeEdge.Application::*
+    dotnet new -i TypeEdge.Application
     ```
 
-    >**Note:** If you already installed the template and you want to **update to a newer template version**, you need to clear the dotnet http and template cache
+    >**Note:** If you already installed the template and you want to **upgrade to a newer template version**, you need to clear the dotnet http and template cache
     ```
     dotnet nuget locals http-cache --clear
     dotnet new --debug:reinit
@@ -74,17 +42,23 @@ Here is the quickest way to get started with TypeEdge. This quick start will cre
     dotnet new typeedgeapp -n Thermostat -m1 SensorModule -m2 PreprocessorModule -cs "YOUR_IOTHUBOWNER_CONNECTION"
     ```
 
-1. Open in VS Code/Visual Studio 2017 and hit F5:
-
+1. Temporary step:
+    
+    Navigate inside the root folder to add the private packages source.  Then, **add your git credentials to the command bellow** and run it. This will download nuget.exe and add the private packages source in your solution. 
     ```
     cd Thermostat
+    addPrivateSource.bat USERNAME PASSWORD
+    ```
+3. Open in VS Code/Visual Studio 2017 and hit F5:
+
+    ```
     code .
     ```
 
-    > Note: you can build and run with no IDE, simply by executing the following
+    > Note: you don't necessarily need VS Code, you can build and run by executing the following
     ```
-    dotnet build Thermostat
-    cd Thermostat\Thermostat.Emulator
+    dotnet build Thermostat.sln
+    cd Thermostat.Emulator
     dotnet run
     ```
 
@@ -92,9 +66,30 @@ Here is the quickest way to get started with TypeEdge. This quick start will cre
     > Note: You should now see the Edge Hub starting up.. 
 ![](images/IoTEdge.png) .. and the messages flowing in .. ![](images/messages.png)
 
-**Congratulations!** You just created your first TypeEdge application. Continue reading bellow to learn how to deploy this application to an IoT Device
+**Congratulations!** You just created your first **TypeEdge** application. Continue reading bellow to learn how to deploy this application to an IoT Device, or take the time to understand [how it works](#how).
 
-## How it works
+## Device Deployment
+
+In the application root folder, type:
+
+    docker-compose build
+
+
+This will build your docker images for the device deployment. Final step is to push the images to the docker registry.
+
+>Note: the registry is configured in the .env file inside the root folder. **Make sure you run the the emulator if you edit the .env file**, to update the cloud IoT Device deployment configuration.
+
+
+    docker-compose push
+
+>Note: If your registry requires authentication, you need to provide the registry credentials to docker:
+
+    docker login YOUR_REGISTRY -u YOUR_USERNAME -p YOUR_PASSWORD 
+
+
+This was the final step. All IoT Edge containers are ready to be deployed to the device. Follow [these instructions](https://docs.microsoft.com/en-us/azure/iot-edge/quickstart#configure-the-iot-edge-runtime) to deploy the application to the device.
+## <a name="how">How it works</a>
+
 
 **TypeEdge** for the moment only supports .NET Core C#. A **TypeEdge** application is a collection of **TypeEdge Modules**.
 
@@ -102,7 +97,7 @@ Here is the quickest way to get started with TypeEdge. This quick start will cre
 
 **TypeEdge** leverages **interfaces** to define the structure and behavior of the modules. A typical example of a **TypeEdge module definition** is:  
  ```cs
-[TypeModule(Name = "SensorModule")]
+[TypeModule]
 public interface ISensorModule
 {
     Output<SensorModuleOutput> Output { get; set; }
@@ -156,16 +151,13 @@ public class SensorModule : EdgeModule, ISensorModule
 ```
 </details>
 <br>
-A **TypeEdge** module can override any of the virtual methods of the base class ``EdgeModule``. As demonstrated in the above example, the ``RunAsync`` method is used for implementing long running loops, typically useful for modules that read sensor values. Another virtual method is ``Configure``, which can be used to read custom module configuration during startup. Finally, the ``BuildSubscriptions`` is used to define handlers to incoming messages.
+A <b>TypeEdge</b> module can override any of the virtual methods of the base class ``EdgeModule``. As demonstrated in the above example, the ``RunAsync`` method is used for implementing long running loops, typically useful for modules that read sensor values. Another virtual method is ``Configure``, which can be used to read custom module configuration during startup. Finally, the ``BuildSubscriptions`` is used to define handlers to incoming messages.
 
 The complete ``EdgeModule`` definition is:
 
 ```cs
 public abstract class EdgeModule
 {
-    public EdgeModule();
-
-    public virtual void BuildSubscriptions();
     public virtual CreationResult Configure(IConfigurationRoot configuration);
     public virtual Task<ExecutionResult> RunAsync();
 }
@@ -195,7 +187,7 @@ Input.Subscribe(proxy.Output, async (msg) =>
     return MessageResult.OK;
 });
 ```
-In this example, the ``PreprocessorModule's`` input called ``Input``, subscribes to ``SensorModule's`` output, called ``Output``, and defines a subscription handler, a delegate that will be called every time the ``SensorModule`` sends a messages through its ``Output ``. In this example, the ``PreprocessorModule`` will enrich the incoming message, and publish it to its output called ``Output ``. These subscriptions need to be declared in the ``BuildSubscriptions`` override.
+In this example, the ``PreprocessorModule's`` input called ``Input``, subscribes to ``SensorModule's`` output, called ``Output``, and defines a subscription handler, a delegate that will be called every time the ``SensorModule`` sends a messages through its ``Output ``. In this example, the ``PreprocessorModule`` will enrich the incoming message, and publish it to its output called ``Output ``. These subscriptions need to be declared in the default constructor.
 
 The complete code of the template's ``PreprocessorModule`` is:
 
@@ -205,18 +197,11 @@ The complete code of the template's ``PreprocessorModule`` is:
 ```cs
 public class PreprocessorModule : EdgeModule, IPreprocessorModule
 {
-    readonly ISensorModule proxy;
-
     public Output<PreprocessorModuleOutput> Output { get; set; }
     public Input<SensorModuleOutput> Input { get; set; }
     public ModuleTwin<PreprocessorModuleTwin> Twin { get; set; }
 
     public PreprocessorModule(ISensorModule proxy)
-    {
-        this.proxy = proxy;
-    }
-
-    public override void BuildSubscriptions()
     {
         Input.Subscribe(proxy.Output, async (msg) =>
         {
@@ -260,6 +245,7 @@ public static async Task Main(string[] args)
     var configuration = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
         .AddEnvironmentVariables()
+        .AddDotenvFile()
         .AddCommandLine(args)
         .Build();
 
@@ -293,6 +279,3 @@ ProxyFactory.GetModuleProxy<ISensorModule>().ResetModule(4);
 ### Solution structure
 Apparently, to reference module definition interfaces and to avoid coupling the module implementation code together, these interfaces need to be defined in a separate project that will be commonly shared across the solution, containing only the definition interfaces and the referenced types.
 ![](images/solution.png)
-
-## Device Deployment
-[Coming soon]

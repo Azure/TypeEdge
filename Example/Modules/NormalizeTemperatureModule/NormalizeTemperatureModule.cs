@@ -18,34 +18,10 @@ namespace Modules
     {
         //memory state
         private TemperatureScale _scale;
-        private readonly ITemperatureModule _temperatureModuleProxy;
 
         public NormalizeTemperatureModule(ITemperatureModule proxy)
         {
-            _temperatureModuleProxy = proxy;
-        }
-
-        public Input<TemperatureModuleOutput> Temperature { get; set; }
-        public Output<TemperatureModuleOutput> NormalizedTemperature { get; set; }
-        public ModuleTwin<NormalizerTwin> Twin { get; set; }
-
-        public override async Task<ExecutionResult> RunAsync()
-        {
-            while (true)
-            {
-                Console.WriteLine("Temporary loop");
-                Thread.Sleep(1000);
-            }
-
-            var twin = await Twin.GetAsync();
-            _scale = twin.Scale;
-
-            return ExecutionResult.Ok;
-        }
-
-        public override void BuildSubscriptions()
-        {
-            Temperature.Subscribe(_temperatureModuleProxy.Temperature, async temp =>
+            Temperature.Subscribe(proxy.Temperature, async temp =>
             {
                 Console.WriteLine("New Message in NormalizeTemperatureModule.");
                 if (temp.Scale != _scale)
@@ -62,6 +38,18 @@ namespace Modules
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
+        }
+
+        public Input<TemperatureModuleOutput> Temperature { get; set; }
+        public Output<TemperatureModuleOutput> NormalizedTemperature { get; set; }
+        public ModuleTwin<NormalizerTwin> Twin { get; set; }
+
+        public override async Task<ExecutionResult> RunAsync()
+        {
+            var twin = await Twin.GetAsync();
+            _scale = twin.Scale;
+
+            return ExecutionResult.Ok;
         }
     }
 }

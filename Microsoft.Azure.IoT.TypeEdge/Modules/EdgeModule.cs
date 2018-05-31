@@ -51,9 +51,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             get
             {
                 var proxyInterface = GetType().GetProxyInterface();
-                if (proxyInterface.GetCustomAttribute(typeof(TypeModuleAttribute), true) is TypeModuleAttribute typeModule)
-                    return typeModule.Name;
-                return GetType().Name;
+
+                if (proxyInterface == null)
+                    throw new ArgumentException($"{GetType().Name} has needs to implement an single interface annotated with the TypeModule Attribute");
+
+                return proxyInterface.Name.Substring(1).ToLower();
             }
         }
 
@@ -87,13 +89,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             return CreationResult.Ok;
         }
 
-        public virtual void BuildSubscriptions()
-        {
-        }
-
         internal async Task<ExecutionResult> InternalRunAsync()
         {
-
             RegisterMethods();
 
             // Open a connection to the Edge runtime

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge.Host;
+using Microsoft.Azure.IoT.TypeEdge.Host.DovEnv;
 using Microsoft.Extensions.Configuration;
 using TypeEdgeApplication.Shared;
 
@@ -14,6 +15,7 @@ namespace TypeEdgeApplication
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
+                .AddDotenvFile()
                 .AddCommandLine(args)
                 .Build();
 

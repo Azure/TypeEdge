@@ -3,7 +3,7 @@
     "NormalizeTemperatureModule": {
       "commandName": "Project",
       "environmentVariables": {
-        "ModuleName": "NormalizeTemperature"
+        "ModuleName": "normalizetemperaturemodule"
       }
     }
   }

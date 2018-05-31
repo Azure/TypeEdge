@@ -12,13 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\.env" Link=".env">
+    <None Include="..\.env" Link=".env" Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.23" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.26" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
   </ItemGroup>

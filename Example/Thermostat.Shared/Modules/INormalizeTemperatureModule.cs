@@ -6,7 +6,7 @@ using ThermostatApplication.Twins;
 
 namespace ThermostatApplication.Modules
 {
-    [TypeModule(Name = "normalizetemperature")]
+    [TypeModule]
     public interface INormalizeTemperatureModule
     {
         Output<TemperatureModuleOutput> NormalizedTemperature { get; set; }

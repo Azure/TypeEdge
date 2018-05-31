@@ -69,9 +69,6 @@ namespace Microsoft.Azure.IoT.TypeEdge
             Module = container.Resolve(moduleType) as EdgeModule;
             if (Module != null)
             {
-
-                Module.BuildSubscriptions();
-
                 Module.InternalConfigure(configuration);
                 await Module.InternalRunAsync();
             }
@@ -108,7 +105,7 @@ namespace Microsoft.Azure.IoT.TypeEdge
             var moduleType = assembly.GetTypes().SingleOrDefault(t =>
                 t.GetInterfaces().SingleOrDefault(i =>
                     i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null &&
-                    string.Equals((i.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute)?.Name, moduleName, StringComparison.CurrentCultureIgnoreCase)) != null);
+                    string.Equals(i.Name.Substring(1), moduleName, StringComparison.CurrentCultureIgnoreCase)) != null);
 
             if (moduleType == null)
             {

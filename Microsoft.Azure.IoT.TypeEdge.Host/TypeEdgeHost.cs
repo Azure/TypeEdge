@@ -194,7 +194,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 {
                     if (!(scope.Resolve(moduleType) is EdgeModule module))
                         continue;
-                    module.BuildSubscriptions();
                     modules.Add(module);
                 }
             }
@@ -207,7 +206,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
 
             var registryManager = RegistryManager.CreateFromConnectionString(_options.IotHubConnectionString);
-            string sasKey = null;
+            string sasKey;
             try
             {
                 var device = await registryManager.AddDeviceAsync(

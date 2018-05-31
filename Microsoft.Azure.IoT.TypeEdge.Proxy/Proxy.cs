@@ -31,11 +31,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
         {
             get
             {
-                var typeModule = typeof(T).GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
-                if (typeModule?.Name != null)
-                    return typeModule.Name;
-
-                return typeof(T).IsInterface ? typeof(T).Name.TrimStart('I') : typeof(T).Name;
+                if (!(typeof(T).GetCustomAttribute(typeof(TypeModuleAttribute), true) is TypeModuleAttribute))
+                    throw new ArgumentException($"{typeof(T).Name} has no TypeModule annotation");
+                if (!typeof(T).IsInterface)
+                    throw new ArgumentException($"{typeof(T).Name} needs to be an interface");
+                return typeof(T).Name.Substring(1).ToLower();
             }
         }
 
@@ -59,7 +59,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
             {
                 //direct methods
                 var methodInvocation =
-                    new CloudToDeviceMethod(invocation.Method.Name) {ResponseTimeout = TimeSpan.FromSeconds(30)};
+                    new CloudToDeviceMethod(invocation.Method.Name) { ResponseTimeout = TimeSpan.FromSeconds(30) };
                 var paramData = JsonConvert.SerializeObject(invocation.Arguments);
                 methodInvocation.SetPayloadJson(paramData);
 
