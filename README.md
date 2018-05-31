@@ -51,8 +51,7 @@ Here is the quickest way to get started with **TypeEdge**. In this quick start y
     ```
     code .
     ```
-
-    > Note: you don't necessarily need VS Code, you can build and run by executing the following
+    ..or run it in the command line:
     ```
     dotnet build Thermostat.sln
     cd Thermostat.Emulator
@@ -60,10 +59,12 @@ Here is the quickest way to get started with **TypeEdge**. In this quick start y
     ```
 
 
-    > Note: You should now see the Edge Hub starting up.. 
+    > Note: You should see now the Edge Hub starting up.. 
 ![](images/IoTEdge.png) .. and the messages flowing in .. ![](images/messages.png)
 
-**Congratulations!** You just created your first **TypeEdge** application. Continue reading bellow to learn how to deploy this application to an IoT Device, or take the time to understand [how it works](#how).
+**Congratulations!** 
+
+You just created your first **TypeEdge** application. Continue reading bellow to learn how to deploy this application to an IoT Device, or take the time to understand [how it works](#how).
 
 ## Device Deployment
 
