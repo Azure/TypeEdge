@@ -1,23 +1,22 @@
 version: '3.4'
-
 services:
 
-  normalizetemperaturemodule:
-    image: ${DOCKER_REGISTRY}normalizetemperaturemodule
+  normalizetemperaturemodule:  
+    image: ${DOCKER_REGISTRY}normalizetemperature
     build:
       context: .
       dockerfile: Modules/NormalizeTemperatureModule/Dockerfile
 
         
   temperaturemodule:
-    image: ${DOCKER_REGISTRY}temperaturemodule 
+    image: ${DOCKER_REGISTRY}temperature
     build:
       context: .
       dockerfile: Modules/TemperatureModule/Dockerfile
-
 
   thermostat.emulator:
     image: ${DOCKER_REGISTRY}thermostatemulator
     build:
       context: .
       dockerfile: Thermostat.Emulator/Dockerfile
+

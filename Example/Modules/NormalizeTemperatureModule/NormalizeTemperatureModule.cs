@@ -1,6 +1,12 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge.Enums;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Enums;
+using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+using Microsoft.Azure.IoT.TypeEdge.Twins;
 using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
@@ -12,11 +18,26 @@ namespace Modules
     {
         //memory state
         private TemperatureScale _scale;
-        private readonly ITemperatureModule _temperatureModuleProxy;
 
         public NormalizeTemperatureModule(ITemperatureModule proxy)
         {
-            _temperatureModuleProxy = proxy;
+            Temperature.Subscribe(proxy.Temperature, async temp =>
+            {
+                Console.WriteLine("New Message in NormalizeTemperatureModule.");
+                if (temp.Scale != _scale)
+                    if (_scale == TemperatureScale.Celsius)
+                        temp.Temperature = temp.Temperature * 9 / 5 + 32;
+                await NormalizedTemperature.PublishAsync(temp);
+
+                return MessageResult.Ok;
+            });
+
+            Twin.Subscribe(async twin =>
+            {
+                _scale = twin.Scale;
+                await Twin.ReportAsync(twin);
+                return TwinResult.Ok;
+            });
         }
 
         public Input<TemperatureModuleOutput> Temperature { get; set; }
@@ -28,27 +49,7 @@ namespace Modules
             var twin = await Twin.GetAsync();
             _scale = twin.Scale;
 
-            return ExecutionResult.OK;
-        }
-
-        public override void BuildSubscriptions()
-        {
-            Temperature.Subscribe(_temperatureModuleProxy.Temperature, async temp =>
-            {
-                if (temp.Scale != _scale)
-                    if (_scale == TemperatureScale.Celsius)
-                        temp.Temperature = temp.Temperature * 9 / 5 + 32;
-                await NormalizedTemperature.PublishAsync(temp);
-
-                return MessageResult.OK;
-            });
-
-            Twin.Subscribe(async twin =>
-            {
-                _scale = twin.Scale;
-                await Twin.ReportAsync(twin);
-                return TwinResult.OK;
-            });
+            return ExecutionResult.Ok;
         }
     }
 }

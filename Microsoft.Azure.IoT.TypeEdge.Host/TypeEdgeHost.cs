@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Castle.DynamicProxy;
-using Microsoft.Azure.Devices;
+using Microsoft.Azure.Devices; 
 using Microsoft.Azure.Devices.Common.Exceptions;
 using Microsoft.Azure.Devices.Edge.Agent.Core;
+using Microsoft.Azure.Devices.Edge.Storage;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.Azure.IoT.TypeEdge.Host.Hub;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
@@ -193,7 +194,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 {
                     if (!(scope.Resolve(moduleType) is EdgeModule module))
                         continue;
-                    module.BuildSubscriptions();
                     modules.Add(module);
                 }
             }
@@ -206,7 +206,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
 
             var registryManager = RegistryManager.CreateFromConnectionString(_options.IotHubConnectionString);
-            string sasKey = null;
+            string sasKey;
             try
             {
                 var device = await registryManager.AddDeviceAsync(
@@ -230,9 +230,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             var modulesConfig =
                 configurationContent.ModuleContent["$edgeAgent"].TargetContent["modules"] as JObject;
+
+            var dockerRegistry = Environment.GetEnvironmentVariable("DOCKER_REGISTRY") ?? "";
+
             foreach (var module in _modules)
             {
-                modulesConfig?.Add(module.Name, JObject.FromObject(new
+                modulesConfig?.Add(module.Name.ToLower(), JObject.FromObject(new
                 {
                     version = "1.0",
                     type = "docker",
@@ -240,9 +243,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                     restartPolicy = "on-failure",
                     settings = new
                     {
-                        image = module.Name.ToLower(),
-                        createOptions = "{\"Env\":[\"" + TypeEdge.Constants.ModuleNameConfigName + "=" +
-                                        module.Name + "\"]}"
+                        image = dockerRegistry + module.Name.ToLower(),
+                        createOptions = "{\n  \"Env\":[\n     \"" + TypeEdge.Constants.ModuleNameConfigName + "=" +
+                                        module.Name.ToLower() + "\"\n  ]\n}"
                     }
                 }));
 
@@ -280,6 +283,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             twinContent.TargetContent = new TwinCollection(patch);
             await registryManager.ApplyConfigurationContentOnDeviceAsync(_options.DeviceId, configurationContent);
+
+            if (_options.PrintDeploymentJson.HasValue && _options.PrintDeploymentJson.Value)
+                Console.WriteLine(JToken.Parse(configurationContent.ToJson()).ToString(Formatting.Indented));
 
             return sasKey;
         }

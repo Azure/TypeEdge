@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\.env" Link=".env">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.0" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.26" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -6,7 +6,7 @@ using TypeEdgeApplication.Shared.Twins;
 
 namespace TypeEdgeApplication.Shared
 {
-    [TypeModule(Name = "TypeEdgeModule1")]
+    [TypeModule]
     public interface ITypeEdgeModule1
     {
         Output<TypeEdgeModule1Output> Output { get; set; }

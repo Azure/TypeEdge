@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -15,6 +17,8 @@ namespace Microsoft.Azure.IoT.TypeEdge
 {
     public static class Startup
     {
+        public static EdgeModule Module { get; set; }
+
         public static async Task DockerEntryPoint(string[] args)
         {
             var services = new ServiceCollection().AddLogging();
@@ -48,39 +52,70 @@ namespace Microsoft.Azure.IoT.TypeEdge
 
             var moduleDepedencies = moduleType.GetConstructors().First().GetParameters();
             var moduleDepedencyTypes = moduleDepedencies.Where(i => i.ParameterType.IsInterface &&
-                                                                    i.GetCustomAttribute(typeof(TypeModuleAttribute),
+                                                                    i.ParameterType.GetCustomAttribute(
+                                                                        typeof(TypeModuleAttribute),
                                                                         true) != null).Select(e => e.ParameterType);
 
             var proxyGenerator = new ProxyGenerator();
-            moduleDepedencyTypes.Select(e =>
+            foreach (var depedency in moduleDepedencyTypes)
+            {
                 containerBuilder.RegisterInstance(
-                    proxyGenerator.CreateInterfaceProxyWithoutTarget(e, new ModuleProxyBase(e))));
+                    proxyGenerator.CreateInterfaceProxyWithoutTarget(depedency, new ModuleProxyBase(depedency)))
+                    .As(depedency);
+            }
 
             var container = containerBuilder.Build();
 
-            if (container.Resolve(moduleType) is EdgeModule module)
+            Module = container.Resolve(moduleType) as EdgeModule;
+            if (Module != null)
             {
-                module.InternalConfigure(configuration);
-                await module.InternalRunAsync();
+                Module.InternalConfigure(configuration);
+                await Module.InternalRunAsync();
             }
+
+
+            // Wait until the app unloads or is cancelled
+            var cts = new CancellationTokenSource();
+            AssemblyLoadContext.Default.Unloading += (ctx) => cts.Cancel();
+            Console.CancelKeyPress += (sender, cpe) => cts.Cancel();
+            await WhenCancelled(cts.Token);
         }
 
-        private static (Type moduleType, Type moduleInterfaceType) 
+        public static Task WhenCancelled(CancellationToken cancellationToken)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).SetResult(true), tcs);
+            return tcs.Task;
+        }
+
+        private static (Type moduleType, Type moduleInterfaceType)
             GetModuleTypes(string moduleName)
         {
-            var moduleType = Assembly.GetCallingAssembly().GetTypes().SingleOrDefault(t =>
+
+            if (GetModule(moduleName, Assembly.GetEntryAssembly(), out var moduleTypes))
+                return moduleTypes;
+
+            //try all assemblies now
+            return AppDomain.CurrentDomain.GetAssemblies().Any(assembly => GetModule(moduleName, assembly, out moduleTypes)) ? moduleTypes : (null, null);
+        }
+
+        private static bool GetModule(string moduleName, Assembly assembly,
+            out (Type moduleType, Type moduleInterfaceType) moduleTypes)
+        {
+            var moduleType = assembly.GetTypes().SingleOrDefault(t =>
                 t.GetInterfaces().SingleOrDefault(i =>
                     i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null &&
-                    (i.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute)?.Name ==
-                    moduleName) != null);
+                    string.Equals(i.Name.Substring(1), moduleName, StringComparison.CurrentCultureIgnoreCase)) != null);
 
-            if (moduleType != null)
+            if (moduleType == null)
             {
-                var moduleInterfaceType = moduleType.GetProxyInterface();
-                return (moduleType, moduleInterfaceType);
+                moduleTypes = (null, null);
+                return false;
             }
 
-            return (null, null);
+            var moduleInterfaceType = moduleType.GetProxyInterface();
+            moduleTypes = (moduleType, moduleInterfaceType);
+            return true;
         }
 
         public static Type GetProxyInterface(this Type type)

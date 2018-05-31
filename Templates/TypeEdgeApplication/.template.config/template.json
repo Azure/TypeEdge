@@ -13,22 +13,51 @@
   "sourceName": "TypeEdgeApplication",
   "preferNameDirectory": true,
   "symbols": {
+    "appNameLower":{
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source":"name",
+        "toLower": true
+      },
+      "replaces":"TypeEdgeApplicationEmulatorImageName"
+    },
     "module1Name": {
       "type": "parameter",
       "defaultValue": "Module1",
       "replaces": "TypeEdgeModule1",
-      "fileRename": "TypeEdgeModule1"
+      "fileRename": "TypeEdgeModule1", 
+      "description": "The name of the first TypeEdge Module"
+    },
+    "module1NameLower":{
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source":"module1Name",
+        "toLower": true
+      },
+      "replaces":"TypeEdgeModule1ImageName"
     },
     "module2Name": {
       "type": "parameter",
       "defaultValue": "Module2",
       "replaces": "TypeEdgeModule2",
-      "fileRename": "TypeEdgeModule2"
+      "fileRename": "TypeEdgeModule2",
+      "description": "The name of the second TypeEdge Module"
+    },
+    "module2NameLower":{
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source":"module2Name",
+        "toLower": true
+      },
+      "replaces":"TypeEdgeModule2ImageName"
     },
     "connectionString": {
       "type": "parameter",
-      "defaultValue": "PUT YOUR IOT HUB OWNER CONNECTION STRING HERE",
-      "replaces": "CONNECTION_STRING"
+      "replaces": "CONNECTION_STRING",
+      "description": "The IoT Hub owner connection string"
     }
   }
 }

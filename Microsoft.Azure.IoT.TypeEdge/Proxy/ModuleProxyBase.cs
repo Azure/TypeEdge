@@ -21,11 +21,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
         {
             get
             {
-                var typeModule = _type.GetCustomAttribute(typeof(TypeModuleAttribute), true) as TypeModuleAttribute;
-                if (typeModule?.Name != null)
-                    return typeModule.Name;
-
-                return _type.IsInterface ? _type.Name.TrimStart('I') : _type.Name;
+                if (!(_type.GetCustomAttribute(typeof(TypeModuleAttribute), true) is TypeModuleAttribute))
+                    throw new ArgumentException($"{_type.Name} has no TypeModule annotation");
+                if (!_type.IsInterface)
+                    throw new ArgumentException($"{_type.Name} needs to be an interface");
+                return _type.Name.Substring(1).ToLower();
             }
         }
 

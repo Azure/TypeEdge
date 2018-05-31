@@ -35,7 +35,6 @@ dotnet new --install TypeEdgeApplication
 dotnet new --install TypeEdgeProxy
 dotnet new --install TypeEdgeEmulator
 
-
 dotnet clean TypeEdgeModule
 dotnet clean TypeEdgeApplication
 dotnet clean TypeEdgeProxy
@@ -53,7 +52,7 @@ nuget.exe pack build\TypeEdgeApplication -Version %version%
 
 move /Y *.nupkg ..\..\TypeEdgeNuGets 
 
-nuget.exe push ..\..\TypeEdgeNuGets\*%version%.nupkg -ApiKey VSTS
+rem nuget.exe push ..\..\TypeEdgeNuGets\*%version%.nupkg -ApiKey VSTS
 
 dotnet nuget locals http-cache --clear
 dotnet new --debug:reinit

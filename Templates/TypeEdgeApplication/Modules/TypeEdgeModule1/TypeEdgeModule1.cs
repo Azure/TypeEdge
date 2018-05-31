@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge.Enums;
@@ -26,11 +27,9 @@ namespace Modules
         {
             while (true)
             {
-                await Output.PublishAsync(new TypeEdgeModule1Output {Data = new Random().NextDouble().ToString()});
+                await Output.PublishAsync(new TypeEdgeModule1Output {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)});
                 Thread.Sleep(1000);
             }
-
-            return await base.RunAsync();
         }
     }
 }

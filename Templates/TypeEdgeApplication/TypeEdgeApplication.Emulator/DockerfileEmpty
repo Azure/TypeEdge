@@ -1,0 +1,2 @@
+ARG base_tag=2.1-runtime-stretch-slim
+FROM microsoft/dotnet:${base_tag} AS base
