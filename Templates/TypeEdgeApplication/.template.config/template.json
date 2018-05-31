@@ -58,6 +58,11 @@
       "type": "parameter",
       "replaces": "CONNECTION_STRING",
       "description": "The IoT Hub owner connection string"
+    },
+    "containerRegistry": {
+      "type": "parameter",
+      "replaces": "CONTAINER_REGISTRY",
+      "description": "The container registry login FQN"
     }
   }
 }

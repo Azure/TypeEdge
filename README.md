@@ -17,6 +17,9 @@ Make sure you have [Docker](https://docs.docker.com/engine/installation/), the l
         
 > Note: To get your git credentials, navigate to the [VSTS repo](https://msblox-03.visualstudio.com/csetypeedge) and under **"clone to your computer"** section, click **"Generate Git Credentials"**.
 
+
+You will need also an [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) and an [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal), or any other secure container registry.
+
 ## QuickStart
 Here is the quickest way to get started with **TypeEdge**. In this quick start you will create an IoT Edge application with two modules and run it in the IoT Edge emulator:
 
@@ -36,8 +39,9 @@ Here is the quickest way to get started with **TypeEdge**. In this quick start y
 1. Create a new IoT TypeEdge application:
     > You can choose the TypeEdge application and modules names of this template. In the example bellow, the application is called **Thermostat**, and the two modules are called **SensorModule** and **PreprocessorModule**. These names will be used as class names, so **Pascal casing** is suggested.
     ```
-    dotnet new typeedgeapp -n Thermostat -m1 SensorModule -m2 PreprocessorModule -cs "YOUR_IOTHUBOWNER_CONNECTION"
+    dotnet new typeedgeapp -n Thermostat -m1 SensorModule -m2 PreprocessorModule -cs "YOUR_IOTHUBOWNER_CONNECTION" -cr YOUR_CONTAINER_REGISTRY
     ```
+    >Note: a localhost registry will not work in this version.
 
 1. Temporary step:
     
@@ -75,15 +79,17 @@ In the application root folder, type:
 
 This will build your docker images for the device deployment. Final step is to push the images to the docker registry.
 
->Note: the registry is configured in the .env file inside the root folder, with initial value, the localhost:5000. **Make sure you run the the emulator if you edit the .env file**, to update the cloud IoT Device deployment configuration.
 
 
-    docker-compose push
-
->Note: If your registry requires authentication, you need to provide the registry credentials to docker:
+>Note: You need to provide the registry credentials to docker before you can push there:
 
     docker login YOUR_REGISTRY -u YOUR_USERNAME -p YOUR_PASSWORD 
 
+Push the images to your registry
+
+    docker-compose push
+
+>Note: The registry is configured in the .env file inside the root folder. **Make sure you run the the emulator if you edit the .env file**, to update the cloud IoT Device deployment configuration.
 
 This was the final step. All IoT Edge containers are ready to be deployed to the device. 
 
