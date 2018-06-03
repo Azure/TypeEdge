@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Microsoft.Azure.Devices.Shared;
-using Microsoft.Azure.IoT.TypeEdge.Attributes;
 using Microsoft.Azure.IoT.TypeEdge.Enums;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Enums;
@@ -71,7 +70,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         internal virtual async Task<T> GetTwinAsync<T>(string name)
             where T : IModuleTwin, new()
-
         {
             var typeTwin = Activator.CreateInstance<T>();
             typeTwin.SetTwin(name, await _ioTHubModuleClient.GetTwinAsync());
@@ -151,7 +149,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         internal CreationResult InternalConfigure(IConfigurationRoot configuration)
         {
             Console.WriteLine($"{Name}:InternalConfigure called");
-            _connectionString = configuration.GetValue<string>(Constants.EdgeHubConnectionStringKey);
+
+            _connectionString = configuration.GetValue<string>($"{Constants.EdgeHubConnectionStringKey}");
+            if (string.IsNullOrEmpty(_connectionString))
+                throw new ArgumentException($"Missing {Constants.EdgeHubConnectionStringKey} in configuration for {Name}");
+
 
             // Cert verification is not yet fully functional when using Windows OS for the container
             var bypassCertVerification = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

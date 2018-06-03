@@ -1,4 +1,6 @@
-﻿using Serilog.Events;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Serilog.Events;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Host
 {
@@ -7,7 +9,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
         public string IotHubConnectionString { get; set; }
         public string DeviceId { get; set; }
         public LogEventLevel? RuntimeLogLevel { get; set; }
-
         public bool? PrintDeploymentJson { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public RunningEnvironment? Environment { get; set; }
     }
 }

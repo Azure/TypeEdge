@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Azure.IoT.TypeEdge.DovEnv;
 using Microsoft.Azure.IoT.TypeEdge.Host;
-using Microsoft.Azure.IoT.TypeEdge.Host.DovEnv;
 using Microsoft.Extensions.Configuration;
 using TypeEdgeApplication.Shared;
 

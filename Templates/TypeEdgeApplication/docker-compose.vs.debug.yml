@@ -6,3 +6,5 @@ services:
     build: 
       context: .
       dockerfile: TypeEdgeApplication.Emulator/Dockerfile
+    volumes:
+    - env:/env
