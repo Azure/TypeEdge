@@ -55,7 +55,7 @@ nuget.exe pack build\TypeEdgeApplication -Version %version%
 
 move /Y *.nupkg ..\..\TypeEdgeNuGets 
 
-rem nuget.exe push ..\..\TypeEdgeNuGets\*%version%.nupkg -ApiKey VSTS
+nuget.exe push ..\..\TypeEdgeNuGets\*%version%.nupkg -ApiKey VSTS
 
 dotnet nuget locals http-cache --clear
 dotnet new --debug:reinit

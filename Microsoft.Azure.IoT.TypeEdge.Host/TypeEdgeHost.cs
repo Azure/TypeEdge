@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Castle.DynamicProxy;
-using Microsoft.Azure.Devices; 
+using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Common.Exceptions;
 using Microsoft.Azure.Devices.Edge.Agent.Core;
 using Microsoft.Azure.Devices.Edge.Storage;
@@ -34,6 +34,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
         private readonly EdgeHub _hub;
         private ModuleCollection _modules;
         private readonly TypeEdgeHostOptions _options;
+        private readonly bool _inContainer;
 
 
         public TypeEdgeHost(IConfigurationRoot configuration)
@@ -53,6 +54,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             _hub = new EdgeHub();
 
             Upstream = new Upstream<JsonMessage>(_hub);
+
+            _inContainer = File.Exists(@"/.dockerenv");
         }
 
         public Upstream<JsonMessage> Upstream { get; set; }
@@ -74,7 +77,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
         public void Build()
         {
-            //setup the container
+            CleanUp();
+
             BuildContainer();
 
             _modules = CreateModules();
@@ -86,6 +90,14 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             BuildHub(deviceSasKey);
         }
 
+        private void CleanUp()
+        {
+            if (!_inContainer || !Directory.Exists(TypeEdge.Constants.ComposeConfigurationPath))
+                return;
+            foreach (var file in Directory.EnumerateFiles(TypeEdge.Constants.ComposeConfigurationPath))
+                File.Delete(file);
+        }
+
 
         public async Task RunAsync()
         {
@@ -93,9 +105,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             {
                 _hub.RunAsync()
             };
+
             //start all modules
-            foreach (var module in _modules)
-                tasks.Add(module.InternalRunAsync());
+            if (!_inContainer)
+                foreach (var module in _modules)
+                    tasks.Add(module.InternalRunAsync());
 
             await Task.WhenAll(tasks.ToArray());
         }
@@ -164,22 +178,49 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
         private void ConfigureModules()
         {
+            var certificatePath = @"Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem";
             var currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+            Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey,
+                Path.Combine(currentLocation,
+                    certificatePath));
+
             foreach (var module in _modules)
             {
                 var moduleConnectionString =
                     GetModuleConnectionStringAsync(_options.IotHubConnectionString, _options.DeviceId, module.Name)
                         .Result;
-                Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
-                    moduleConnectionString);
-                Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey,
-                    Path.Combine(currentLocation, @"Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem"));
 
-                var moduleConfiguration = new ConfigurationBuilder()
-                    .AddEnvironmentVariables()
-                    .Build();
+                if (_inContainer)
+                {
+                    System.Console.WriteLine("Emulator running in docker-compose mode.");
 
-                module.InternalConfigure(moduleConfiguration);
+                    const string envPath = TypeEdge.Constants.ComposeConfigurationPath;
+                    var path = Path.Combine(envPath, $"{module.Name}.env");
+                    var certPath = Path.Combine(envPath, certificatePath);
+
+                    var dotenvData = $"{Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey}={moduleConnectionString}";
+                    dotenvData += $"{Environment.NewLine}{Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey}={certPath}";
+
+                    if (!Directory.Exists(Path.GetDirectoryName(certPath)))
+                        Directory.CreateDirectory(Path.GetDirectoryName(certPath));
+
+                    if (!File.Exists(certPath))
+                        File.Copy(Path.Combine(currentLocation, certificatePath), certPath);
+
+                    File.WriteAllText(path, dotenvData);
+                }
+                else
+                {
+                    Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
+                        moduleConnectionString);
+
+                    var moduleConfiguration = new ConfigurationBuilder()
+                        .AddEnvironmentVariables()
+                        .Build();
+
+                    module.InternalConfigure(moduleConfiguration);
+                }
             }
         }
 
@@ -210,7 +251,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             try
             {
                 var device = await registryManager.AddDeviceAsync(
-                    new Device(_options.DeviceId) {Capabilities = new DeviceCapabilities {IotEdge = true}});
+                    new Device(_options.DeviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
                 sasKey = device.Authentication.SymmetricKey.PrimaryKey;
             }
             catch (DeviceAlreadyExistsException)
@@ -231,7 +272,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             var modulesConfig =
                 configurationContent.ModuleContent["$edgeAgent"].TargetContent["modules"] as JObject;
 
-            var dockerRegistry = Environment.GetEnvironmentVariable("DOCKER_REGISTRY") ?? "";
+            var dockerRegistry = _configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
 
             foreach (var module in _modules)
             {
@@ -265,8 +306,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             var routes = new Dictionary<string, string>();
 
             foreach (var module in _modules)
-            foreach (var route in module.Routes)
-                routes[$"route{routes.Count}"] = route;
+                foreach (var route in module.Routes)
+                    routes[$"route{routes.Count}"] = route;
 
             foreach (var route in _hub.Routes) routes[$"route{routes.Count}"] = route;
 

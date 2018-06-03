@@ -4,6 +4,7 @@
     {
         public const string ConfigFileName = "appsettings_compose.json";
         public const string EdgeHubConnectionStringKey = "EdgeHubConnectionString";
-        public const string ModuleNameConfigName = "ModuleName";
+        public const string ModuleNameConfigName = "moduleName";
+        public const string ComposeConfigurationPath = "/env";
     }
 }

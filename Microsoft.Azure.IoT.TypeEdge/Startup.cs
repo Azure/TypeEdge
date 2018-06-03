@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -8,10 +9,12 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Castle.DynamicProxy;
 using Microsoft.Azure.IoT.TypeEdge.Attributes;
+using Microsoft.Azure.IoT.TypeEdge.DovEnv;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Azure.IoT.TypeEdge.Proxy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static System.String;
 
 namespace Microsoft.Azure.IoT.TypeEdge
 {
@@ -31,22 +34,65 @@ namespace Microsoft.Azure.IoT.TypeEdge
                 .AddCommandLine(args)
                 .Build();
 
-
             var moduleName = configuration.GetValue<string>(Constants.ModuleNameConfigName);
 
-            //todo: throw or warn here?
-            if (string.IsNullOrEmpty(moduleName))
+            if (IsNullOrEmpty(moduleName))
             {
                 Console.WriteLine($"WARN:No {Constants.ModuleNameConfigName} in configuration. ");
-                Console.WriteLine("Exiting...");
-                return;
-                //throw new ArgumentException($"No moduleName in arguments");
+
+                moduleName = DiscoverModuleName();
+                if (IsNullOrEmpty(moduleName))
+                {
+                    Console.WriteLine("Exiting...");
+                    return;
+                    //throw new ArgumentException($"No moduleName in arguments");
+                }
             }
 
             var (moduleType, _) = GetModuleTypes(moduleName);
 
             if (moduleType == null)
-                throw new ArgumentException($"No module callled {moduleName} in calling assembly");
+                throw new ArgumentException($"No module called {moduleName} in calling assembly");
+
+            var connectionString = configuration.GetValue<string>($"{Constants.EdgeHubConnectionStringKey}");
+
+            if (IsNullOrEmpty(connectionString))
+            {
+                
+                //check the file system, we are in docker-compose mode
+                var fileName = Path.Combine(Constants.ComposeConfigurationPath, $"{moduleName}.env");
+                var remainingSeconds = 30;
+                while (remainingSeconds-- > 0)
+                {
+                    if (File.Exists(fileName))
+                    {
+                        configuration = new ConfigurationBuilder()
+                            .AddEnvironmentVariables()
+                            .AddCommandLine(args)
+                            .AddDotenvFile(fileName)
+                            .Build();
+                        File.Delete(fileName);
+                        break;
+                    }
+
+                    var directory = Path.GetDirectoryName(fileName);
+                    foreach (var file in Directory.EnumerateFiles(directory))
+                    {
+                        Console.WriteLine(file);
+                    }
+
+                    Console.WriteLine($"{moduleName}:{fileName} does not exist. Retrying in 1 sec.");
+                    Thread.Sleep(1000);
+                }
+
+                if (remainingSeconds < 0)
+                {
+                    Console.WriteLine($"{moduleName}:No {moduleName}.env found.");
+                    Console.WriteLine($"{moduleName}:Exiting...");
+                    return;
+                }
+            }
+
 
             containerBuilder.RegisterType(moduleType);
 
@@ -81,6 +127,20 @@ namespace Microsoft.Azure.IoT.TypeEdge
             await WhenCancelled(cts.Token);
         }
 
+        private static string DiscoverModuleName()
+        {
+            var assembly = Assembly.GetEntryAssembly();
+            var moduleType = assembly.GetTypes().SingleOrDefault(t =>
+                t.GetInterfaces().SingleOrDefault(i =>
+                    i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null) != null);
+
+            if (moduleType == null)
+                return null;
+
+            var moduleInterfaceType = moduleType.GetProxyInterface();
+            return moduleInterfaceType.Name.Substring(1).ToLower();
+        }
+
         public static Task WhenCancelled(CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<bool>();
@@ -105,7 +165,7 @@ namespace Microsoft.Azure.IoT.TypeEdge
             var moduleType = assembly.GetTypes().SingleOrDefault(t =>
                 t.GetInterfaces().SingleOrDefault(i =>
                     i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null &&
-                    string.Equals(i.Name.Substring(1), moduleName, StringComparison.CurrentCultureIgnoreCase)) != null);
+                    String.Equals(i.Name.Substring(1), moduleName, StringComparison.CurrentCultureIgnoreCase)) != null);
 
             if (moduleType == null)
             {

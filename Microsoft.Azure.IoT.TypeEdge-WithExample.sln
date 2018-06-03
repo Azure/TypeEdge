@@ -12,18 +12,31 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{F2FF1756-9AAF-411B-8B54-3829EAC21515}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemperatureModule", "Example\Modules\TemperatureModule\TemperatureModule.csproj", "{48302C68-971D-414F-A29D-742F79415D74}"
+	ProjectSection(ProjectDependencies) = postProject
+		{54587D56-7C22-4084-9321-84D57C2F6ECB} = {54587D56-7C22-4084-9321-84D57C2F6ECB}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NormalizeTemperatureModule", "Example\Modules\NormalizeTemperatureModule\NormalizeTemperatureModule.csproj", "{30A335A6-47C9-435A-BA23-50988EAF2C33}"
+	ProjectSection(ProjectDependencies) = postProject
+		{54587D56-7C22-4084-9321-84D57C2F6ECB} = {54587D56-7C22-4084-9321-84D57C2F6ECB}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thermostat.Shared", "Example\Thermostat.Shared\Thermostat.Shared.csproj", "{45F97F43-7C75-49B8-8525-7F0E9C7B9FB7}"
 	ProjectSection(ProjectDependencies) = postProject
+		{54587D56-7C22-4084-9321-84D57C2F6ECB} = {54587D56-7C22-4084-9321-84D57C2F6ECB}
 		{E738845B-4D98-4CB9-BDA4-F83193FE81B5} = {E738845B-4D98-4CB9-BDA4-F83193FE81B5}
 		{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3} = {6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thermostat.Emulator", "Example\Thermostat.Emulator\Thermostat.Emulator.csproj", "{2076DDEF-8EE3-4BC1-BF79-1C1F62A8719D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{54587D56-7C22-4084-9321-84D57C2F6ECB} = {54587D56-7C22-4084-9321-84D57C2F6ECB}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thermostat.ServiceApp", "Example\Thermostat.ServiceApp\Thermostat.ServiceApp.csproj", "{286CDAA1-5410-4322-AC1C-F35A83CDA63D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{54587D56-7C22-4084-9321-84D57C2F6ECB} = {54587D56-7C22-4084-9321-84D57C2F6ECB}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.IoT.TypeEdge.Proxy", "Microsoft.Azure.IoT.TypeEdge.Proxy\Microsoft.Azure.IoT.TypeEdge.Proxy.csproj", "{E738845B-4D98-4CB9-BDA4-F83193FE81B5}"
 EndProject
