@@ -101,10 +101,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
         public async Task RunAsync()
         {
-            await _hub.RunAsync();
             var tasks = new List<Task>
             {
-                //_hub.RunAsync()
+                _hub.RunAsync()
             };
 
             //start all modules
@@ -159,10 +158,16 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             Environment.SetEnvironmentVariable("storageFolder", storageFolder);
 
             var csBuilder = IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
+
+            //new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, _options.DeviceId)
+            //       .WithModuleId(Devices.Edge.Agent.Core.Constants.EdgeHubModuleName)
+            //       .WithModuleId(Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
+            //       .WithSharedAccessKey(deviceSasKey)
+            //       .Build();
+
             var edgeConnectionString =
-                new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, _options.DeviceId)
-                    .WithModuleId(Devices.Edge.Agent.Core.Constants.EdgeHubModuleName)
-                    .WithModuleId(Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
+                new ModuleConnectionStringBuilder(csBuilder.HostName, _options.DeviceId)
+                    .Create(Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
                     .WithSharedAccessKey(deviceSasKey)
                     .Build();
             Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
@@ -340,9 +345,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             var module = await registryManager.GetModuleAsync(deviceId, moduleName);
             var sasKey = module.Authentication.SymmetricKey.PrimaryKey;
 
-            return new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
+            return new ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
+                .Create(moduleName)
                 .WithGatewayHostName(Environment.MachineName)
-                .WithModuleId(moduleName)
                 .WithSharedAccessKey(sasKey)
                 .Build();
         }

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Proxy" Version="0.1.51" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Proxy" Version="0.1.55" />
   </ItemGroup>
 
 </Project>
