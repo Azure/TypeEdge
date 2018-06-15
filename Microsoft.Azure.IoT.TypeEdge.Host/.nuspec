@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Microsoft.Azure.IoT.TypeEdge.Host</id>
-    <version>0.1.48</version>
+    <version>0.1.50</version>
     <authors>paloukari</authors>
     <owners>paloukari</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

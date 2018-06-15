@@ -1,0 +1,36 @@
+version: '3.4'
+volumes:
+  env:
+      
+services:
+  TypeEdgeML.Emulator:
+    image: ${DOCKER_REGISTRY}emulatorimage
+    build: 
+      context: .
+      dockerfile: TypeEdgeML.Emulator/DockerfileEmpty
+    volumes:
+    - env:/env
+
+  TypeEdgeModule1:
+    image: ${DOCKER_REGISTRY}module1image
+    build:
+      context: .
+      dockerfile: Modules/TypeEdgeModule1/Dockerfile
+    volumes:
+    - env:/env
+
+  TypeEdgeModule2:
+    image: ${DOCKER_REGISTRY}module2image   
+    build:
+      context: .
+      dockerfile: Modules/TypeEdgeModule2/Dockerfile
+    volumes:
+    - env:/env
+
+  TypeEdgeModule3:
+    image: ${DOCKER_REGISTRY}module3image   
+    build:
+      context: .
+      dockerfile: Modules/TypeEdgeModule3/Dockerfile
+    volumes:
+    - env:/env

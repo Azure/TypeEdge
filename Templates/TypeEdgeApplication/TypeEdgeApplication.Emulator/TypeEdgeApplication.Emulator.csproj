@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.48" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.50" />
   </ItemGroup>
 
   <ItemGroup>

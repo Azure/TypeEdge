@@ -165,7 +165,7 @@ namespace Microsoft.Azure.IoT.TypeEdge
             var moduleType = assembly.GetTypes().SingleOrDefault(t =>
                 t.GetInterfaces().SingleOrDefault(i =>
                     i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null &&
-                    String.Equals(i.Name.Substring(1), moduleName, StringComparison.CurrentCultureIgnoreCase)) != null);
+                    String.Equals(i.Name.Substring(1), moduleName, StringComparison.InvariantCultureIgnoreCase)) != null);
 
             if (moduleType == null)
             {

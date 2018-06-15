@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.IoT.TypeEdge.Proxy</PackageId>
-    <Version>0.1.48</Version>
+    <Version>0.1.50</Version>
     <Authors>paloukari</Authors>
     <Company>Microsoft</Company>
 

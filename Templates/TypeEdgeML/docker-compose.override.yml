@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  TypeEdgeML.Emulator:
+    image: ${DOCKER_REGISTRY}emulatorimage
+    build: 
+      context: .
+      dockerfile: TypeEdgeML.Emulator/Dockerfile
+    volumes:
+    - env:/env
