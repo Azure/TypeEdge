@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Devices.Edge.Agent.Core" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.Devices.Edge.Hub.Service" Version="1.0.0">
+    <PackageReference Include="Microsoft.Azure.Devices.Edge.Hub.Service" Version="1.0.2">
       <ExcludeAssets>contentFiles</ExcludeAssets>
     </PackageReference>
   </ItemGroup>

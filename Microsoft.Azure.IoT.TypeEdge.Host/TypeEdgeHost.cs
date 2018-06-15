@@ -101,9 +101,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
         public async Task RunAsync()
         {
+            await _hub.RunAsync();
             var tasks = new List<Task>
             {
-                _hub.RunAsync()
+                //_hub.RunAsync()
             };
 
             //start all modules

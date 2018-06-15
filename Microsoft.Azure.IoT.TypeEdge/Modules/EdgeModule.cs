@@ -31,7 +31,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
         private string _connectionString;
-        private DeviceClient _ioTHubModuleClient;
+        private ModuleClient _ioTHubModuleClient;
         private ITransportSettings[] _transportSettings;
 
         protected EdgeModule()
@@ -92,7 +92,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             RegisterMethods();
 
             // Open a connection to the Edge runtime
-            _ioTHubModuleClient = DeviceClient.CreateFromConnectionString(_connectionString, _transportSettings);
+            _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, _transportSettings);
 
             await _ioTHubModuleClient.OpenAsync();
             Console.WriteLine($"{Name}:IoT Hub module client initialized.");
@@ -173,6 +173,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         {
             Console.WriteLine($"{Name}:PublishMessageAsync called");
             var edgeMessage = new Message(message.GetBytes());
+             
+
             if (message.Properties != null)
                 foreach (var prop in edgeMessage.Properties)
                     edgeMessage.Properties.Add(prop.Key, prop.Value);

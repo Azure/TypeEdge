@@ -32,7 +32,7 @@ namespace Modules
                     Scale = TemperatureScale.Celsius,
                     Temperature = new Random().NextDouble() * 100
                 });
-                Thread.Sleep(1000);
+                Thread.Sleep(10);
             }
 
             return await base.RunAsync();
