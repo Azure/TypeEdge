@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Proxy" Version="0.1.55" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Proxy" Version="0.1.68" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'"/>
   </ItemGroup>
 
 

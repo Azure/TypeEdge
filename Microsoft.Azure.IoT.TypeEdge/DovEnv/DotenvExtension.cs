@@ -73,7 +73,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.DovEnv
                     foreach (var basePath in basePaths)
                     {
                         var testPath = string.Join("/", new string[] { basePath, path });
-                        Console.WriteLine($"DotEnv: checking for {testPath}");
+                        //Console.WriteLine($"DotEnv: checking for {testPath}");
                         if (!File.Exists(testPath))
                             continue;
                         fileExists = true;

@@ -8,7 +8,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Twins
 {
     public abstract class TypeModuleTwin : IModuleTwin
     {
-        public Twin LastKnownTwin { get; set; }
+        private object _twinLock = new object();
+        Twin _lastTwin;
+
+        public Twin LastKnownTwin { get { lock (_twinLock) return _lastTwin; } set { lock (_twinLock) _lastTwin = value; } }
 
         public void SetTwin(string name, Twin twin)
         {
@@ -18,7 +21,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Twins
             var settings = new JsonSerializerSettings
             {
                 ContractResolver = resolver,
-                Converters = new JsonConverter[] {new JsonFlatteningConverter(resolver)}
+                Converters = new JsonConverter[] { new JsonFlatteningConverter(resolver) }
             };
 
             JsonConvert.PopulateObject(twin.Properties.Desired.ToJson(), this, settings);
@@ -41,7 +44,15 @@ namespace Microsoft.Azure.IoT.TypeEdge.Twins
             //todo: use the json serializer here
             var result = LastKnownTwin;
             TwinCollection properties;
-            if (result == null) result = desired ? new Twin {Properties = new TwinProperties {Desired = new TwinCollection()}} : new Twin {Properties = new TwinProperties {Reported = new TwinCollection()}};
+            if (result == null) result = desired ?
+                    new Twin
+                    {
+                        Properties = new TwinProperties { Desired = new TwinCollection() }
+                    } :
+                    new Twin
+                    {
+                        Properties = new TwinProperties { Reported = new TwinCollection() }
+                    };
 
             if (desired)
                 properties = result.Properties.Desired;

@@ -17,6 +17,7 @@ using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
 using Microsoft.Azure.IoT.TypeEdge.Proxy;
+using Microsoft.Azure.IoT.TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -159,12 +160,6 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             var csBuilder = IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
 
-            //new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, _options.DeviceId)
-            //       .WithModuleId(Devices.Edge.Agent.Core.Constants.EdgeHubModuleName)
-            //       .WithModuleId(Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
-            //       .WithSharedAccessKey(deviceSasKey)
-            //       .Build();
-
             var edgeConnectionString =
                 new ModuleConnectionStringBuilder(csBuilder.HostName, _options.DeviceId)
                     .Create(Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
@@ -241,6 +236,21 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 {
                     if (!(scope.Resolve(moduleType) is EdgeModule module))
                         continue;
+
+
+                    //foreach (var item in module.GetType().GetProperties())
+                    //{
+                    //    if (!item.PropertyType.IsGenericType)
+                    //        continue;
+                    //    var genericDef = item.PropertyType.GetGenericTypeDefinition();
+                    //    if (!genericDef.IsAssignableFrom(typeof(Volume<>)))
+                    //        continue;
+
+                    //    //the ctor of this prop registers the volume
+                    //    var instance = Activator.CreateInstance(
+                    //    genericDef.MakeGenericType(item.PropertyType.GenericTypeArguments),
+                    //    item.Name, module);
+                    //}
                     modules.Add(module);
                 }
             }
@@ -282,6 +292,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             foreach (var module in _modules)
             {
+                var volumes = "";
+                if (module.Volumes.Count > 0)
+                {
+                    var v = String.Join(',', module.Volumes.Select(e => $"\"{$"/env/{e.Key.ToLower()}"}\": {{}}"));
+                    volumes = $", \"Volumes\": {{ {v} }}";
+                }
                 modulesConfig?.Add(module.Name.ToLower(), JObject.FromObject(new
                 {
                     version = "1.0",
@@ -292,7 +308,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                     {
                         image = dockerRegistry + module.Name.ToLower(),
                         createOptions = "{\n  \"Env\":[\n     \"" + TypeEdge.Constants.ModuleNameConfigName + "=" +
-                                        module.Name.ToLower() + "\"\n  ]\n}"
+                                            module.Name.ToLower() + $"\"\n  ]\n {volumes} }}"
                     }
                 }));
 

@@ -86,7 +86,7 @@ If your modules have system dependencies and you want to debug inside the contai
 
 Alternatively, you can run your application inside the containers in command line:
 
-    docker-compose -f docker-compose.yml -f docker-compose.override.yml -f docker-compose.vs.debug.yml up
+    docker-compose -f docker-compose.yml -f docker-compose.override.yml up
 
 > Note: To build the docker containers, temporarily you need to [add the private NuGet feed](#feed) first.
 

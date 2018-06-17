@@ -5,17 +5,18 @@ using Microsoft.Azure.IoT.TypeEdge.Modules.Enums;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Twins
 {
-    public class ModuleTwin<T>
+    public class ModuleTwin<T> : TypeProperty
         where T : TypeModuleTwin, new()
     {
-        public ModuleTwin(string name, EdgeModule module)
-        {
-            Module = module;
-            Name = name;
-        }
+        private object _twinLock = new object();
+        T _lastTwin;
 
-        private string Name { get; }
-        private EdgeModule Module { get; }
+        public T LastKnownTwin { get { lock (_twinLock) return _lastTwin; } set { lock (_twinLock) _lastTwin = value; } }
+
+        public ModuleTwin(string name, EdgeModule module)
+           : base(name, module)
+        {
+        }
 
         public virtual void Subscribe(Func<T, Task<TwinResult>> handler)
         {
@@ -25,16 +26,21 @@ namespace Microsoft.Azure.IoT.TypeEdge.Twins
         public async Task ReportAsync(T twin)
         {
             await Module.ReportTwinAsync(Name, twin);
+            LastKnownTwin = twin;
         }
 
-        public Task<T> PublishAsync(T twin)
+        public async Task<T> PublishAsync(T twin)
         {
-            return Module.PublishTwinAsync(Name, twin);
+            var t = await Module.PublishTwinAsync(Name, twin);
+            LastKnownTwin = t;
+            return t;
         }
 
         public async Task<T> GetAsync()
         {
-            return await Module.GetTwinAsync<T>(Name);
+            var t = await Module.GetTwinAsync<T>(Name);
+            LastKnownTwin = t;
+            return t;
         }
     }
 }

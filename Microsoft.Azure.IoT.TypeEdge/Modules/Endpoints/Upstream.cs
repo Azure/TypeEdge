@@ -3,7 +3,7 @@
 namespace Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints
 {
     public class Upstream<T> : Output<T>
-        where T : IEdgeMessage
+        where T : class, IEdgeMessage, new()
 
     {
         public Upstream(EdgeModule module) :
@@ -14,7 +14,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints
         public override string RouteName => "$upstream";
 
         public void Subscribe<TO>(Output<TO> output)
-            where TO : IEdgeMessage
+            where TO : class, IEdgeMessage, new()
         {
             Module.SubscribeRoute(output.Name, output.RouteName, Name, RouteName);
         }

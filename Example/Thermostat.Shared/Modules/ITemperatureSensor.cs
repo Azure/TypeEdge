@@ -7,10 +7,11 @@ using ThermostatApplication.Twins;
 namespace ThermostatApplication.Modules
 {
     [TypeModule]
-    public interface INormalizeTemperatureModule
+    public interface ITemperatureSensor
     {
-        Output<TemperatureModuleOutput> NormalizedTemperature { get; set; }
+        Output<Temperature> Temperature { get; set; }
+        ModuleTwin<TemperatureTwin> Twin { get; set; }
 
-        ModuleTwin<NormalizerTwin> Twin { get; set; }
+        bool ResetSensor(int sensitivity);
     }
 }

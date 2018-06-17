@@ -7,11 +7,13 @@ using ThermostatApplication.Twins;
 namespace ThermostatApplication.Modules
 {
     [TypeModule]
-    public interface ITemperatureModule
+    public interface IPreprocessor
     {
-        Output<TemperatureModuleOutput> Temperature { get; set; }
-        ModuleTwin<TemperatureTwin> Twin { get; set; }
+        Input<Temperature> Temperature { get; set; }
 
-        bool ResetSensor(int sensitivity);
+        Output<Temperature> Training { get; set; }
+        Output<Temperature> Detection { get; set; }
+
+        ModuleTwin<PreprocessorTwin> Twin { get; set; }
     }
 }

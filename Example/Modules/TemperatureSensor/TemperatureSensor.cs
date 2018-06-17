@@ -12,9 +12,9 @@ using ThermostatApplication.Twins;
 
 namespace Modules
 {
-    public class TemperatureModule : EdgeModule, ITemperatureModule
+    public class TemperatureSensor : EdgeModule, ITemperatureSensor
     {
-        public Output<TemperatureModuleOutput> Temperature { get; set; }
+        public Output<Temperature> Temperature { get; set; }
         public ModuleTwin<TemperatureTwin> Twin { get; set; }
 
         public bool ResetSensor(int sensitivity)
@@ -25,16 +25,32 @@ namespace Modules
 
         public override async Task<ExecutionResult> RunAsync()
         {
+            double frequency = 0.5;
+            int offset = 70;
+            int amplitute = 10;
+            int samplingRate = 25;
+
             while (true)
             {
-                await Temperature.PublishAsync(new TemperatureModuleOutput
+                var sin = Math.Sin(2 * Math.PI * frequency * DateTime.Now.TimeOfDay.TotalSeconds);
+                var value = amplitute
+                    * sin
+                    + offset;
+
+                await Temperature.PublishAsync(new Temperature
                 {
                     Scale = TemperatureScale.Celsius,
-                    Temperature = new Random().NextDouble() * 100
+                    Value = value
                 });
-                Thread.Sleep(10);
-            }
 
+
+                int left = 40;
+                left = (int)(sin * left) + left;
+                var text = new string('-', left);
+                Console.WriteLine($"{value.ToString("F2")} {text}");
+
+                Thread.Sleep(1000 / samplingRate);
+            }
             return await base.RunAsync();
         }
     }

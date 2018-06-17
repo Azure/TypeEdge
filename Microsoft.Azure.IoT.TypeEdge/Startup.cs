@@ -75,12 +75,6 @@ namespace Microsoft.Azure.IoT.TypeEdge
                         break;
                     }
 
-                    var directory = Path.GetDirectoryName(fileName);
-                    foreach (var file in Directory.EnumerateFiles(directory))
-                    {
-                        Console.WriteLine(file);
-                    }
-
                     Console.WriteLine($"{moduleName}:{fileName} does not exist. Retrying in 1 sec.");
                     Thread.Sleep(1000);
                 }
