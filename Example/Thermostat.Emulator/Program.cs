@@ -26,7 +26,7 @@ namespace ThermostatApplication
             host.RegisterModule<IDataSampling, DataSampling>();
             host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
 
-            host.Upstream.Subscribe(host.GetProxy<IPreprocessor>().Detection);
+            host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
             host.Build();
 

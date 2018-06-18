@@ -30,6 +30,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints
                 {
                     typeof(T).GetProperty("FileName").SetValue(message, fileName);
                     typeof(T).GetProperty("Message").SetValue(message, null);
+                    var referenceCount = (int)typeof(T).GetProperty("ReferenceCount").GetValue(message);
+                    typeof(T).GetProperty("ReferenceCount").SetValue(message, ++referenceCount);
                 }
             }
             return await Module.PublishMessageAsync(Name, message);

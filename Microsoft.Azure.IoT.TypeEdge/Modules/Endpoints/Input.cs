@@ -32,10 +32,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints
                     var referenceCount = (int)typeof(T).GetProperty("ReferenceCount").GetValue(t);
                     var message = _volume.Read(fileName);
 
+                    var res =  handler(message);
+
                     if (--referenceCount <= 0)
                         _volume.Delete(fileName);
 
-                    return handler(message);
+                    return res;
                 }
                 else
                     return handler(t);

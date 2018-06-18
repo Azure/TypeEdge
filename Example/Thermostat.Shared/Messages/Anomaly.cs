@@ -7,6 +7,6 @@ namespace ThermostatApplication.Messages
 {
     public class Anomaly : EdgeMessage
     {
-        public double Value { get; set; }
+        public Temperature Temperature { get; set; }
     }
 }

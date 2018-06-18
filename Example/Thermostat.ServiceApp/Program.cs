@@ -11,6 +11,52 @@ namespace Thermostat.ServiceApp
     {
         private static async Task Main(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+              .AddJsonFile("appsettings_thermostat.json")
+              .AddEnvironmentVariables()
+              .Build();
+
+            ProxyFactory.Configure(configuration["IotHubConnectionString"],
+                configuration["DeviceId"]);
+
+
+            while (true)
+            {
+                Console.WriteLine("Select Action: (T)win, (A)nomaly, (E)xit");
+
+                var res = Console.ReadLine();
+                switch (res.ToUpper())
+                {
+                    case "T":
+                        await SetTwin();
+                        break;
+                    case "A":
+                        ProxyFactory.GetModuleProxy<ITemperatureSensor>().GenerateAnomaly(40);
+                        break;
+                    default:
+                        continue;
+                }
+                break;
+            }
+
+            Console.WriteLine("Press <ENTER> to exit..");
+            Console.ReadLine();
+        }
+
+        private static async Task SetTwin()
+        {
+            ThermostatApplication.Twins.Routing routing = PromptRoutingMode();
+
+            var processor = ProxyFactory.GetModuleProxy<IPreprocessor>();
+
+            var twin = await processor.Twin.GetAsync();
+            twin.Scale = TemperatureScale.Celsius;
+            twin.RoutingMode = routing;
+            await processor.Twin.PublishAsync(twin);
+        }
+
+        private static ThermostatApplication.Twins.Routing PromptRoutingMode()
+        {
             ThermostatApplication.Twins.Routing routing = ThermostatApplication.Twins.Routing.None;
             while (true)
             {
@@ -34,25 +80,8 @@ namespace Thermostat.ServiceApp
                 }
                 break;
             }
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings_thermostat.json")
-                .AddEnvironmentVariables()
-                .Build();
 
-            ProxyFactory.Configure(configuration["IotHubConnectionString"],
-                configuration["DeviceId"]);
-
-            var normalizer = ProxyFactory.GetModuleProxy<IPreprocessor>();
-
-            var twin = await normalizer.Twin.GetAsync();
-            twin.Scale = TemperatureScale.Celsius;
-            twin.RoutingMode = routing;
-            await normalizer.Twin.PublishAsync(twin);
-
-            //var result = ProxyFactory.GetModuleProxy<ITemperatureSensor>().ResetSensor(10);
-
-            Console.WriteLine("Press <ENTER> to exit..");
-            Console.ReadLine();
+            return routing;
         }
     }
 }

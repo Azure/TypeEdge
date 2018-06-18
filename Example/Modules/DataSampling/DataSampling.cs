@@ -10,25 +10,36 @@ namespace Modules
 {
     public class DataSampling : EdgeModule, IDataSampling
     {
-        List<Temperature> _sample;
+        const int _windowMaxSamples = 1000;
+        const int _maxDelayPercentage = 10;
+
+        Queue<Temperature> _sample;
 
         public Input<Temperature> Temperature { get; set; }
         public Output<Reference<Sample>> Samples { get; set; }
 
         public DataSampling(IPreprocessor proxy)
         {
-            _sample = new List<Temperature>();
+            _sample = new Queue<Temperature>();
             Temperature.Subscribe(proxy.Training, async signal =>
             {
-                _sample.Add(signal);
-                if (_sample.Count > 999)
+                Reference<Sample> message = null;
+                lock (_sample)
                 {
-                    await Samples.PublishAsync(new Reference<Sample>()
+                    _sample.Enqueue(signal);
+                    if (_sample.Count >= _windowMaxSamples)
                     {
-                        Message = new Sample() { Data = _sample.ToArray() }
-                    });
-                    _sample.Clear();
+                        message = new Reference<Sample>()
+                        {
+                            Message = new Sample() { Data = _sample.ToArray() }
+                        };
+                        for (int i = 0; i < _maxDelayPercentage * _windowMaxSamples / 100; i++)
+                            _sample.Dequeue();
+                    }
                 }
+                if (message != null)
+                    await Samples.PublishAsync(message);
+
                 return MessageResult.Ok;
             });
 

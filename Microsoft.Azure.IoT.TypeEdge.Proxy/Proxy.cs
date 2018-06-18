@@ -69,9 +69,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
                 var response = _serviceClient.InvokeDeviceMethodAsync(_deviceId, Name, methodInvocation).Result;
 
                 if (response.Status == 200)
-                    invocation.ReturnValue =
-                        Convert.ChangeType(JsonConvert.DeserializeObject(response.GetPayloadAsJson()),
-                            invocation.Method.ReturnType);
+                {
+                    if (invocation.Method.ReturnType != typeof(void))
+                        invocation.ReturnValue =
+                            Convert.ChangeType(JsonConvert.DeserializeObject(response.GetPayloadAsJson()),
+                                invocation.Method.ReturnType);
+                }
                 else
                     throw new Exception(
                         $"Direct method result Status:{response.Status}, {response.GetPayloadAsJson()}");
