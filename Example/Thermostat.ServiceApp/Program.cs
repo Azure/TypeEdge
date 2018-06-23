@@ -12,7 +12,7 @@ namespace Thermostat.ServiceApp
         private static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
-              .AddJsonFile("appsettings_thermostat.json")
+              .AddJsonFile("appsettings.json")
               .AddEnvironmentVariables()
               .Build();
 

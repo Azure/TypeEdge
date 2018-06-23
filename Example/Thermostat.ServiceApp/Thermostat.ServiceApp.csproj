@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Proxy" Version="0.1.76" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'"/>
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Proxy" Version="0.1.76" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
   </ItemGroup>
 
 
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings_thermostat.json">
+    <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
