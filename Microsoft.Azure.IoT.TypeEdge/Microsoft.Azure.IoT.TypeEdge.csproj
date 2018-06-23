@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.IoT.TypeEdge</PackageId>
-    <Version>0.1.48</Version>
+    <Version>0.1.76</Version>
     <Authors>paloukari</Authors>
     <Company>Microsoft</Company>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
@@ -18,7 +19,7 @@
     <PackageReference Include="Autofac" Version="4.8.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
     <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.4.0" />
-    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.17.0-preview-006" />
+    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.17.0-preview-012" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.0.1" />

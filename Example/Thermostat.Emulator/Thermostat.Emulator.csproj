@@ -18,20 +18,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.48" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.76" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
   </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
-    <ProjectReference Include="..\Modules\NormalizeTemperatureModule\NormalizeTemperatureModule.csproj" />
-    <ProjectReference Include="..\Modules\TemperatureModule\TemperatureModule.csproj" />
+    <ProjectReference Include="..\Modules\AnomalyDetection\AnomalyDetection.csproj" />
+    <ProjectReference Include="..\Modules\DataSampling\DataSampling.csproj" />
+    <ProjectReference Include="..\Modules\Preprocessor\Preprocessor.csproj" />
+    <ProjectReference Include="..\Modules\TemperatureSensor\TemperatureSensor.csproj" />
     <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="appsettings_thermostat.json">
+    <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

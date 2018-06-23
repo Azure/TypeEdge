@@ -3,24 +3,24 @@ volumes:
   env:
       
 services:
-  TypeEdgeApplication.Emulator:
-    image: ${DOCKER_REGISTRY}TypeEdgeApplicationEmulatorImageName
+  emulatorimage:
+    image: ${DOCKER_REGISTRY}emulatorimage
     build: 
       context: .
       dockerfile: TypeEdgeApplication.Emulator/DockerfileEmpty
     volumes:
     - env:/env
 
-  TypeEdgeModule1:
-    image: ${DOCKER_REGISTRY}TypeEdgeModule1ImageName
+  module1image:
+    image: ${DOCKER_REGISTRY}module1image
     build:
       context: .
       dockerfile: Modules/TypeEdgeModule1/Dockerfile
     volumes:
     - env:/env
 
-  TypeEdgeModule2:
-    image: ${DOCKER_REGISTRY}TypeEdgeModule2ImageName   
+  module2image:
+    image: ${DOCKER_REGISTRY}module2image   
     build:
       context: .
       dockerfile: Modules/TypeEdgeModule2/Dockerfile

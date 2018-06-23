@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.IoT.TypeEdge.Proxy</PackageId>
-    <Version>0.1.48</Version>
+    <Version>0.1.76</Version>
     <Authors>paloukari</Authors>
     <Company>Microsoft</Company>
 
@@ -15,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Devices" Version="1.16.0-preview-003" />
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.16.0-preview-005" />
   </ItemGroup>
 
   <ItemGroup>

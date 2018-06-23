@@ -7,6 +7,9 @@ Templates/build/*
 *.user
 *.userosscache
 *.sln.docstates
+appsettings.json
+[Nn]u[Gg]et.[Cc]onfig
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

@@ -4,6 +4,7 @@ namespace ThermostatApplication.Twins
 {
     public class TemperatureTwin : TypeModuleTwin
     {
-        public int MaxLimit { get; set; }
+        public double DesiredMaximum { get; set; }
+        public double DesiredMinimum { get; set; }
     }
 }

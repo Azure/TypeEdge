@@ -1,4 +1,5 @@
-FROM microsoft/dotnet:2.1-runtime AS base
+ARG base_tag=2.1.0-runtime-bionic
+FROM microsoft/dotnet:${base_tag} AS base
 
 # Add an unprivileged user account for running Edge Hub
 RUN useradd -ms /bin/bash edgehubuser
@@ -35,8 +36,10 @@ FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
 COPY Thermostat.Emulator/Thermostat.Emulator.csproj Thermostat.Emulator/
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
-COPY Modules/NormalizeTemperatureModule/NormalizeTemperatureModule.csproj Modules/NormalizeTemperatureModule/
-COPY Modules/TemperatureModule/TemperatureModule.csproj Modules/TemperatureModule/
+COPY Modules/Preprocessor/Preprocessor.csproj Modules/Preprocessor/
+COPY Modules/TemperatureSensor/TemperatureSensor.csproj Modules/TemperatureSensor/
+COPY Modules/DataSampling/DataSampling.csproj Modules/DataSampling/
+COPY Modules/AnomalyDetection/AnomalyDetection.csproj Modules/AnomalyDetection/
 COPY ./.env Thermostat.Emulator/
 COPY NuGet.Config ./
 RUN dotnet restore Thermostat.Emulator/Thermostat.Emulator.csproj

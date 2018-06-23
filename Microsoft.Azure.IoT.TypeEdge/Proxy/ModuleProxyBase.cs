@@ -5,6 +5,7 @@ using Microsoft.Azure.IoT.TypeEdge.Attributes;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.IoT.TypeEdge.Twins;
+using Microsoft.Azure.IoT.TypeEdge.Volumes;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Proxy
 {
@@ -34,8 +35,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
             if (!invocation.Method.ReturnType.IsGenericType)
                 return;
             var genericDef = invocation.Method.ReturnType.GetGenericTypeDefinition();
-            if (!genericDef.IsAssignableFrom(typeof(Input<>)) && !genericDef.IsAssignableFrom(typeof(Output<>)) &&
-                !genericDef.IsAssignableFrom(typeof(ModuleTwin<>)))
+            if (!genericDef.IsAssignableFrom(typeof(Input<>)) &&
+                !genericDef.IsAssignableFrom(typeof(Output<>)) &&
+                !genericDef.IsAssignableFrom(typeof(ModuleTwin<>)) &&
+                !genericDef.IsAssignableFrom(typeof(Volume<>)))
                 return;
             var value = Activator.CreateInstance(
                 genericDef.MakeGenericType(invocation.Method.ReturnType.GenericTypeArguments),

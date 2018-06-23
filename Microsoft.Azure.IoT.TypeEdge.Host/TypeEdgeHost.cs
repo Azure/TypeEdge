@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -17,6 +18,7 @@ using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
 using Microsoft.Azure.IoT.TypeEdge.Proxy;
+using Microsoft.Azure.IoT.TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -158,10 +160,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             Environment.SetEnvironmentVariable("storageFolder", storageFolder);
 
             var csBuilder = IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
+
             var edgeConnectionString =
-                new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, _options.DeviceId)
-                    .WithModuleId(Devices.Edge.Agent.Core.Constants.EdgeHubModuleName)
-                    .WithModuleId(Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
+                new ModuleConnectionStringBuilder(csBuilder.HostName, _options.DeviceId)
+                    .Create(Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
                     .WithSharedAccessKey(deviceSasKey)
                     .Build();
             Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
@@ -232,11 +234,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 foreach (var moduleType in _container.ComponentRegistry.Registrations
                     .Where(r => typeof(EdgeModule).IsAssignableFrom(r.Activator.LimitType))
                     .Select(r => r.Activator.LimitType).Distinct())
-                {
-                    if (!(scope.Resolve(moduleType) is EdgeModule module))
-                        continue;
-                    modules.Add(module);
-                }
+                    if ((scope.Resolve(moduleType) is EdgeModule module))
+                        modules.Add(module);
             }
 
             return modules;
@@ -276,6 +275,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             foreach (var module in _modules)
             {
+                var volumes = "";
+                if (module.Volumes.Count > 0)
+                {
+                    var v = String.Join(',', module.Volumes.Select(e => $"\"{$"/env/{e.Key.ToLower()}"}\": {{}}"));
+                    volumes = $", \"Volumes\": {{ {v} }}";
+                }
                 modulesConfig?.Add(module.Name.ToLower(), JObject.FromObject(new
                 {
                     version = "1.0",
@@ -286,7 +291,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                     {
                         image = dockerRegistry + module.Name.ToLower(),
                         createOptions = "{\n  \"Env\":[\n     \"" + TypeEdge.Constants.ModuleNameConfigName + "=" +
-                                        module.Name.ToLower() + "\"\n  ]\n}"
+                                            module.Name.ToLower() + $"\"\n  ]\n {volumes} }}"
                     }
                 }));
 
@@ -339,9 +344,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
             var module = await registryManager.GetModuleAsync(deviceId, moduleName);
             var sasKey = module.Authentication.SymmetricKey.PrimaryKey;
 
-            return new ModuleConnectionString.ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
+            return new ModuleConnectionStringBuilder(csBuilder.HostName, deviceId)
+                .Create(moduleName)
                 .WithGatewayHostName(Environment.MachineName)
-                .WithModuleId(moduleName)
                 .WithSharedAccessKey(sasKey)
                 .Build();
         }

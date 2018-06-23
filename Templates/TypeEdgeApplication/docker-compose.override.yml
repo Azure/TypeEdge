@@ -1,1 +1,10 @@
 version: '3.4'
+
+services:
+  emulatorimage:
+    image: ${DOCKER_REGISTRY}emulatorimage
+    build: 
+      context: .
+      dockerfile: TypeEdgeApplication.Emulator/Dockerfile
+    volumes:
+    - env:/env

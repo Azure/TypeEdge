@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
@@ -16,6 +15,7 @@ using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Enums;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
 using Microsoft.Azure.IoT.TypeEdge.Twins;
+using Microsoft.Azure.IoT.TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -24,14 +24,13 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Modules
 {
-    public abstract class EdgeModule
+    public abstract class EdgeModule : IDisposable
     {
         private readonly Dictionary<string, MethodCallback> _methodSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> _routeSubscriptions;
-
         private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
         private string _connectionString;
-        private DeviceClient _ioTHubModuleClient;
+        private ModuleClient _ioTHubModuleClient;
         private ITransportSettings[] _transportSettings;
 
         protected EdgeModule()
@@ -39,6 +38,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             _routeSubscriptions = new Dictionary<string, SubscriptionCallback>();
             _twinSubscriptions = new Dictionary<string, SubscriptionCallback>();
             _methodSubscriptions = new Dictionary<string, MethodCallback>();
+            Volumes = new Dictionary<string, string>();
 
             Routes = new List<string>();
 
@@ -60,6 +60,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         internal List<string> Routes { get; set; }
 
+        public Dictionary<string, string> Volumes { get; }
 
         internal virtual Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : IModuleTwin, new()
@@ -92,10 +93,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             RegisterMethods();
 
             // Open a connection to the Edge runtime
-            _ioTHubModuleClient = DeviceClient.CreateFromConnectionString(_connectionString, _transportSettings);
+            _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, _transportSettings);
 
             await _ioTHubModuleClient.OpenAsync();
-            Console.WriteLine($"{Name}:IoT Hub module client initialized.");
+            //Console.WriteLine($"{Name}:IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
             foreach (var subscription in _routeSubscriptions)
@@ -103,7 +104,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                 await _ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, MessageHandler,
                     subscription.Value);
 
-                Console.WriteLine($"{Name}:MessageHandler set for {subscription.Key}");
+                //Console.WriteLine($"{Name}:MessageHandler set for {subscription.Key}");
             }
 
             // Register callback to be called when a twin update is received by the module
@@ -112,16 +113,16 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             foreach (var subscription in _methodSubscriptions)
             {
                 await _ioTHubModuleClient.SetMethodHandlerAsync(subscription.Key, MethodCallback, subscription.Value);
-                Console.WriteLine($"{Name}:MethodCallback set for{subscription.Key}");
+                //Console.WriteLine($"{Name}:MethodCallback set for{subscription.Key}");
             }
 
-            Console.WriteLine($"{Name}:Running RunAsync..");
+            //Console.WriteLine($"{Name}:Running RunAsync..");
             return await RunAsync();
         }
 
         private Task<MethodResponse> MethodCallback(MethodRequest methodRequest, object userContext)
         {
-            Console.WriteLine($"{Name}:MethodCallback called");
+            //Console.WriteLine($"{Name}:MethodCallback called");
             if (!(userContext is MethodCallback callback))
                 throw new InvalidOperationException($"{Name}:UserContext doesn't contain a valid SubscriptionCallback");
 
@@ -140,6 +141,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"{Name}:ERROR:{ex}");
+
                 // Acknowlege the direct method call with a 400 error message
                 var result = "{\"result\":\"" + ex.Message + "\"}";
                 return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 400));
@@ -148,7 +151,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         internal CreationResult InternalConfigure(IConfigurationRoot configuration)
         {
-            Console.WriteLine($"{Name}:InternalConfigure called");
+            //Console.WriteLine($"{Name}:InternalConfigure called");
 
             _connectionString = configuration.GetValue<string>($"{Constants.EdgeHubConnectionStringKey}");
             if (string.IsNullOrEmpty(_connectionString))
@@ -171,8 +174,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         internal async Task<PublishResult> PublishMessageAsync<T>(string outputName, T message)
             where T : IEdgeMessage
         {
-            Console.WriteLine($"{Name}:PublishMessageAsync called");
+            //Console.WriteLine($"{Name}:PublishMessageAsync called");
             var edgeMessage = new Message(message.GetBytes());
+
+
             if (message.Properties != null)
                 foreach (var prop in edgeMessage.Properties)
                     edgeMessage.Properties.Add(prop.Key, prop.Value);
@@ -180,7 +185,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             await _ioTHubModuleClient.SendEventAsync(outputName, edgeMessage);
 
             var messageString = Encoding.UTF8.GetString(message.GetBytes());
-            Console.WriteLine($">>>>>>{Name}: message: Body: [{messageString}]");
+            //Console.WriteLine($">>>>>>{Name}: message: Body: [{messageString}]");
 
             return PublishResult.Ok;
         }
@@ -189,17 +194,20 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             Func<T, Task<MessageResult>> handler)
             where T : IEdgeMessage
         {
-            Console.WriteLine($"{Name}:SubscribeRoute called");
+            //Console.WriteLine($"{Name}:SubscribeRoute called");
 
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
+
+            if (_routeSubscriptions.Keys.Contains(inName))
+                throw new Exception($"Only one subscription allowed with name {inName} in Module {Name}");
 
             _routeSubscriptions[inName] = new SubscriptionCallback(inName, handler, typeof(T));
         }
 
         internal void SubscribeRoute(string outName, string outRoute, string inName, string inRoute)
         {
-            Console.WriteLine($"{Name}:SubscribeRoute called");
+            //Console.WriteLine($"{Name}:SubscribeRoute called");
 
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
@@ -207,21 +215,21 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         internal void SubscribeTwin<T>(string name, Func<T, Task<TwinResult>> handler) where T : IModuleTwin
         {
-            Console.WriteLine($"{Name}:SubscribeTwin called");
+            //Console.WriteLine($"{Name}:SubscribeTwin called");
 
             _twinSubscriptions[name] = new SubscriptionCallback(name, handler, typeof(T));
         }
 
         private async Task<MessageResponse> MessageHandler(Message message, object userContext)
         {
-            Console.WriteLine($"{Name}:MessageHandler called");
+            //Console.WriteLine($"{Name}:MessageHandler called");
 
             if (!(userContext is SubscriptionCallback callback))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
             var messageBytes = message.GetBytes();
             var messageString = Encoding.UTF8.GetString(messageBytes);
-            Console.WriteLine($"<<<<<<{Name}:message: Body: [{messageString}]");
+            //Console.WriteLine($"<<<<<<{Name}:message: Body: [{messageString}]");
 
             if (!(Activator.CreateInstance(callback.Type) is IEdgeMessage input))
             {
@@ -239,13 +247,13 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         private async Task PropertyHandler(TwinCollection desiredProperties, object userContext)
         {
-            Console.WriteLine($"{Name}:PropertyHandler called");
+            //Console.WriteLine($"{Name}:PropertyHandler called");
 
             if (!(userContext is Dictionary<string, SubscriptionCallback> callbacks))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
-            Console.WriteLine($"{Name}:Desired property change:");
-            Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
+            //Console.WriteLine($"{Name}:Desired property change:");
+            //Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
 
             foreach (var callback in callbacks)
                 if (desiredProperties.Contains($"___{callback.Key}"))
@@ -279,7 +287,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadWrite);
             store.Add(new X509Certificate2(X509Certificate.CreateFromCertFile(certPath)));
-            Console.WriteLine($"{Name}:Added Cert: " + certPath);
+            //Console.WriteLine($"{Name}:Added Cert: " + certPath);
             store.Close();
         }
 
@@ -297,7 +305,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                 var genericDef = type.GetGenericTypeDefinition();
                 if (genericDef == typeof(Input<>)
                     || genericDef == typeof(Output<>)
-                    || genericDef == typeof(ModuleTwin<>))
+                    || genericDef == typeof(ModuleTwin<>)
+                    || genericDef == typeof(Volume<>))
                 {
                     if (!prop.CanWrite)
                         throw new Exception($"{prop.Name} needs to be set dynamically, please define a setter.");
@@ -312,7 +321,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         private void RegisterMethods()
         {
-            Console.WriteLine($"{Name}:RegisterMethods called");
+            //Console.WriteLine($"{Name}:RegisterMethods called");
             var interfaceType = GetType().GetProxyInterface();
 
             if (interfaceType == null)
@@ -326,9 +335,93 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         internal async Task ReportTwinAsync<T>(string name, T twin)
             where T : IModuleTwin
         {
-            Console.WriteLine($"{Name}:ReportTwinAsync called");
-
+            //Console.WriteLine($"{Name}:ReportTwinAsync called");
             await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
+        }
+
+        internal void RegisterVolume(string volumeName)
+        {
+            if (Volumes.Keys.Contains(volumeName))
+                return;
+
+            var volumePath = volumeName.ToLower();
+
+            if (!Directory.Exists(volumePath))
+            {
+                var di = Directory.CreateDirectory(volumePath);
+            }
+
+            Volumes[volumeName] = volumePath;
+        }
+
+        internal T GetFileData<T>(string name, string index)
+            where T : class, new()
+        {
+            try
+            {
+                var path = Path.Combine(Volumes[name], index);
+                if (File.Exists(path))
+                {
+                    var bytes = File.ReadAllBytes(path);
+                    var result = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes));
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{Name}:ERROR:{ex}");
+            }
+            return null;
+        }
+
+        internal bool SetFileData<T>(string name, string index, T value)
+            where T : class, new()
+        {
+            try
+            {
+                var path = Path.Combine(Volumes[name], index);
+                var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value));
+
+                File.WriteAllBytes(path, bytes);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{Name}:ERROR:{ex}");
+            }
+            return false;
+        }
+
+        internal bool DeleteFile(string name, string index)
+        {
+            try
+            {
+                var path = Path.Combine(Volumes[name], index);
+                if (File.Exists(path))
+                    File.Delete(path);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{Name}:ERROR:{ex}");
+            }
+            return false;
+        }
+
+        public void Dispose()
+        {
+            if (Volumes != null)
+                foreach (var item in Volumes)
+                {
+                    try
+                    {
+                        //todo:empty or not?
+                        //if (Directory.Exists(item.Value))
+                        //    Directory.Delete(item.Value);
+                    }
+                    catch { }
+                }
         }
     }
 }

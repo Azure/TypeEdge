@@ -13,30 +13,30 @@
   "sourceName": "TypeEdgeApplication",
   "preferNameDirectory": true,
   "symbols": {
-    "appNameLower":{
+    "appNameLower": {
       "type": "generated",
       "generator": "casing",
       "parameters": {
-        "source":"name",
+        "source": "name",
         "toLower": true
       },
-      "replaces":"TypeEdgeApplicationEmulatorImageName"
+      "replaces": "emulatorimage"
     },
     "module1Name": {
       "type": "parameter",
       "defaultValue": "Module1",
       "replaces": "TypeEdgeModule1",
-      "fileRename": "TypeEdgeModule1", 
+      "fileRename": "TypeEdgeModule1",
       "description": "The name of the first TypeEdge Module"
     },
-    "module1NameLower":{
+    "module1NameLower": {
       "type": "generated",
       "generator": "casing",
       "parameters": {
-        "source":"module1Name",
+        "source": "module1Name",
         "toLower": true
       },
-      "replaces":"TypeEdgeModule1ImageName"
+      "replaces": "module1image"
     },
     "module2Name": {
       "type": "parameter",
@@ -45,14 +45,14 @@
       "fileRename": "TypeEdgeModule2",
       "description": "The name of the second TypeEdge Module"
     },
-    "module2NameLower":{
+    "module2NameLower": {
       "type": "generated",
       "generator": "casing",
       "parameters": {
-        "source":"module2Name",
+        "source": "module2Name",
         "toLower": true
       },
-      "replaces":"TypeEdgeModule2ImageName"
+      "replaces": "module2image"
     },
     "connectionString": {
       "type": "parameter",
@@ -61,7 +61,7 @@
     },
     "containerRegistry": {
       "type": "parameter",
-      "replaces": "CONTAINER_REGISTRY",
+      "replaces": "registry",
       "description": "The container registry login FQN"
     }
   }

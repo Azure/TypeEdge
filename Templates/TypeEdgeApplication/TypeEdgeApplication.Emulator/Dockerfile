@@ -31,6 +31,7 @@ COPY TypeEdgeApplication.Emulator/TypeEdgeApplication.Emulator.csproj TypeEdgeAp
 COPY TypeEdgeApplication.Shared/TypeEdgeApplication.Shared.csproj TypeEdgeApplication.Shared/
 COPY Modules/TypeEdgeModule2/TypeEdgeModule2.csproj Modules/TypeEdgeModule2/
 COPY Modules/TypeEdgeModule1/TypeEdgeModule1.csproj Modules/TypeEdgeModule1/
+
 COPY NuGet.Config ./
 RUN dotnet restore TypeEdgeApplication.Emulator/TypeEdgeApplication.Emulator.csproj
 COPY . .

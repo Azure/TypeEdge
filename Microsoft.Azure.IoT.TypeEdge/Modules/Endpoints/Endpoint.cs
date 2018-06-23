@@ -1,15 +1,11 @@
 ﻿namespace Microsoft.Azure.IoT.TypeEdge.Modules
 {
-    public abstract class Endpoint
+    public abstract class Endpoint : TypeProperty
     {
         protected Endpoint(string name, EdgeModule module)
+            :base(name, module)
         {
-            Name = name;
-            Module = module;
         }
-
-        public string Name { get; set; }
         public abstract string RouteName { get; }
-        internal EdgeModule Module { get; set; }
     }
 }

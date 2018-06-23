@@ -7,6 +7,7 @@ using Microsoft.Azure.IoT.TypeEdge.Attributes;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.IoT.TypeEdge.Twins;
+using Microsoft.Azure.IoT.TypeEdge.Volumes;
 using Newtonsoft.Json;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Proxy
@@ -47,7 +48,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
                 var genericDef = invocation.Method.ReturnType.GetGenericTypeDefinition();
                 if (genericDef.IsAssignableFrom(typeof(Input<>))
                     || genericDef.IsAssignableFrom(typeof(Output<>))
-                    || genericDef.IsAssignableFrom(typeof(ModuleTwin<>)))
+                    || genericDef.IsAssignableFrom(typeof(ModuleTwin<>))
+                    || genericDef.IsAssignableFrom(typeof(Volume<>)))
                 {
                     var value = Activator.CreateInstance(
                         genericDef.MakeGenericType(invocation.Method.ReturnType.GenericTypeArguments),
@@ -67,9 +69,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
                 var response = _serviceClient.InvokeDeviceMethodAsync(_deviceId, Name, methodInvocation).Result;
 
                 if (response.Status == 200)
-                    invocation.ReturnValue =
-                        Convert.ChangeType(JsonConvert.DeserializeObject(response.GetPayloadAsJson()),
-                            invocation.Method.ReturnType);
+                {
+                    if (invocation.Method.ReturnType != typeof(void))
+                        invocation.ReturnValue =
+                            Convert.ChangeType(JsonConvert.DeserializeObject(response.GetPayloadAsJson()),
+                                invocation.Method.ReturnType);
+                }
                 else
                     throw new Exception(
                         $"Direct method result Status:{response.Status}, {response.GetPayloadAsJson()}");
