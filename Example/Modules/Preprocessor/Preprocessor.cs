@@ -14,14 +14,13 @@ namespace Modules
 {
     public class Preprocessor : EdgeModule, IPreprocessor
     {
-        public Input<Temperature> Temperature { get; set; }
         public Output<Temperature> Training { get; set; }
         public Output<Temperature> Detection { get; set; }
         public ModuleTwin<PreprocessorTwin> Twin { get; set; }
 
         public Preprocessor(ITemperatureSensor proxy)
         {
-            Temperature.Subscribe(proxy.Temperature, async signal =>
+            proxy.Temperature.Subscribe(this, async signal =>
             {
                 var twin = Twin.LastKnownTwin;
                 if (twin != null)

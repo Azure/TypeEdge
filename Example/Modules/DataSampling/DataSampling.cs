@@ -15,13 +15,12 @@ namespace Modules
 
         Queue<Temperature> _sample;
 
-        public Input<Temperature> Temperature { get; set; }
         public Output<Reference<Sample>> Samples { get; set; }
 
         public DataSampling(IPreprocessor proxy)
         {
             _sample = new Queue<Temperature>();
-            Temperature.Subscribe(proxy.Training, async signal =>
+            proxy.Training.Subscribe(this, async signal =>
             {
                 Reference<Sample> message = null;
                 lock (_sample)

@@ -199,6 +199,9 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
 
+            if (_routeSubscriptions.Keys.Contains(inName))
+                throw new Exception($"Only one subscription allowed with name {inName} in Module {Name}");
+
             _routeSubscriptions[inName] = new SubscriptionCallback(inName, handler, typeof(T));
         }
 
@@ -338,10 +341,13 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
         internal void RegisterVolume(string volumeName)
         {
+            if (Volumes.Keys.Contains(volumeName))
+                return;
+
             var volumePath = volumeName.ToLower();
 
             if (!Directory.Exists(volumePath))
-            { 
+            {
                 var di = Directory.CreateDirectory(volumePath);
             }
 

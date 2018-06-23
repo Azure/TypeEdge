@@ -17,14 +17,12 @@ namespace Modules
         int _numClusters = 3;
         KMeansClustering _kMeansClustering;
 
-        public Input<Temperature> Temperature { get; set; }
-        public Input<Reference<Sample>> Samples { get; set; }
         public Output<Anomaly> Anomaly { get; set; }
 
 
         public AnomalyDetection(IPreprocessor preprocessor, IDataSampling trainer)
         {
-            Temperature.Subscribe(preprocessor.Detection, async signal =>
+            preprocessor.Detection.Subscribe(this, async signal =>
             {
                 int cluster = 0;
                 if (_kMeansClustering != null)
@@ -40,7 +38,7 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            Samples.Subscribe(trainer.Samples, async (sampleReference) =>
+            trainer.Samples.Subscribe(this, async (sampleReference) =>
             {
                 //if the messages has been stored and forwarded, but the file has been deleted (e.g. a restart)
                 //then the message can be empty (null)

@@ -9,8 +9,6 @@ namespace ThermostatApplication.Modules
     [TypeModule]
     public interface IPreprocessor
     {
-        Input<Temperature> Temperature { get; set; }
-
         Output<Temperature> Training { get; set; }
         Output<Temperature> Detection { get; set; }
 

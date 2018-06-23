@@ -9,21 +9,37 @@ services:
       context: .
       dockerfile: Thermostat.Emulator/Dockerfile
     volumes:
-    - env:/env
+    - env:/app/env
 
 
-  normalizetemperaturemodule:  
-    image: ${DOCKER_REGISTRY}normalizetemperaturemodule
+  preprocessor:  
+    image: ${DOCKER_REGISTRY}preprocessor
     build:
       context: .
-      dockerfile: Modules/NormalizeTemperatureModule/Dockerfile
+      dockerfile: Modules/Preprocessor/Dockerfile
     volumes:
-    - env:/env
+    - env:/app/env
         
-  temperaturemodule:
-    image: ${DOCKER_REGISTRY}temperaturemodule
+  temperaturesensor:
+    image: ${DOCKER_REGISTRY}temperaturesensor
     build:
       context: .
-      dockerfile: Modules/TemperatureModule/Dockerfile
+      dockerfile: Modules/TemperatureSensor/Dockerfile
     volumes:
-    - env:/env
+    - env:/app/env
+
+  datasampling:
+    image: ${DOCKER_REGISTRY}datasampling
+    build:
+      context: .
+      dockerfile: Modules/DataSampling/Dockerfile
+    volumes:
+    - env:/app/env
+
+  anomalydetection:
+    image: ${DOCKER_REGISTRY}anomalydetection
+    build:
+      context: .
+      dockerfile: Modules/AnomalyDetection/Dockerfile
+    volumes:
+    - env:/app/env

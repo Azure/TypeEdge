@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  TypeEdgeApplication.Emulator:
+  emulatorimage:
     image: ${DOCKER_REGISTRY}emulatorimage
     build: 
       context: .

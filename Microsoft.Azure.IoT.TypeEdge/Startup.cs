@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
@@ -58,7 +59,7 @@ namespace Microsoft.Azure.IoT.TypeEdge
 
             if (IsNullOrEmpty(connectionString))
             {
-                
+
                 //check the file system, we are in docker-compose mode
                 var fileName = Path.Combine(Constants.ComposeConfigurationPath, $"{moduleName}.env");
                 var remainingSeconds = 30;
@@ -86,7 +87,6 @@ namespace Microsoft.Azure.IoT.TypeEdge
                     return;
                 }
             }
-
 
             containerBuilder.RegisterType(moduleType);
 

@@ -3,7 +3,7 @@ volumes:
   env:
       
 services:
-  TypeEdgeML.Emulator:
+  emulatorimage:
     image: ${DOCKER_REGISTRY}emulatorimage
     build: 
       context: .
@@ -11,7 +11,7 @@ services:
     volumes:
     - env:/env
 
-  TypeEdgeModule1:
+  module1image:
     image: ${DOCKER_REGISTRY}module1image
     build:
       context: .
@@ -19,7 +19,7 @@ services:
     volumes:
     - env:/env
 
-  TypeEdgeModule2:
+  module2image:
     image: ${DOCKER_REGISTRY}module2image   
     build:
       context: .
@@ -27,7 +27,7 @@ services:
     volumes:
     - env:/env
 
-  TypeEdgeModule3:
+  module3image:
     image: ${DOCKER_REGISTRY}module3image   
     build:
       context: .

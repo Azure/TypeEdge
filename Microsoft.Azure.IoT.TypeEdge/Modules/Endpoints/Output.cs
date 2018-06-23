@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge.Enums;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
 
@@ -36,5 +37,40 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints
             }
             return await Module.PublishMessageAsync(Name, message);
         }
+
+        public virtual void Subscribe(EdgeModule input, Func<T, Task<MessageResult>> handler)
+        {
+            var dereference = new Func<T, Task<MessageResult>>((t) =>
+            {
+                if (_volume != null)
+                {
+                    //todo: find a typed way to do this
+                    var fileName = typeof(T).GetProperty("FileName").GetValue(t) as string;
+                    var referenceCount = (int)typeof(T).GetProperty("ReferenceCount").GetValue(t);
+                    var message = _volume.Read(fileName);
+
+                    var res = handler(message);
+
+                    if (--referenceCount <= 0)
+                        _volume.Delete(fileName);
+
+                    return res;
+                }
+                else
+                    return handler(t);
+            });
+
+            var inRouteName = $"BrokeredEndpoint(\"/modules/{input.Name}/inputs/{Name}\")";
+
+            if (_volume != null)
+                input.RegisterVolume(Name);
+
+            input.SubscribeRoute(Name,
+                RouteName,
+                Name,
+                inRouteName,
+                dereference);
+        }
+
     }
 }

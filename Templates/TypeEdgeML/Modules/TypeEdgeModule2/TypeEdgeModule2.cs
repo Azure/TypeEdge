@@ -13,19 +13,20 @@ namespace Modules
     {
         public TypeEdgeModule2(ITypeEdgeModule1 proxy)
         {
-            Input.Subscribe(proxy.Output, async msg =>
+            proxy.Output.Subscribe(this, async msg =>
             {
                 await Output.PublishAsync(new TypeEdgeModule2Output
                 {
                     Data = msg.Data,
                     Metadata = DateTime.UtcNow.ToShortTimeString()
                 });
+                Console.WriteLine("TypeEdgeModule2: Generated Message");
+
                 return MessageResult.Ok;
             });
         }
 
         public Output<TypeEdgeModule2Output> Output { get; set; }
-        public Input<TypeEdgeModule1Output> Input { get; set; }
         public ModuleTwin<TypeEdgeModule2Twin> Twin { get; set; }
     }
 }

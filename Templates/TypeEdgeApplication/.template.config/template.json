@@ -61,7 +61,7 @@
     },
     "containerRegistry": {
       "type": "parameter",
-      "replaces": "CONTAINER_REGISTRY",
+      "replaces": "registry",
       "description": "The container registry login FQN"
     }
   }

@@ -16,15 +16,15 @@ if exist nuget.exe (
 )
 
 
-echo Adding the private nuget packages feed "private-typeedge-feed"
-nuget.exe sources Add -Name "private-typeedge-feed" -Source "https://msblox-03.pkgs.visualstudio.com/_packaging/typeedge-feed/nuget/v3/index.json" -StorePasswordInClearText -ConfigFile NuGet.Config -UserName "%1" -Password "%2"
+echo Adding the private nuget packages feed "typeedge-feed"
+nuget.exe sources Add -Name "typeedge-feed" -Source "https://msblox-03.pkgs.visualstudio.com/_packaging/typeedge-feed/nuget/v3/index.json" -StorePasswordInClearText -ConfigFile NuGet.Config -UserName "%1" -Password "%2"
 
 if errorlevel 1  (
 	echo Failed, trying to remove an existing record first ..
-	echo Removing the private "private-typeedge-feed" ..
-	nuget.exe sources Remove -Name "private-typeedge-feed" 
-	echo Adding the private nuget packages feed "private-typeedge-feed"
-	nuget.exe sources Add -Name "private-typeedge-feed" -Source "https://msblox-03.pkgs.visualstudio.com/_packaging/typeedge-feed/nuget/v3/index.json" -StorePasswordInClearText -ConfigFile NuGet.Config -UserName "%1" -Password "%2"
+	echo Removing the private "typeedge-feed" ..
+	nuget.exe sources Remove -Name "typeedge-feed" 
+	echo Adding the private nuget packages feed "typeedge-feed"
+	nuget.exe sources Add -Name "typeedge-feed" -Source "https://msblox-03.pkgs.visualstudio.com/_packaging/typeedge-feed/nuget/v3/index.json" -StorePasswordInClearText -ConfigFile NuGet.Config -UserName "%1" -Password "%2"
 	if errorlevel 0 (
 		echo Success!			
 	)	

@@ -56,8 +56,9 @@ namespace AnomalyDetectionAlgorithms
 
             for (int i = 0; i < _rawData.Length; ++i)
             {
-                result[i] = new double[_rawData[i].Length];
-                Array.Copy(_rawData[i], result[i], _rawData[i].Length);
+                var current = _rawData[i];
+                result[i] = new double[current.Length];
+                Array.Copy(current, result[i], current.Length);
             }
             for (int j = 0; j < result[0].Length; ++j) // each col
             {
@@ -131,13 +132,17 @@ namespace AnomalyDetectionAlgorithms
                 ++clusterCounts[cluster];
             }
 
-            for (int k = 0; k < _numClusters; ++k)
+            for (int k = 0; k < clusterCounts.Length; ++k)
                 if (clusterCounts[k] == 0)
                     return false;
 
             for (int k = 0; k < _means.Length; ++k)
-                for (int j = 0; j < _means[k].Length; ++j)
-                    _means[k][j] = 0.0;
+            {
+                double[] current = _means[k];
+                for (int j = 0; j < current.Length; ++j)
+                    current[j] = 0.0;
+            }
+
 
             for (int i = 0; i < _normalizedData.Length; ++i)
             {

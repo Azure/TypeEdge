@@ -18,7 +18,7 @@ using TypeEdgeModule3;
 
 namespace Modules
 {
-    public class TypeEdgeModule3 : EdgeModule, ITypeEdgeModule3
+    public class TypeEdgeModule3 : EdgeModule, ITypeEdgeModule3, IDisposable
     {
         private Py.GILState _state;
         private dynamic _sys;
@@ -54,7 +54,7 @@ namespace Modules
 
         public TypeEdgeModule3(ITypeEdgeModule2 proxy)
         {
-            Input.Subscribe(proxy.Output, async msg =>
+            proxy.Output.Subscribe(this, async msg =>
             {
                 Console.WriteLine("Processing new message in TypeEdgeModule3");
 
@@ -86,17 +86,19 @@ namespace Modules
                     Data = msg.Data,
                     Metadata = DateTime.UtcNow.ToShortTimeString()
                 });
+                Console.WriteLine("TypeEdgeModule3: Generated Message");
+
                 return MessageResult.Ok;
             });
         }
 
         public Output<TypeEdgeModule3Output> Output { get; set; }
-        public Input<TypeEdgeModule2Output> Input { get; set; }
         public ModuleTwin<TypeEdgeModule3Twin> Twin { get; set; }
 
-        public void Dispose()
+        public new void Dispose()
         {
             _pythonTaskScheduler?.Schedule(() => { _state?.Dispose(); });
+            base.Dispose();
         }
     }
 }

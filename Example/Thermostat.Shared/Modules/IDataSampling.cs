@@ -8,7 +8,6 @@ namespace ThermostatApplication.Modules
     [TypeModule]
     public interface IDataSampling 
     {
-        Input<Temperature> Temperature { get; set; }
         Output<Reference<Sample>> Samples { get; set; }
     }
 }

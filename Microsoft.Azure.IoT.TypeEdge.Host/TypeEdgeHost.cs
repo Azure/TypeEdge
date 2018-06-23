@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -233,26 +234,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 foreach (var moduleType in _container.ComponentRegistry.Registrations
                     .Where(r => typeof(EdgeModule).IsAssignableFrom(r.Activator.LimitType))
                     .Select(r => r.Activator.LimitType).Distinct())
-                {
-                    if (!(scope.Resolve(moduleType) is EdgeModule module))
-                        continue;
-
-
-                    //foreach (var item in module.GetType().GetProperties())
-                    //{
-                    //    if (!item.PropertyType.IsGenericType)
-                    //        continue;
-                    //    var genericDef = item.PropertyType.GetGenericTypeDefinition();
-                    //    if (!genericDef.IsAssignableFrom(typeof(Volume<>)))
-                    //        continue;
-
-                    //    //the ctor of this prop registers the volume
-                    //    var instance = Activator.CreateInstance(
-                    //    genericDef.MakeGenericType(item.PropertyType.GenericTypeArguments),
-                    //    item.Name, module);
-                    //}
-                    modules.Add(module);
-                }
+                    if ((scope.Resolve(moduleType) is EdgeModule module))
+                        modules.Add(module);
             }
 
             return modules;

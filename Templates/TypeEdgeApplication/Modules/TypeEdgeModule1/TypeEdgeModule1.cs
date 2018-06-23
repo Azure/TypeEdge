@@ -28,6 +28,8 @@ namespace Modules
             while (true)
             {
                 await Output.PublishAsync(new TypeEdgeModule1Output {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)});
+                Console.WriteLine("TypeEdgeModule1: Generated Message");
+
                 Thread.Sleep(1000);
             }
         }

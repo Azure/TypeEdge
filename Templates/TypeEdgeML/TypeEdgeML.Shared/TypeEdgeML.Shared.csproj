@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge" Version="0.1.69" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge" Version="0.1.76" />
   </ItemGroup>
 
 </Project>

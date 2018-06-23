@@ -8,9 +8,6 @@ namespace ThermostatApplication.Modules
     [TypeModule]
     public interface IAnomalyDetection 
     {
-        Input<Temperature> Temperature { get; set; }
-        Input<Reference<Sample>> Samples { get; set; }
-
         Output<Anomaly> Anomaly { get; set; }
     }
 }

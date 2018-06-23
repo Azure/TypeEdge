@@ -33,14 +33,13 @@ namespace Thermostat.ServiceApp
                     case "A":
                         ProxyFactory.GetModuleProxy<ITemperatureSensor>().GenerateAnomaly(40);
                         break;
+                    case "E":
+                        return;
                     default:
-                        continue;
-                }
-                break;
-            }
+                        break;
 
-            Console.WriteLine("Press <ENTER> to exit..");
-            Console.ReadLine();
+                }
+            }
         }
 
         private static async Task SetTwin()

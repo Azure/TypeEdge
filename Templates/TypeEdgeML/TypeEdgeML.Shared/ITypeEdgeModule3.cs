@@ -10,7 +10,6 @@ namespace TypeEdgeML.Shared
     public interface ITypeEdgeModule3
     {
         Output<TypeEdgeModule3Output> Output { get; set; }
-        Input<TypeEdgeModule2Output> Input { get; set; }
         ModuleTwin<TypeEdgeModule3Twin> Twin { get; set; }
     }
 }
