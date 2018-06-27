@@ -20,13 +20,11 @@ namespace Modules
         public override CreationResult Configure(IConfigurationRoot configuration)
         {
             _webHost = new WebHostBuilder()
-                .UseKestrel()
                 .UseConfiguration(configuration)
-                .UseContentRoot(@"C:\work\oss\me\Microsoft.Azure.IoT.TypeEdge\Example\Modules\VisualizationWeb")
-                //.UseContentRoot(Path.Combine(Directory.GetCurrentDirectory()))
+                .UseKestrel()
+                .UseContentRoot(Path.Combine(Directory.GetCurrentDirectory()))
                 .UseIISIntegration()
                 .UseStartup<Startup>()
-                .UseUrls("http://localhost:5001/")
                 .Build();
 
             return base.Configure(configuration);
