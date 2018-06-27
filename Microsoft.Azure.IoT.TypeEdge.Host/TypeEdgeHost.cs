@@ -218,6 +218,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                         moduleConnectionString);
 
                     var moduleConfiguration = new ConfigurationBuilder()
+                        .AddJsonFile("appsettings.json")
                         .AddEnvironmentVariables()
                         .Build();
 

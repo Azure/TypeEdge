@@ -2,7 +2,9 @@
 using System.Reflection;
 using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json;
+using System.Linq;
 using Newtonsoft.Json.Serialization;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.IoT.TypeEdge.Twins
 {
@@ -59,6 +61,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Twins
             else
                 properties = result.Properties.Reported;
 
+            //arrays are not supported!!
             foreach (var prop in GetType()
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
                 if (prop.GetValue(this) != null)

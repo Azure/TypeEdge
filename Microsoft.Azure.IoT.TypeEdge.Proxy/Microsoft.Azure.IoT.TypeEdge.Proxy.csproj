@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.IoT.TypeEdge.Proxy</PackageId>
-    <Version>0.1.76</Version>
+    <Version>0.1.80</Version>
     <Authors>paloukari</Authors>
     <Company>Microsoft</Company>
 

@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge.Enums;
 using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
@@ -12,13 +15,14 @@ using ThermostatApplication.Twins;
 
 namespace Modules
 {
-    public class Preprocessor : EdgeModule, IPreprocessor
+    public class Orchestrator : EdgeModule, IOrchestrator
     {
         public Output<Temperature> Training { get; set; }
         public Output<Temperature> Detection { get; set; }
-        public ModuleTwin<PreprocessorTwin> Twin { get; set; }
+        public Output<Temperature> Visualization { get; set; }
+        public ModuleTwin<OrchestratorTwin> Twin { get; set; }
 
-        public Preprocessor(ITemperatureSensor proxy)
+        public Orchestrator(ITemperatureSensor proxy)
         {
             proxy.Temperature.Subscribe(this, async signal =>
             {
@@ -29,7 +33,13 @@ namespace Modules
                         if (twin.Scale == TemperatureScale.Celsius)
                             signal.Value = signal.Value * 9 / 5 + 32;
 
-                    await RouteMessageAsync(signal, twin.RoutingMode);
+                    List<Task> messages = new List<Task>();
+                    foreach (Routing item in Enum.GetValues(typeof(Routing)))
+                        if (twin.RoutingMode.HasFlag(item))
+                            messages.Add(RouteMessage(signal, item));
+
+                    if (messages.Count > 0)
+                        await Task.WhenAll(messages);
                 }
                 return MessageResult.Ok;
             });
@@ -42,28 +52,18 @@ namespace Modules
             });
         }
 
-        private async Task RouteMessageAsync(Temperature signal, Routing mode)
+        private Task RouteMessage(Temperature signal, Routing mode)
         {
             switch (mode)
             {
-                case Routing.None:
-                    break;
                 case Routing.Train:
-                    await Training.PublishAsync(signal);
-                    break;
+                    return Training.PublishAsync(signal);
                 case Routing.Detect:
-                    await Detection.PublishAsync(signal);
-                    break;
-                case Routing.Both:
-                    var results = new Task<PublishResult>[] {
-                        Training.PublishAsync(signal),
-                        Detection.PublishAsync(signal)
-                    };
-                    await Task.WhenAll(results);
-                    break;
-                default:
-                    break;
+                    return Detection.PublishAsync(signal);
+                case Routing.Visualize:
+                    return Visualization.PublishAsync(signal);
             }
+            return null;
         }
 
         public override async Task<ExecutionResult> RunAsync()

@@ -20,7 +20,7 @@ namespace Modules
         public Output<Anomaly> Anomaly { get; set; }
 
 
-        public AnomalyDetection(IPreprocessor preprocessor, IDataSampling trainer)
+        public AnomalyDetection(IOrchestrator preprocessor, IDataSampling trainer)
         {
             preprocessor.Detection.Subscribe(this, async signal =>
             {
