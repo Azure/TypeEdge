@@ -22,11 +22,13 @@ namespace ThermostatApplication
             var host = new TypeEdgeHost(configuration);
 
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
-            host.RegisterModule<IPreprocessor, Preprocessor>(); 
-            host.RegisterModule<IDataSampling, DataSampling>();
-            host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
+            host.Upstream.Subscribe(host.GetProxy<ITemperatureSensor>().Temperature);
 
-            host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
+            //host.RegisterModule<IPreprocessor, Preprocessor>(); 
+            //host.RegisterModule<IDataSampling, DataSampling>();
+            //host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
+
+            //host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
             host.Build();
 

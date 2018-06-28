@@ -163,10 +163,10 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             if (!bypassCertVerification)
                 InstallCert();
 
-            var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
+            var settings = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
             if (true) //bypassCertVerification)
-                mqttSetting.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-            _transportSettings = new ITransportSettings[] { mqttSetting };
+                settings.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            _transportSettings = new ITransportSettings[] { settings };
 
             return Configure(configuration);
         }

@@ -2,16 +2,55 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>Microsoft.Azure.IoT.TypeEdge.Host</id>
-    <version>0.1.76</version>
+    <version>0.1.95</version>
     <authors>paloukari</authors>
     <owners>paloukari</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Package Description</description>
     <dependencies>
       <group targetFramework=".NETCoreApp2.1">
-        <dependency id="Microsoft.Azure.IoT.TypeEdge" version="0.1.76" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Azure.Devices.Edge.Agent.Core" version="1.0.0" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Azure.Devices.Edge.Hub.Service" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Azure.IoT.TypeEdge" version="0.1.95" exclude="Build,Analyzers" />
+        <dependency id="Serilog.Extensions.Logging" version="1.4.0" exclude="Build,Analyzers" />
+        <dependency id="Serilog.Sinks.Console" version="2.1.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyInjection" version="2.1.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Azure.Devices" version="1.16.0" exclude="Build,Analyzers" />
+        <dependency id="System.Collections.Immutable" version="1.3.1" />
+        <dependency id="System.IO.FileSystem.Watcher" version="4.3.0" />
+        <dependency id="System.Reactive" version="3.1.1" />
+        <dependency id="System.Threading.Thread" version="4.3.0" />
+        <dependency id="Microsoft.Azure.Amqp" version="2.2.0" />
+        <dependency id="Stateless" version="4.0.0" />
+        <dependency id="JetBrains.Annotations" version="11.1.0" />
+        <dependency id="Microsoft.Azure.Devices.Client" version="1.17.0" />
+        <dependency id="System.ValueTuple" version="4.4.0" />
+        <dependency id="Microsoft.AspNetCore" version="2.1.1" />
+        <dependency id="Microsoft.AspNetCore.Hosting" version="2.1.1" />
+        <dependency id="Microsoft.AspNetCore.Http" version="2.1.1" />
+        <dependency id="Microsoft.AspNetCore.Http.Extensions" version="2.1.1" />
+        <dependency id="Microsoft.AspNetCore.Http.Features" version="2.1.1" />
+        <dependency id="Microsoft.AspNetCore.Mvc" version="2.1.1" />
+        <dependency id="Microsoft.AspNetCore.WebSockets" version="2.1.1" />
+        <dependency id="Microsoft.Azure.Devices.ProtocolGateway.Core" version="1.3.0" />
+        <dependency id="Microsoft.Extensions.Configuration" version="2.1.1" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="2.1.1" />
+        <dependency id="Autofac" version="4.5.0" />
+        <dependency id="Microsoft.Extensions.Configuration" version="2.1.1" />
+        <dependency id="Microsoft.Extensions.Configuration.EnvironmentVariables" version="2.1.1" />	
+        <dependency id="Autofac.Extensions.DependencyInjection" version="4.1.0" />
+        <dependency id="RocksDbNative" version="5.4.6.10" />
+        <dependency id="RocksDbSharp" version="5.4.6.10" />
+        <dependency id="Microsoft.Extensions.Logging" version="2.1.1" />
+        <dependency id="Portable.BouncyCastle" version="1.8.2" />
+        <dependency id="System.Runtime.Loader" version="4.3.0" />
+        <dependency id="System.ValueTuple" version="4.4.0" />
+        <dependency id="Antlr4" version="4.6.1-beta002" />
+        <dependency id="Microsoft.Extensions.Logging.Console" version="2.1.1" />
+        <dependency id="System.Collections.Immutable" version="1.3.1" />
+        <dependency id="System.Reflection.Extensions" version="4.3.0" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
+        <dependency id="System.Threading.Tasks.Dataflow" version="4.7.0" />
+    
+    
       </group>
     </dependencies>
     <contentFiles>
@@ -22,14 +61,42 @@
     </contentFiles>
   </metadata>
   <files>
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.Host.dll" target="lib\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.Host.dll" />
-    
+
+
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.dll"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.pdb"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.dll" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.dll"    target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.pdb"    target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.dll"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.pdb"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.dll" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.dll"           target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.pdb"           target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.dll"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.pdb"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.pdb"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.dll"                target="lib\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.pdb"                target="lib\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.pdb"  />
+
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.Host.dll" target="lib\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.Host.dll"  />
+    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.Host.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.IoT.TypeEdge.Host.pdb"  />
+
     <file src="Microsoft.Azure.IoT.TypeEdge.Host.targets" target="build\Microsoft.Azure.IoT.TypeEdge.Host.targets" />
     <file src="Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" target="build\Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" />
     <file src="Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem" target="build\Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem" />
     <file src="Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" target="build\Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" />
-    
+
     <file src="appsettings_hub.json" target="build\Config\appsettings_hub.json" />
-    
+
   </files>
 </package>

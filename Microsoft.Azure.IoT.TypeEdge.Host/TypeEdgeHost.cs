@@ -18,7 +18,6 @@ using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
 using Microsoft.Azure.IoT.TypeEdge.Proxy;
-using Microsoft.Azure.IoT.TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -268,8 +267,12 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 configurationContent = JsonConvert.DeserializeObject<ConfigurationContent>(deviceconfig);
             }
 
-            var modulesConfig =
-                configurationContent.ModuleContent["$edgeAgent"].TargetContent["modules"] as JObject;
+            var agentDesired = JObject.FromObject(configurationContent.ModulesContent["$edgeAgent"]["properties.desired"]);
+
+            if (!agentDesired.TryGetValue("modules", out JToken modules))
+                throw new Exception("Cannot read modules config from $edgeAgent");
+
+            var modulesConfig = modules as JObject;
 
             var dockerRegistry = _configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
 
@@ -303,10 +306,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 {
                 }
             }
-
-            var twinContent = new TwinContent();
-            configurationContent.ModuleContent["$edgeHub"] = twinContent;
-
+            agentDesired["modules"] = modulesConfig;
+            configurationContent.ModulesContent["$edgeAgent"]["properties.desired"] = agentDesired;
 
             var routes = new Dictionary<string, string>();
 
@@ -316,18 +317,19 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             foreach (var route in _hub.Routes) routes[$"route{routes.Count}"] = route;
 
-            var desiredProperties = new
+            configurationContent.ModulesContent["$edgeHub"] = new Dictionary<string, object>
             {
-                schemaVersion = "1.0",
-                routes,
-                storeAndForwardConfiguration = new
+                ["properties.desired"] = new
                 {
-                    timeToLiveSecs = 20
+                    schemaVersion = "1.0",
+                    routes,
+                    storeAndForwardConfiguration = new
+                    {
+                        timeToLiveSecs = 20
+                    }
                 }
             };
-            var patch = JsonConvert.SerializeObject(desiredProperties);
 
-            twinContent.TargetContent = new TwinCollection(patch);
             await registryManager.ApplyConfigurationContentOnDeviceAsync(_options.DeviceId, configurationContent);
 
             if (_options.PrintDeploymentJson.HasValue && _options.PrintDeploymentJson.Value)
