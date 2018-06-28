@@ -1,0 +1,3 @@
+[submodule "IoT.Edge"]
+	path = IoT.Edge
+	url = https://github.com/Azure/iotedge
