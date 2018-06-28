@@ -22,7 +22,7 @@
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
     <ProjectReference Include="..\Modules\AnomalyDetection\AnomalyDetection.csproj" />
@@ -31,7 +31,28 @@
     <ProjectReference Include="..\Modules\TemperatureSensor\TemperatureSensor.csproj" />
     <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
   </ItemGroup>
-  
+
+
+  <ItemGroup>
+    <Content Include="../Microsoft.Azure.IoT.TypeEdge.Host/Certificates/Certificates/edge-chain-ca/cert/edge-chain-ca.cert.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../Microsoft.Azure.IoT.TypeEdge.Host/Certificates//Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../Microsoft.Azure.IoT.TypeEdge.Host/Certificates//Certificates/edge-hub-server/cert/edge-hub-server.cert.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings_hub.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+
+
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
