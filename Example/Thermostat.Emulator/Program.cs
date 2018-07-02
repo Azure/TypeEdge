@@ -10,7 +10,7 @@ namespace ThermostatApplication
 {
     internal class Program
     {
-        private static async Task Main(string[] args)
+        private static async Task Main(string[] args) 
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
@@ -22,11 +22,12 @@ namespace ThermostatApplication
             var host = new TypeEdgeHost(configuration);
 
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
-            host.RegisterModule<IPreprocessor, Preprocessor>();
+            host.RegisterModule<IOrchestrator, Orchestrator>(); 
             host.RegisterModule<IDataSampling, DataSampling>();
-            host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
+            //host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
+            host.RegisterModule<IVisualization, Visualization>();
 
-            host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
+            //host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
             host.Build();
 

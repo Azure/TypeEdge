@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.IoT.TypeEdge.Proxy;
 using Microsoft.Extensions.Configuration;
 using ThermostatApplication;
 using ThermostatApplication.Modules;
+using ThermostatApplication.Twins;
 
 namespace Thermostat.ServiceApp
 {
@@ -44,43 +47,34 @@ namespace Thermostat.ServiceApp
 
         private static async Task SetTwin()
         {
-            ThermostatApplication.Twins.Routing routing = PromptRoutingMode();
+            var routing = PromptRoutingMode();
 
-            var processor = ProxyFactory.GetModuleProxy<IPreprocessor>();
+            var processor = ProxyFactory.GetModuleProxy<IOrchestrator>();
 
             var twin = await processor.Twin.GetAsync();
             twin.Scale = TemperatureScale.Celsius;
+
+
             twin.RoutingMode = routing;
             await processor.Twin.PublishAsync(twin);
         }
 
-        private static ThermostatApplication.Twins.Routing PromptRoutingMode()
+        private static Routing PromptRoutingMode()
         {
-            ThermostatApplication.Twins.Routing routing = ThermostatApplication.Twins.Routing.None;
-            while (true)
-            {
-                Console.WriteLine("Select Processor routing mode : (N)one, (T)rain, (D)etect, (B)oth");
-                var res = Console.ReadLine();
-                switch (res.ToUpper())
-                {
-                    case "T":
-                        routing = ThermostatApplication.Twins.Routing.Train;
-                        break;
-                    case "N":
-                        break;
-                    case "D":
-                        routing = ThermostatApplication.Twins.Routing.Detect;
-                        break;
-                    case "B":
-                        routing = ThermostatApplication.Twins.Routing.Both;
-                        break;
-                    default:
-                        continue;
-                }
-                break;
-            }
+            Routing result = 0;
 
-            return routing;
+            Console.WriteLine("Select Processor routing modes (multiple choices are allowed) : (T)rain, (D)etect, (V)isualization, empty for none");
+            var res = Console.ReadLine();
+            if (!string.IsNullOrEmpty(res))
+            {
+                if (res.Contains("T"))
+                    result |= Routing.Train;
+                if (res.Contains("D"))
+                    result |= Routing.Detect;
+                if (res.Contains("V"))
+                    result |= Routing.Visualize;
+            }
+            return result;
         }
     }
 }

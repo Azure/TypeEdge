@@ -17,7 +17,7 @@ namespace Modules
 
         public Output<Reference<Sample>> Samples { get; set; }
 
-        public DataSampling(IPreprocessor proxy)
+        public DataSampling(IOrchestrator proxy)
         {
             _sample = new Queue<Temperature>();
             proxy.Training.Subscribe(this, async signal =>

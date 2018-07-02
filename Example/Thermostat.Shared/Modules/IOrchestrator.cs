@@ -7,11 +7,12 @@ using ThermostatApplication.Twins;
 namespace ThermostatApplication.Modules
 {
     [TypeModule]
-    public interface IPreprocessor
+    public interface IOrchestrator
     {
         Output<Temperature> Training { get; set; }
         Output<Temperature> Detection { get; set; }
+        Output<Temperature> Visualization { get; set; }
 
-        ModuleTwin<PreprocessorTwin> Twin { get; set; }
+        ModuleTwin<OrchestratorTwin> Twin { get; set; }
     }
 }
