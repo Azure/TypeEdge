@@ -24,10 +24,10 @@ namespace ThermostatApplication
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
             host.RegisterModule<IOrchestrator, Orchestrator>(); 
             host.RegisterModule<IDataSampling, DataSampling>();
-            //host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
+            host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
             host.RegisterModule<IVisualization, Visualization>();
 
-            //host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
+            host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
             host.Build();
 

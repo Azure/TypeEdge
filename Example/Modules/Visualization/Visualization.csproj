@@ -13,8 +13,8 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
     <PackageReference Include="Microsoft.Azure.IoT.TypeEdge" Version="0.1.80" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
-    <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
