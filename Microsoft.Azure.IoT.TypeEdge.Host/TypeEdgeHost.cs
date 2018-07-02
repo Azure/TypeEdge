@@ -131,7 +131,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                             {
                                 new AmqpTransportSettings(Devices.Client.TransportType.Amqp_Tcp_Only)
                                 {
-                                    RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+                                    RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
+                                    OpenTimeout = new TimeSpan(1)
                                 }
                             }
                         );

@@ -7,7 +7,7 @@ using ThermostatApplication.Modules;
 using Microsoft.Azure.IoT.TypeEdge.DovEnv;
 
 namespace ThermostatApplication
-{ 
+{
     internal class Program
     {
         private static async Task Main(string[] args)
@@ -18,17 +18,15 @@ namespace ThermostatApplication
                 .AddDotenvFile()
                 .AddCommandLine(args)
                 .Build();
-             
+
             var host = new TypeEdgeHost(configuration);
 
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
-            host.Upstream.Subscribe(host.GetProxy<ITemperatureSensor>().Temperature);
+            host.RegisterModule<IPreprocessor, Preprocessor>();
+            host.RegisterModule<IDataSampling, DataSampling>();
+            host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
 
-            //host.RegisterModule<IPreprocessor, Preprocessor>(); 
-            //host.RegisterModule<IDataSampling, DataSampling>();
-            //host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
-
-            //host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
+            host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
             host.Build();
 
