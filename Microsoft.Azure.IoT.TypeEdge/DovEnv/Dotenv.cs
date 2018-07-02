@@ -68,7 +68,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.DovEnv
                 {
                     // When variable is not defined the result should be "{}".
                     var replace = String.IsNullOrEmpty(parsedVars[var]) ? "{}" : parsedVars[var];
-                    value = value.Replace("${" + var + "}", replace);
+                    value = value.Replace("${" + var + "}", replace, StringComparison.OrdinalIgnoreCase);
                 }
 
                 Environment.SetEnvironmentVariable(key, value);
@@ -118,7 +118,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.DovEnv
                 }
 
                 // Split string that don't starts with a quote.
-                if (!value.StartsWith("\"") && !value.StartsWith("\'"))
+                if (!value.StartsWith("\"", StringComparison.OrdinalIgnoreCase) && !value.StartsWith("\'", StringComparison.OrdinalIgnoreCase))
                 {
                     value = value.Split(' ')[0];
                 }
