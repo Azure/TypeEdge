@@ -23,7 +23,6 @@ The minimum requirements to get started with **TypeEdge** are:
 To be able to publish your application, you will also need:
  - [Docker](https://docs.docker.com/engine/installation/)
  - An [Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal), or any other secure container registry.
- - Temporarily, you'll need your git credentials to login [to the private packages feed.](https://msblox-03.visualstudio.com/csetypeedge)
 
 
 ## Create a new **TypeEdge** application
@@ -39,10 +38,10 @@ Here is the quickest way to get started with **TypeEdge**. In this quick start y
     dotnet nuget locals http-cache --clear
     dotnet new --debug:reinit
     ```
-1. Copy the **iothubowner** connection string from your Azure **IoT Hub**.
+2. Copy the **iothubowner** connection string from your Azure **IoT Hub**.
     > The **iothubowner** is required because TypeEdge needs to provision a new device with the generated deployment configuration. 
 
-1. Create a new IoT TypeEdge application:
+3. Create a new IoT TypeEdge application:
     > You can customize the TypeEdge application and modules names when you use the template. In the next example, the application is called **Thermostat**, and the two modules are called **SensorModule** and **PreprocessorModule**. These names will be used as class names, so **Pascal casing** is suggested.
     ```
     dotnet new typeedgeapp -n Thermostat -m1 SensorModule -m2 PreprocessorModule -cs "YOUR_IOTHUBOWNER_CONNECTION" -cr YOUR_CONTAINER_REGISTRY
@@ -84,7 +83,7 @@ You should see now the Edge Hub starting up..
 .. and the messages flowing in ..
 ![](images/messages.png)
 
-## Containers debugging
+## Debugging inside the containers
 
 If your modules have system dependencies and you want to debug them inside the containers, you can leverage the *docker support* feature of VS 2017. Simply right click the **docker-compose** project and start it from VS 2017 to **debug your application inside the docker containers**.
 
@@ -93,27 +92,20 @@ Alternatively, you can run your application inside the containers in command lin
 
     docker-compose -f docker-compose.yml -f docker-compose.override.yml up
 
-> Note: To build the docker containers, temporarily you need to [add the private NuGet feed](#feed) first.
-
 ![](images/incontainer.png)
 
-**Congratulations!** 
+**Congratulations!**
 
 You just created your first **TypeEdge** application. Continue reading to learn how to deploy this application to an IoT Device, or take the time to understand [how it works](#how).
 
 ## Publish the Application
 
-## 
-1. ***Temporary step* <a name="feed">Private packages feed:</a>** To build the containers, you have to add the private packages source first. **Add your git credentials to the private repo** and run the below command. This will download nuget.exe and add the private packages source in your solution. 
-
-        addPrivateSource.bat USERNAME PASSWORD
-
-1. Now, you can build the container images:
+1. You can build the container images using **docker-compose**:
     
         docker-compose build
 
 
-1. The final step is to push these images to your docker registry. Make sure Docker can access your registry:
+2. The final step is to push these images to your docker registry. Make sure Docker can access your registry:
 
         docker login YOUR_REGISTRY -u YOUR_USERNAME -p YOUR_PASSWORD 
 
