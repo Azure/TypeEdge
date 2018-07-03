@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
-    <PackageReference Include="TypeEdge.Host" Version="0.1.98" />
+    <PackageReference Include="TypeEdge.Host" Version="0.2.1" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
   </ItemGroup>
 
   <ItemGroup>
