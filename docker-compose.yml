@@ -1,0 +1,45 @@
+version: '3.4'
+volumes:
+  env:
+
+services:
+  thermostat.emulator:
+    image: ${DOCKER_REGISTRY}thermostatemulator
+    build:
+      context: .
+      dockerfile: Thermostat.Emulator/Dockerfile
+    volumes:
+    - env:/app/env
+
+
+  preprocessor:  
+    image: ${DOCKER_REGISTRY}preprocessor
+    build:
+      context: .
+      dockerfile: Modules/Preprocessor/Dockerfile
+    volumes:
+    - env:/app/env
+        
+  temperaturesensor:
+    image: ${DOCKER_REGISTRY}temperaturesensor
+    build:
+      context: .
+      dockerfile: Modules/TemperatureSensor/Dockerfile
+    volumes:
+    - env:/app/env
+
+  datasampling:
+    image: ${DOCKER_REGISTRY}datasampling
+    build:
+      context: .
+      dockerfile: Modules/DataSampling/Dockerfile
+    volumes:
+    - env:/app/env
+
+  anomalydetection:
+    image: ${DOCKER_REGISTRY}anomalydetection
+    build:
+      context: .
+      dockerfile: Modules/AnomalyDetection/Dockerfile
+    volumes:
+    - env:/app/env
