@@ -1,8 +1,8 @@
 ﻿using System;
-using Microsoft.Azure.IoT.TypeEdge.Modules;
-using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
-using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
-using Microsoft.Azure.IoT.TypeEdge.Twins;
+using TypeEdge.Modules;
+using TypeEdge.Modules.Endpoints;
+using TypeEdge.Modules.Messages;
+using TypeEdge.Twins;
 using TypeEdgeML.Shared;
 using TypeEdgeML.Shared.Messages;
 using TypeEdgeML.Shared.Twins;

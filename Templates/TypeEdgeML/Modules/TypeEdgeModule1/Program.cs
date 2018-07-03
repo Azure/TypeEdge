@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge;
+using TypeEdge;
 
 namespace TypeEdgeModule1
 {

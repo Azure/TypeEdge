@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>TypeEdge.Host</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>paloukari</Authors>
+    <Company>Microsoft</Company>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
+
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+
+    <NuspecFile>.nuspec</NuspecFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="deviceconfig.json" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\IoT.Edge\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Core\Microsoft.Azure.Devices.Edge.Agent.Core.csproj" />
+    <ProjectReference Include="..\IoT.Edge\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Service\Microsoft.Azure.Devices.Edge.Hub.Service.csproj" />
+    <ProjectReference Include="..\TypeEdge\TypeEdge.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings_hub.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Dockerfile">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="deviceconfig.json" />
+  </ItemGroup>
+</Project>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+using TypeEdge.Modules.Messages;
 using Newtonsoft.Json;
 
 namespace TypeEdgeApplication.Shared.Messages

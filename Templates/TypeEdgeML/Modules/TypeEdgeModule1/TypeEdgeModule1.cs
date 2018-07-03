@@ -2,10 +2,10 @@
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge.Enums;
-using Microsoft.Azure.IoT.TypeEdge.Modules;
-using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
-using Microsoft.Azure.IoT.TypeEdge.Twins;
+using TypeEdge.Enums;
+using TypeEdge.Modules;
+using TypeEdge.Modules.Endpoints;
+using TypeEdge.Twins;
 using TypeEdgeML.Shared;
 using TypeEdgeML.Shared.Messages;
 using TypeEdgeML.Shared.Twins;

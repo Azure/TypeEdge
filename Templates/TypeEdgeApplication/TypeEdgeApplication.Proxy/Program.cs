@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge.Proxy;
+using TypeEdge.Proxy;
 using Microsoft.Extensions.Configuration;
 using TypeEdgeApplication.Shared;
 

@@ -1,5 +1,5 @@
-﻿using Microsoft.Azure.IoT.TypeEdge;
-using Microsoft.Azure.IoT.TypeEdge.Attributes;
+﻿using TypeEdge;
+using TypeEdge.Attributes;
 using System;
 using System.Linq;
 using System.Reflection;
