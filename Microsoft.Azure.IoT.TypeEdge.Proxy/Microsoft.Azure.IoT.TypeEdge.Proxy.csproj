@@ -2,10 +2,9 @@
 
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <PackageId>Microsoft.Azure.IoT.TypeEdge.Proxy</PackageId>
+    <PackageId>TypeEdge.Proxy</PackageId>
     <Version>0.1.96</Version>
     <Authors>paloukari</Authors>
-    <Company>Microsoft</Company>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
