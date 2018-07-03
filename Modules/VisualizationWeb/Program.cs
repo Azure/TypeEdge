@@ -12,6 +12,7 @@ namespace VisualizationWeb
 {
     public class Program
     {
+        // Begin 
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();
