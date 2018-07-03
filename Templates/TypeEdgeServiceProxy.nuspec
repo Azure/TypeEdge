@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <id>TypeEdge.Proxy</id>
+        <id>TypeEdge.ServiceProxy</id>
         <version>0.1.2</version>
-        <description>Creates a new Azure IoT Edge Proxy project for TypeEdge, a strongly typed Azure IoT Edge framework</description>
+        <description>Creates a new Azure IoT Edge Service Proxy project for TypeEdge, a strongly typed Azure IoT Edge framework</description>
         <authors>paloukari</authors>
     	<owners>paloukari</owners>
     	<requireLicenseAcceptance>false</requireLicenseAcceptance>
