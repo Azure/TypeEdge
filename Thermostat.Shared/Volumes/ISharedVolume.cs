@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.IoT.TypeEdge.Volumes;
+﻿using TypeEdge.Volumes;
 using ThermostatApplication.Messages;
 
 namespace ThermostatApplication.Modules

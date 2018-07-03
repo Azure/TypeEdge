@@ -1,7 +1,7 @@
 ﻿
-using Microsoft.Azure.IoT.TypeEdge.Modules;
-using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
-using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+using TypeEdge.Modules;
+using TypeEdge.Modules.Endpoints;
+using TypeEdge.Modules.Messages;
 using System.Collections.Generic;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;

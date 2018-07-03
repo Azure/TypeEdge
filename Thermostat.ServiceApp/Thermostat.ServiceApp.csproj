@@ -12,12 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Proxy" Version="0.1.96" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+    <PackageReference Include="TypeEdge.Proxy" Version="0.1.98" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Proxy\Microsoft.Azure.IoT.TypeEdge.Proxy.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
+    <ProjectReference Include="..\..\..\TypeEdge.Proxy\TypeEdge.Proxy.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
     <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+﻿using TypeEdge.Modules.Messages;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;

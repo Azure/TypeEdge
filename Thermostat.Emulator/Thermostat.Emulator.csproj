@@ -18,13 +18,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.96" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
+    <PackageReference Include="TypeEdge.Host" Version="0.1.98" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Microsoft.Azure.IoT.TypeEdge.Host\Microsoft.Azure.IoT.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
+    <ProjectReference Include="..\..\..\TypeEdge.Host\TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
     <ProjectReference Include="..\Modules\AnomalyDetection\AnomalyDetection.csproj" />
     <ProjectReference Include="..\Modules\DataSampling\DataSampling.csproj" />
     <ProjectReference Include="..\Modules\Orchestrator\Orchestrator.csproj" />
@@ -35,13 +35,13 @@
 
 
   <ItemGroup>
-    <None Include="..\..\Microsoft.Azure.IoT.TypeEdge.Host\Certificates\**\*.*" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'">
+    <None Include="..\..\..\TypeEdge.Host\Certificates\**\*.*" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'">
       <Link>Certificates\%(RecursiveDir)%(FileName)%(Extension)</Link>
     </None>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\Microsoft.Azure.IoT.TypeEdge.Host\appsettings_hub.json" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'">
+    <None Include="..\..\..\TypeEdge.Host\appsettings_hub.json" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'">
       <Link>appsettings_hub.json</Link>
     </None>
   </ItemGroup>

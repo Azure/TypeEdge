@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.IoT.TypeEdge.Twins;
+﻿using TypeEdge.Twins;
 using System;
 
 namespace ThermostatApplication.Twins

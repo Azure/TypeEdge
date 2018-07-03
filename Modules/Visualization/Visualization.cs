@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Azure.IoT.TypeEdge.Enums;
-using Microsoft.Azure.IoT.TypeEdge.Modules;
-using Microsoft.Azure.IoT.TypeEdge.Modules.Enums;
-using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+using TypeEdge.Enums;
+using TypeEdge.Modules;
+using TypeEdge.Modules.Enums;
+using TypeEdge.Modules.Messages;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;

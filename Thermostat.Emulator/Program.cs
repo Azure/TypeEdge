@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge.Host;
+using TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using Modules;
 using ThermostatApplication.Modules;
-using Microsoft.Azure.IoT.TypeEdge.DovEnv;
+using TypeEdge.DovEnv;
 
 namespace ThermostatApplication
 {

@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.IoT.TypeEdge;
+﻿using TypeEdge;
 using System;
 using System.Threading.Tasks;
 

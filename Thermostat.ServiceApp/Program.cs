@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.IoT.TypeEdge.Proxy;
+using TypeEdge.Proxy;
 using Microsoft.Extensions.Configuration;
 using ThermostatApplication;
 using ThermostatApplication.Modules;

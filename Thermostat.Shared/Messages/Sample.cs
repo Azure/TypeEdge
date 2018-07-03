@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
+﻿using TypeEdge.Modules.Messages;
 
 namespace ThermostatApplication.Messages
 {
