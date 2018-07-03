@@ -21,6 +21,8 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\IoT.Edge\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Core\Microsoft.Azure.Devices.Edge.Agent.Core.csproj" />
+    <ProjectReference Include="..\IoT.Edge\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Service\Microsoft.Azure.Devices.Edge.Hub.Service.csproj" />
     <ProjectReference Include="..\Microsoft.Azure.IoT.TypeEdge\Microsoft.Azure.IoT.TypeEdge.csproj" />
   </ItemGroup>
 
@@ -36,10 +38,5 @@
 
   <ItemGroup>
     <EmbeddedResource Include="deviceconfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Devices.Edge.Agent.Core" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Azure.Devices.Edge.Hub.Service" Version="1.0.0" />
   </ItemGroup>
 </Project>

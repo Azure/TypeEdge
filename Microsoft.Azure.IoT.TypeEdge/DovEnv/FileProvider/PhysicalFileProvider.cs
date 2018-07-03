@@ -9,7 +9,7 @@ using PhysicalFilesWatcher = Microsoft.Azure.IoT.TypeEdge.DovEnv.FileProvider.Ph
 
 namespace Microsoft.Azure.IoT.TypeEdge.DovEnv.FileProvider
 {
-    public class PhysicalFileProvider : IFileProvider, IDisposable
+    public sealed class PhysicalFileProvider : IFileProvider, IDisposable
     {
         private const string PollingEnvironmentKey = "DOTNET_USE_POLLING_FILE_WATCHER";
 
@@ -105,11 +105,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.DovEnv.FileProvider
 
             foreach (var segment in tokenizer)
             {
-                if (segment.Equals(".") || segment.Equals(""))
+                if (segment.Equals(".", StringComparison.OrdinalIgnoreCase) || segment.Equals("", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
-                else if (segment.Equals(".."))
+                else if (segment.Equals("..", StringComparison.OrdinalIgnoreCase))
                 {
                     depth--;
 

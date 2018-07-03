@@ -16,6 +16,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
         where T : class
     {
         private readonly ServiceClient _serviceClient;
+
         private readonly string _deviceId;
         private readonly string _iotHubConnectionString;
         private readonly RegistryManager _registryManager;
@@ -66,7 +67,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Proxy
                 methodInvocation.SetPayloadJson(paramData);
 
                 // Invoke the direct method asynchronously and get the response from the simulated device.
-                var response = _serviceClient.InvokeDeviceMethodAsync(_deviceId, Name, methodInvocation).Result;
+                var response = _serviceClient.InvokeDeviceMethodAsync(_deviceId,  Name, methodInvocation).Result;
 
                 if (response.Status == 200)
                 {

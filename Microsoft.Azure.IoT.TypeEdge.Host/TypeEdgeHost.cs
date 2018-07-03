@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Castle.DynamicProxy;
 using Microsoft.Azure.Devices;
+using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Common.Exceptions;
 using Microsoft.Azure.Devices.Edge.Agent.Core;
 using Microsoft.Azure.Devices.Edge.Storage;
@@ -18,7 +20,6 @@ using Microsoft.Azure.IoT.TypeEdge.Modules;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.IoT.TypeEdge.Modules.Messages;
 using Microsoft.Azure.IoT.TypeEdge.Proxy;
-using Microsoft.Azure.IoT.TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -38,6 +39,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
         private readonly TypeEdgeHostOptions _options;
         private readonly bool _inContainer;
 
+        const string DisableServerCertificateValidationKeyName =
+            "Microsoft.Azure.Devices.DisableServerCertificateValidation";
 
         public TypeEdgeHost(IConfigurationRoot configuration)
         {
@@ -105,6 +108,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
         {
             var tasks = new List<Task>
             {
+                CreateTemporaryConnection(),
                 _hub.RunAsync()
             };
 
@@ -114,6 +118,30 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                     tasks.Add(module.InternalRunAsync());
 
             await Task.WhenAll(tasks.ToArray());
+        }
+
+        private async Task CreateTemporaryConnection()
+        {
+            var moduleConnectionString =
+                  GetModuleConnectionStringAsync(_options.IotHubConnectionString, _options.DeviceId, _modules[0].Name)
+                      .Result;
+
+            var tmpClient = ModuleClient.CreateFromConnectionString(moduleConnectionString,
+                            new ITransportSettings[]
+                            {
+                                new AmqpTransportSettings(Devices.Client.TransportType.Amqp_Tcp_Only)
+                                {
+                                    RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
+                                    OpenTimeout = new TimeSpan(1)
+                                }
+                            }
+                        );
+
+            try
+            {
+                await tmpClient.OpenAsync();
+            }
+            catch { }
         }
 
         public T GetProxy<T>()
@@ -159,7 +187,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             Environment.SetEnvironmentVariable("storageFolder", storageFolder);
 
-            var csBuilder = IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
+            var csBuilder = Devices.IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
 
             var edgeConnectionString =
                 new ModuleConnectionStringBuilder(csBuilder.HostName, _options.DeviceId)
@@ -218,6 +246,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                         moduleConnectionString);
 
                     var moduleConfiguration = new ConfigurationBuilder()
+                        .AddJsonFile("appsettings.json")
                         .AddEnvironmentVariables()
                         .Build();
 
@@ -243,21 +272,17 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
         private async Task<string> ProvisionDeviceAsync()
         {
-            IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
+            Devices.IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
 
             var registryManager = RegistryManager.CreateFromConnectionString(_options.IotHubConnectionString);
             string sasKey;
-            try
+            var device = await registryManager.GetDeviceAsync(_options.DeviceId);
+            if (device == null)
             {
-                var device = await registryManager.AddDeviceAsync(
-                    new Device(_options.DeviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
-                sasKey = device.Authentication.SymmetricKey.PrimaryKey;
+                device = await registryManager.AddDeviceAsync(
+                new Device(_options.DeviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
             }
-            catch (DeviceAlreadyExistsException)
-            {
-                var device = await registryManager.GetDeviceAsync(_options.DeviceId);
-                sasKey = device.Authentication.SymmetricKey.PrimaryKey;
-            }
+            sasKey = device.Authentication.SymmetricKey.PrimaryKey;
 
             ConfigurationContent configurationContent;
             using (var stream = Assembly.GetExecutingAssembly()
@@ -268,10 +293,26 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 configurationContent = JsonConvert.DeserializeObject<ConfigurationContent>(deviceconfig);
             }
 
-            var modulesConfig =
-                configurationContent.ModuleContent["$edgeAgent"].TargetContent["modules"] as JObject;
+            var agentDesired = JObject.FromObject(configurationContent.ModulesContent["$edgeAgent"]["properties.desired"]);
+
+            if (!agentDesired.TryGetValue("modules", out JToken modules))
+                throw new Exception("Cannot read modules config from $edgeAgent");
+
+            var modulesConfig = modules as JObject;
 
             var dockerRegistry = _configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
+
+
+            try
+            {
+                var oldModules = await registryManager.GetModulesOnDeviceAsync(_options.DeviceId);
+                foreach (var oldModule in oldModules)
+                    if (!oldModule.Id.StartsWith("$"))
+                        await registryManager.RemoveModuleAsync(oldModule);
+            }
+            catch
+            {
+            }
 
             foreach (var module in _modules)
             {
@@ -303,10 +344,8 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
                 {
                 }
             }
-
-            var twinContent = new TwinContent();
-            configurationContent.ModuleContent["$edgeHub"] = twinContent;
-
+            agentDesired["modules"] = modulesConfig;
+            configurationContent.ModulesContent["$edgeAgent"]["properties.desired"] = agentDesired;
 
             var routes = new Dictionary<string, string>();
 
@@ -316,18 +355,19 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
 
             foreach (var route in _hub.Routes) routes[$"route{routes.Count}"] = route;
 
-            var desiredProperties = new
+            configurationContent.ModulesContent["$edgeHub"] = new Dictionary<string, object>
             {
-                schemaVersion = "1.0",
-                routes,
-                storeAndForwardConfiguration = new
+                ["properties.desired"] = new
                 {
-                    timeToLiveSecs = 20
+                    schemaVersion = "1.0",
+                    routes,
+                    storeAndForwardConfiguration = new
+                    {
+                        timeToLiveSecs = 20
+                    }
                 }
             };
-            var patch = JsonConvert.SerializeObject(desiredProperties);
 
-            twinContent.TargetContent = new TwinCollection(patch);
             await registryManager.ApplyConfigurationContentOnDeviceAsync(_options.DeviceId, configurationContent);
 
             if (_options.PrintDeploymentJson.HasValue && _options.PrintDeploymentJson.Value)
@@ -339,7 +379,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Host
         private async Task<string> GetModuleConnectionStringAsync(string iotHubConnectionString, string deviceId,
             string moduleName)
         {
-            var csBuilder = IotHubConnectionStringBuilder.Create(iotHubConnectionString);
+            var csBuilder = Devices.IotHubConnectionStringBuilder.Create(iotHubConnectionString);
             var registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
             var module = await registryManager.GetModuleAsync(deviceId, moduleName);
             var sasKey = module.Authentication.SymmetricKey.PrimaryKey;

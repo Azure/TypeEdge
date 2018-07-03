@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Transport.Mqtt;
@@ -31,6 +33,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
         private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
         private string _connectionString;
         private ModuleClient _ioTHubModuleClient;
+        
         private ITransportSettings[] _transportSettings;
 
         protected EdgeModule()
@@ -54,7 +57,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
                 if (proxyInterface == null)
                     throw new ArgumentException($"{GetType().Name} has needs to implement an single interface annotated with the TypeModule Attribute");
 
-                return proxyInterface.Name.Substring(1).ToLower();
+                return proxyInterface.Name.Substring(1).ToLower(CultureInfo.CurrentCulture);
             }
         }
 
@@ -94,7 +97,7 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
 
             // Open a connection to the Edge runtime
             _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, _transportSettings);
-
+            
             await _ioTHubModuleClient.OpenAsync();
             //Console.WriteLine($"{Name}:IoT Hub module client initialized.");
 
@@ -163,10 +166,11 @@ namespace Microsoft.Azure.IoT.TypeEdge.Modules
             if (!bypassCertVerification)
                 InstallCert();
 
-            var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
+            var settings = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
             if (true) //bypassCertVerification)
-                mqttSetting.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-            _transportSettings = new ITransportSettings[] { mqttSetting };
+                settings.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
+                true;
+            _transportSettings = new ITransportSettings[] { settings };
 
             return Configure(configuration);
         }
