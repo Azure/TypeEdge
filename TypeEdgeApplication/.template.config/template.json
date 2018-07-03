@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Spyros Garyfallos",
+  "classifications": [ "TypeEdge", "Azure", "IoT", "Edge", "Application" ],
+  "name": "Type Edge Application",
+  "identity": "TypeEdge.Application.CSharp",
+  "groupIdentity": "TypeEdgeApplication",
+  "shortName": "typeedgeapp",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "TypeEdgeApplication",
+  "preferNameDirectory": true,
+  "symbols": {
+    "appNameLower": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "name",
+        "toLower": true
+      },
+      "replaces": "emulatorimage"
+    },
+    "module1Name": {
+      "type": "parameter",
+      "defaultValue": "Module1",
+      "replaces": "TypeEdgeModule1",
+      "fileRename": "TypeEdgeModule1",
+      "description": "The name of the first TypeEdge Module"
+    },
+    "module1NameLower": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "module1Name",
+        "toLower": true
+      },
+      "replaces": "module1image"
+    },
+    "module2Name": {
+      "type": "parameter",
+      "defaultValue": "Module2",
+      "replaces": "TypeEdgeModule2",
+      "fileRename": "TypeEdgeModule2",
+      "description": "The name of the second TypeEdge Module"
+    },
+    "module2NameLower": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "module2Name",
+        "toLower": true
+      },
+      "replaces": "module2image"
+    },
+    "connectionString": {
+      "type": "parameter",
+      "replaces": "CONNECTION_STRING",
+      "description": "The IoT Hub owner connection string"
+    },
+    "containerRegistry": {
+      "type": "parameter",
+      "replaces": "registry",
+      "description": "The container registry login FQN"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Spyros Garyfallos",
+  "classifications": [ "TypeEdge", "Azure", "IoT", "Edge", "Service", "Proxy" ],
+  "name": "Type Edge Service Proxy",
+  "identity": "TypeEdge.ServiceProxy.CSharp",
+  "groupIdentity": "TypeEdgeServiceProxy",
+  "shortName": "typeedgeserviceproxy",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "TypeEdgeServiceProxy",
+  "preferNameDirectory": true
+}
