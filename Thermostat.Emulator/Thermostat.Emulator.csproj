@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.95" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge.Host" Version="0.1.96" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
   </ItemGroup>
@@ -45,14 +45,6 @@
       <Link>appsettings_hub.json</Link>
     </None>
   </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="appsettings_hub.json" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-
 
   <ItemGroup>
     <None Update="appsettings.json">

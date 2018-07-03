@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge" Version="0.1.95" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.IoT.TypeEdge" Version="0.1.96" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
   </ItemGroup>
 
   <ItemGroup>
