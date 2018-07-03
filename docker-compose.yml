@@ -13,10 +13,10 @@ services:
 
 
   preprocessor:  
-    image: ${DOCKER_REGISTRY}preprocessor
+    image: ${DOCKER_REGISTRY}orchestrator
     build:
       context: .
-      dockerfile: Modules/Preprocessor/Dockerfile
+      dockerfile: Modules/Orchestrator/Dockerfile
     volumes:
     - env:/app/env
         
