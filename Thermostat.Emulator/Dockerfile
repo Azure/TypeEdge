@@ -41,6 +41,7 @@ COPY Modules/TemperatureSensor/TemperatureSensor.csproj Modules/TemperatureSenso
 COPY Modules/DataSampling/DataSampling.csproj Modules/DataSampling/
 COPY Modules/AnomalyDetection/AnomalyDetection.csproj Modules/AnomalyDetection/
 COPY Modules/Visualization/Visualization.csproj Modules/Visualization/
+COPY Modules/VisualizationWeb/VisualizationWeb.csproj Modules/VisualizationWeb/
 
 COPY ./.env Thermostat.Emulator/
 COPY NuGet.Config ./
