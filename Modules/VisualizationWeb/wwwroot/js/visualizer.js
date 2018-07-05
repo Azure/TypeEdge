@@ -10,7 +10,7 @@ var pause = false;
 // and functions to get the top Ten or top 100 points so far. Archer has mentioned
 // storing this in a database instead, which would help reduce space concerns.
 var data = {
-    header: ['Timestamp', 'Value'],
+    header: [],
     points: [],
     getLog: function () {
         return this.points;
@@ -21,7 +21,6 @@ var data = {
         return tempArray;
     },
     getTop: function (x) {
-        this.points = this.points.slice(0, x);
         var tempArray = this.points.slice(0, x);
         tempArray.unshift(this.header);
         return tempArray;
@@ -36,12 +35,24 @@ var data = {
 }
 
 // Called when a new message is received.
-connection.on("ReceiveMessage", (timestamp, value) => {
-    const msg = value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const encodedMsg = timestamp + ", " + msg;
-    timestamp = parseFloat(timestamp);
-    value = parseFloat(value);
-    data.points.unshift([timestamp, value]);
+// This method accepts an array of strings for header information and an array of strings for inputs.
+connection.on("ReceiveInput", (obj) => {
+    const Msg = JSON.parse(obj);
+    header = obj.NewVal.header;
+    inputs = obj.NewVal.inputs;
+    FFTResult.points = obj.FFTResult;
+    if (data.header === undefined || data.header.length == 0) {
+        data.header = headers;
+    }
+    var messages = [];
+    
+    inputs.forEach(function (value) {
+        value = parseFloat(value);
+        messages.push(value);
+        
+    });
+    data.points.unshift(messages);
+    data.points = data.points.slice(0, x);
     if (!pause) {
         drawChart();
     }
@@ -76,8 +87,8 @@ document.getElementById("pauseButton").addEventListener("click", event => {
 document.getElementById("displayNum").addEventListener("click", event => {
     var display = document.getElementById("displayNum")
     numToDraw = Math.pow(2, parseInt(display.value));
-    console.log(numToDraw);
-    console.log(display.value);
+    //console.log(numToDraw);
+    //console.log(display.value);
 })
 
 google.charts.load('current', { 'packages': ['corechart'] });
