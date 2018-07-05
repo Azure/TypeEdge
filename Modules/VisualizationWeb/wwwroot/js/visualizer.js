@@ -37,7 +37,6 @@ var data = {
 // Called when a new message is received.
 // This method accepts an array of strings for header information and an array of strings for inputs.
 connection.on("ReceiveInput", (obj) => {
-    console.log(obj);
     const Msg = JSON.parse(obj);
     headers = Msg.NewVal.Headers;
     inputs = Msg.NewVal.Inputs;
@@ -93,7 +92,8 @@ document.getElementById("displayNum").addEventListener("click", event => {
 })
 
 google.charts.load('current', { 'packages': ['corechart'] });
-
+var chart1 = "";
+var chart2 = "";
 // This actually draws the chart. Possible parameterization: allow the user to determine
 // How many elements to pull out.
 function drawChart() {
@@ -104,9 +104,12 @@ function drawChart() {
     var options = {
         title: 'Timestamp/Value Chart', hAxis: { title: 'Timestamp' }, vAxis: { title: 'Value' }, curveType: 'function', legend: { position: 'bottom' }
     };
-    var chart1 = new google.visualization.LineChart(document.getElementById('curve_chart'));
+    if (chart1 != "") {
+        chart1.clearChart();
+    }
+    chart1 = new google.visualization.LineChart(document.getElementById('curve_chart'));
     chart1.draw(dataTable, options);
-
+    
     /* Processing for FFT */
     var reals = [];
     var imags = [];
@@ -130,11 +133,12 @@ function drawChart() {
     var options2 = {
         title: 'FFT Chart', hAxis: { title: 'Frequency' }, vAxis: { title: 'Amplitude' }, curveType: 'function', legend: { position: 'bottom' }
     };
-
-    var chart2 = new google.visualization.LineChart(document.getElementById('fft_chart'));
-
+    if (chart2 != "") {
+        chart2.clearChart();
+    }
+    chart2 = new google.visualization.LineChart(document.getElementById('fft_chart'));
     chart2.draw(dataFFTTable, options2);
-
+    
 }
 /* 
  * Free FFT and convolution (JavaScript)
