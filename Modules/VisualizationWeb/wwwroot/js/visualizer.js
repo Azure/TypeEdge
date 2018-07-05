@@ -83,8 +83,6 @@ document.getElementById("displayNum").addEventListener("click", event => {
     var display = document.getElementById("displayNum")
     numToDraw = Math.pow(2, parseInt(display.value));
     fft = FFTNayuki(numToDraw);
-    //console.log(numToDraw);
-    //console.log(display.value);
 })
 
 google.charts.load('current', { 'packages': ['corechart'] });
@@ -114,12 +112,9 @@ function drawChart() {
     var options2 = {
         title: 'FFT Chart', hAxis: { title: 'Frequency' }, vAxis: { title: 'Amplitude' }, curveType: 'function', legend: { position: 'bottom' }
     };
-    
-
     /* Processing for FFT */
     var reals = [];
     var imags = [];
-
     // Format array correctly and send to FFT. We send 0 for the imaginaries.
     topNumbers.forEach((val, i) => { reals.push(val[1]); imags.push(0); });
     this.forward(reals, imags);
@@ -139,9 +134,8 @@ function drawChart() {
         chart2.clearChart();
     }
     else {
-        chart2 = new google.visualization.LineChart(document.getElementById('curve_chart'));
+        chart2 = new google.visualization.LineChart(document.getElementById('fft_chart'));
     }
-    chart2 = new google.visualization.LineChart(document.getElementById('fft_chart'));
     chart2.draw(dataFFTTable, options2);
     
 }
