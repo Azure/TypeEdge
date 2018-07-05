@@ -37,7 +37,7 @@ var data = {
 // Called when a new message is received.
 // This method accepts an array of strings for header information and an array of strings for inputs.
 connection.on("ReceiveInput", (obj) => {
-    Console.log(obj);
+    console.log(obj);
     const Msg = JSON.parse(obj);
     headers = Msg.NewVal.Headers;
     inputs = Msg.NewVal.Inputs;
