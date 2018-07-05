@@ -37,10 +37,11 @@ var data = {
 // Called when a new message is received.
 // This method accepts an array of strings for header information and an array of strings for inputs.
 connection.on("ReceiveInput", (obj) => {
+    Console.log(obj);
     const Msg = JSON.parse(obj);
-    header = obj.NewVal.header;
-    inputs = obj.NewVal.inputs;
-    FFTResult.points = obj.FFTResult;
+    headers = Msg.NewVal.Headers;
+    inputs = Msg.NewVal.Inputs;
+    //FFTResult.points = obj.FFTResult;
     if (data.header === undefined || data.header.length == 0) {
         data.header = headers;
     }
@@ -52,7 +53,7 @@ connection.on("ReceiveInput", (obj) => {
         
     });
     data.points.unshift(messages);
-    data.points = data.points.slice(0, x);
+    data.points = data.points.slice(0, numToDraw);
     if (!pause) {
         drawChart();
     }
