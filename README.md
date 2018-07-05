@@ -40,7 +40,7 @@ A Dirac delta distribution is defined as:
 <!-- $$f(t_{0})=\int_{-\infty }^{\infty } \! f(t)\delta(t-t_{0}) \, dt$$ -->
 
 <p align="center">
-  <img width="80%" src="images/dirac.png" style="max-width:200px">
+  <img width="30%" src="images/dirac.png" style="max-width:200px">
 </p>
 
 where f(t) is smooth function.
@@ -48,7 +48,7 @@ where f(t) is smooth function.
 The Fourier transformation of the Dirac delta function is:
 
 <p align="center">
-  <img width="80%" src="images/diracTr.png" style="max-width:200px">
+  <img width="30%" src="images/diracTr.png" style="max-width:200px">
 </p>
 
 <!-- $$\hat \delta(\omega)=\frac {1}{\sqrt{2 \pi}}e^{-j \omega t_{0}}$$ -->
