@@ -30,7 +30,7 @@ To inject Anomalies to the waveform, run the `Thermostat.ServiceApp` console app
 This is a Service (cloud) side application that sends twin updates and calls direct methods of the IoT Edge application modules.
 
 <p align="center">
-  <img width="80%" height="100%" src="images/serviceApp.PNG" style="max-width:600px">
+  <img width="80%" height="100%" src="images/serviceApp.png" style="max-width:600px">
 </p>
 
 When you call the Anomaly Direct method, an ad hoc anomaly value is generated. This anomaly is a Dirac delta function (Impulse), added to the normal waveform.
@@ -49,7 +49,7 @@ which in our case, just a sine wave.
 You can observe this anomaly in the real time visualization page:
 
 <p align="center">
-  <img width="80%" height="100%" src="images/Anomaly.PNG" style="max-width:600px">
+  <img width="80%" height="100%" src="images/Anomaly.png" style="max-width:600px">
 </p>
 
 >Note: It's interesting to observe the impact that this spike has on the frequency spectrum.
