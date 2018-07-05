@@ -97,8 +97,10 @@ namespace Modules
                     int left = 40;
                     //var text = new string('-', (int)((value - +(_maximum + _minimum) / 2) / amplitute * left / 2) + left);
                     //Console.WriteLine($"{value.ToString("F2")} {text}");
-                    Console.WriteLine(i);
-                    connection.InvokeAsync("SendMessage", i.ToString(), (int)((value - +(_maximum + _minimum) / 2) / amplitute * left / 2) + left);
+                    //Console.WriteLine(i);
+                    var val = new int[] { i, ((int)((value - +(_maximum + _minimum) / 2) / amplitute * left / 2) + left), 3 };
+                    var headers = new string[] { "Timestamp", "Value1", "Value2" };
+                    connection.InvokeAsync("SendInput", headers, val);
                     i = i + 1;
                     System.Threading.Thread.Sleep(50);
                 }
