@@ -31,6 +31,8 @@ namespace sendInfo
 
             cur = 0;
             isChanged = false;
+
+            curResult = new double[128];
         }
 
         //give newest value generated, if appropriate we compute and send FFT

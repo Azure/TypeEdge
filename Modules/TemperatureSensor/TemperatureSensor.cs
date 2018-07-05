@@ -121,8 +121,6 @@ namespace Modules
                 valueCounter++;
 
             }
-            return await base.RunAsync();
         }
-
     }
 }
