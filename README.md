@@ -23,6 +23,14 @@ The minimum requirements to get started with **TypeEdge.AnomalyDetection** are:
   <img width="80%" height="100%" src="images/VisualizationGraphs.PNG" style="max-width:600px">
 </p>
 
+## High Level Architecture
+
+<p align="center">
+  <img width="80%" height="100%" src="images/EdgeML_AD_HighLevelArchitecture.png" style="max-width:600px">
+</p>
+
+This is the high level architecture. This diagram depicts all of the logical components of a complete Anomaly Detection on the Edge application, including a cloud pipeline as a reference. There are many factors to weigh in when forming the Software Architecture, based on this logical design. The prime design principal was to define an abstract Edge application based on optional generic micro-Services that can be easily replaced by scenario specific modules. Apparently, the tradeoff is the introduced performance penalty of the increased inter-process communication on the Edge. 
+
 ## Injecting ad hoc Anomalies
 
 To inject Anomalies to the waveform, run the `Thermostat.ServiceApp` console app, after editing first the `IotHubConnectionString` value inside the `/Thermostat.ServiceApp/appsettings.json` file. Same as before, you need to use the **iothubowner** connection string from your Azure **IoT Hub**.
@@ -40,7 +48,7 @@ A Dirac delta distribution is defined as:
 <!-- $$f(t_{0})=\int_{-\infty }^{\infty } \! f(t)\delta(t-t_{0}) \, dt$$ -->
 
 <p align="center">
-  <img width="30%" src="images/dirac.png" style="max-width:200px">
+  <img width="35%" src="images/dirac.png" style="max-width:250px">
 </p>
 
 where f(t) is smooth function.
