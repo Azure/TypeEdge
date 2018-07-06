@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 using MathNet.Numerics.Optimization.ObjectiveFunctions;
 
-namespace sendInfo
+namespace Modules
 {
     class FFT
     {
@@ -31,6 +31,8 @@ namespace sendInfo
 
             cur = 0;
             isChanged = false;
+
+            curResult = new double[128];
         }
 
         //give newest value generated, if appropriate we compute and send FFT

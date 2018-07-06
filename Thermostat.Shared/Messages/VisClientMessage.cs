@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Azure.Amqp.Framing;
 
-namespace sendInfo
+namespace ThermostatApplication.Messages
 {
-    class Message
+    public class VisClientMessage
     {
         public NewValue NewVal = new NewValue();
         public double[] FFTResult;
