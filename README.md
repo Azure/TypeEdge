@@ -52,7 +52,7 @@ The Fourier transformation of the Dirac delta function is:
 </p>
 
 <!-- $$\hat \delta(\omega)=\frac {1}{\sqrt{2 \pi}}e^{-j \omega t_{0}}$$ -->
-which in our case, just a sine wave.
+which in our case equals to 1.
 
 You can observe this anomaly in the real time visualization page:
 
@@ -60,4 +60,4 @@ You can observe this anomaly in the real time visualization page:
   <img width="80%" height="100%" src="images/Anomaly.png" style="max-width:600px">
 </p>
 
->Note: It's interesting to observe the impact that this spike has on the frequency spectrum.
+>Note: It's interesting to observe the impact this spike has on the frequency spectrum. The discrepancy of the theoretical and the computational results is apparent. This happens because this implementation is an FFT over discrete sampled data, rather than actual Fourier transformation on a theoretical input and for an infinite time scale.
