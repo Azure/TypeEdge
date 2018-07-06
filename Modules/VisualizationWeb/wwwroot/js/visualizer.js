@@ -6,6 +6,8 @@ var numToDraw = 32; // Note: needs to be a power of 2
 var pause = false;
 var fftResultGlobal;
 var readRateGlobal;
+var frames = 1;
+var frameNum = 0;
 
 // This pseudo-object is possibly the most important in the file. It contains 
 // header information, all data points, a function to return all points (getLog)
@@ -57,31 +59,23 @@ connection.on("ReceiveInput", (obj) => {
     });
     data.points.unshift(messages);
     data.points = data.points.slice(0, numToDraw);
-    if (!pause) {
+    if (!pause && frameNum % frames == 0) {
         drawChart();
     }
+    frameNum += 1
 });
-
-// There could be new messages here, for when a user wants to change the refresh rate or
-// to parametrize the graph.
-
-
-// Downloads the log of all points to the user.
-function downloadLog() {
-    let csvContent = "data:text/csv;charset=utf-8,";
-    data.points.forEach(function (rowArray) {
-        let row = rowArray.join(",");
-        csvContent += row + '\r\n';
-    });
-    var encodedUri = encodeURI(csvContent);
-    window.open(encodedUri);
-}
 
 connection.start().catch(err => console.error(err.toString()));
 
 // Helper function to download the log
-document.getElementById("downloadButton").addEventListener("click", event => {
-    downloadLog();
+document.getElementById("frameButton").addEventListener("click", event => {
+    console.log(document.getElementById("frameRate").value);
+    var framerate = parseInt(document.getElementById("frameRate").value);
+    console.log(framerate);
+    if (!isNaN(framerate) && framerate != 0) {
+        frames = framerate;
+    }
+    console.log(frames);
 });
 
 document.getElementById("pauseButton").addEventListener("click", event => {
@@ -99,22 +93,24 @@ document.getElementById("displayNum").addEventListener("click",
 google.charts.load('current', { 'packages': ['corechart'] });
 var chart1 = "";
 var chart2 = "";
+var fft = FFTNayuki(numToDraw);
 // This actually draws the chart. Possible parameterization: allow the user to determine
 // How many elements to pull out.
 function drawChart() {
     var top = data.getTop(numToDraw);
     var dataTable = google.visualization.arrayToDataTable(top); // This takes care of the first chart
-    var topNumbers = data.getTopNums(numToDraw);
     var options = {
         title: 'Timestamp/Value Chart', hAxis: { title: 'Timestamp' }, vAxis: { title: 'Value' }, curveType: 'function', legend: { position: 'bottom' }
     };
     if (chart1 != "") {
         chart1.clearChart();
     }
-    chart1 = new google.visualization.LineChart(document.getElementById('curve_chart'));
+    else {
+        chart1 = new google.visualization.LineChart(document.getElementById('curve_chart'));
+    }
     chart1.draw(dataTable, options);
-    
 
+    var topNumbers = data.getTopNums(numToDraw);
 
     // Format array for graph 
     var result = [];
@@ -122,19 +118,17 @@ function drawChart() {
         result.push([(idx*readRateGlobal / fftResultGlobal.length), fftResultGlobal[idx], 0]);
     }
     // Header
-    result.unshift(["Timestamp", "Real", "Imag"]);
+    result.unshift(["Timestamp", "Real"]);
     var dataFFTTable = google.visualization.arrayToDataTable(result);
 
     /* Draw Charts! */
-
     
-    var options2 = {
-        title: 'FFT Chart', hAxis: { title: 'Frequency' }, vAxis: { title: 'Amplitude' }, curveType: 'function', legend: { position: 'bottom' }
-    };
     if (chart2 != "") {
         chart2.clearChart();
     }
-    chart2 = new google.visualization.LineChart(document.getElementById('fft_chart'));
+    else {
+        chart2 = new google.visualization.LineChart(document.getElementById('fft_chart'));
+    }
     chart2.draw(dataFFTTable, options2);
     
 }
