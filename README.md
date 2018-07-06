@@ -25,13 +25,17 @@ The minimum requirements to get started with **TypeEdge.AnomalyDetection** are:
 
 ## High Level Architecture
 
+This is the high level architecture. This diagram depicts all of the logical components of a complete Anomaly Detection on the Edge application, including a cloud pipeline as a reference.
+
 <p align="center">
   <img width="80%" height="100%" src="images/EdgeML_AD_HighLevelArchitecture.png" style="max-width:600px">
 </p>
 
-This is the high level architecture. This diagram depicts all of the logical components of a complete Anomaly Detection on the Edge application, including a cloud pipeline as a reference. There are many factors to weigh in when forming the Software Architecture, based on this logical design. The prime design principal was to define an abstract Edge application based on optional generic micro-Services that can be easily replaced by scenario specific modules. Apparently, the tradeoff is the introduced performance penalty of the increased inter-process communication on the Edge. 
+ There are many factors to weigh in when designing the Edge Software Architecture based on this logical design. The prime logical design principle was to define an abstract Edge application based on optional generic micro-Services that each one of them can be easily replaced by scenario specific modules. Apparently, the tradeoff of this highly decoupled design is the introduced performance penalty of the increased inter-process communication on the Edge.
 
-## Injecting ad hoc Anomalies
+ This abstract design serves a second purpose, to define a benchmarking mechanism to evaluate multiple options on different device specific capabilities.
+ 
+ ## Injecting ad hoc Anomalies
 
 To inject Anomalies to the waveform, run the `Thermostat.ServiceApp` console app, after editing first the `IotHubConnectionString` value inside the `/Thermostat.ServiceApp/appsettings.json` file. Same as before, you need to use the **iothubowner** connection string from your Azure **IoT Hub**.
 
