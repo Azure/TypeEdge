@@ -6,7 +6,7 @@ using System.Numerics;
 using System.Text;
 using MathNet.Numerics.Optimization.ObjectiveFunctions;
 
-namespace sendInfo
+namespace Modules
 {
     class FFT
     {

@@ -14,7 +14,6 @@ using ThermostatApplication.Twins;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using sendInfo;
 using WaveGenerator;
 
 namespace Modules
@@ -83,7 +82,7 @@ namespace Modules
             {
                 VerticalShift = 130
             };
-            var g = new WaveGenerator.WaveGenerator(comps);
+            var dataGenerator = new WaveGenerator.WaveGenerator(comps);
 
             //intitialize FFT object, which encapsulates the whole business
             FFT fft = new FFT(128, 10);
@@ -91,8 +90,8 @@ namespace Modules
             var valueCounter = 0;
             while (true)
             {
-                var newValue = g.Read();
-                Message m = new Message();
+                var newValue = dataGenerator.Read();
+                VisClientMessage m = new VisClientMessage();
                 m.NewVal.Headers = new String[]
                 {
                     "Timestamp",
