@@ -114,9 +114,9 @@ namespace Modules
                     "value1",
                     "Val2"
                 };
-                m1.fft = false;
+                m1.fft = true;
                 m1.append = true;
-
+                m1.chartName = "Chart1";
                 visMessages.messages[0] = m1;
                 await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
                 await Task.Delay(100);

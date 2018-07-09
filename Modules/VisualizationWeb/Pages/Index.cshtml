@@ -15,10 +15,10 @@
     <div class="row">
         <div class="col-6">&nbsp;</div>
         <div class="col-6">
-            <input type="range" min="2" max="8" value="5" class="slider" id="displayNum">
+            <input type="range" min="2" max="10" value="5" class="slider" id="displayNum">
         </div>
         <div class="col-6">
-            Refresh Rate: Every <input type="text" id="frameRate" value="1" /> Frames <input type="button" id="frameButton" value="Go!" /> <input type="button" id="pauseButton" value="Pause/Play" />
+            Refresh Rate: Every <input type="text" id="frameRate" value="1" /> Frames <input type="button" id="frameButton" value="Go!" /> <input type="button" id="pauseButton" value="Pause/Play" /> <input type="button" id="fftButton" value="Render FFT" />
         </div>
     </div>
     <div class="row">
@@ -34,7 +34,8 @@
 <script src="~/js/visualizer.js"></script>
 @*<script src="~/js/es5-chat.js"></script>*@
 
-<body>
-    <div class="center-div" id="curve_chart" style="width: 900px; height: 500px"></div>
-    <div class="center-div"id="fft_chart" style="width: 900px; height: 500px"></div>
+<body onload="load()">
+    <div id="charts">
+    </div>
+    
 </body>
