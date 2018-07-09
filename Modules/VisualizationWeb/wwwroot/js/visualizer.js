@@ -3,21 +3,7 @@
     .build();
 connection.start().catch(err => console.error(err.toString()));
 
-var numToDraw = 32; // Note: needs to be a power of 2
-var pause = false;
-/*
- *  <div class="col-6">
-        <input type="range" min="2" max="10" value="5" class="slider" id="displayNum">
-    </div>
-    <div class="col-6">
-        Refresh Rate: Every <input type="text" id="frameRate" value="1" /> Frames <input type="button" id="frameButton" value="Go!" /> <input type="button" id="pauseButton" value="Pause/Play" /> <input type="button" id="fftButton" value="Render FFT" />
-    </div>
- */
-
-var frames = 1;
-var frameNum = 0;
 var charts = {};
-google.charts.load('current', { 'packages': ['corechart'] });
 
 
 // This pseudo-object is possibly the most important in the file. It contains 
@@ -32,106 +18,170 @@ class Chart {
         else {
             this.points = newPoints;
         }
-        this.points = this.points.slice(0, numToDraw);
+        this.points = this.points.slice(0, this.numToDraw);
     }
     constructor(chart) {
-        
+        if (!document || !google || !google.visualization) {
+            return;
+        }
         this.chartName = chart.chartName;
         this.xlabel = chart.xlabel;
         this.ylabel = chart.ylabel;
         this.headers = chart.headers;
         this.points = chart.points;
         this.append = chart.append;
+
+        /* Set up JavaScript variables */
+        this.numToDraw = 32; // Note: needs to be a power of 2
+        this.pause = false;
+        this.frames = 1;
+        this.frameNum = 0;
+        var chartElement = document.getElementById("charts");
+
+        /* Now we need to set up the buttons */
+        /* First, display */
+        var displayNumButton = document.createElement("input");
+        displayNumButton.type = "range";
+        displayNumButton.min = "2";
+        displayNumButton.max = "10";
+        displayNumButton.value = "5";
+        displayNumButton.class = "slider";
+        displayNumButton.id = "displayNum" + this.chartName;
+        displayNumButton.name = this.chartName;
+        displayNumButton.onclick = function () {
+            // Since the number of elements to display must be a power of 2, we use the sliding
+            // bar to determine the exponent of number to display.
+            var name = "displayNum" + displayNumButton.name;
+            var display = document.getElementById(name);
+            charts[displayNumButton.name].numToDraw = Math.pow(2, parseInt(display.value));
+        };
+        chartElement.appendChild(displayNumButton);
+
+        /* Second, framerate */
+        var frameButton = document.createElement("input");
+        frameButton.type = "text";
+        frameButton.id = "frameRate" + this.chartName;
+        frameButton.value = "1";
+        frameButton.name = this.chartName;
+        var description = document.createTextNode(" Frames ");
+        chartElement.appendChild(frameButton);
+        chartElement.appendChild(description);
+
+        var frameGoButton = document.createElement("input");
+        frameGoButton.type = "button";
+        frameGoButton.id = "frameButton" + this.chartName;
+        frameGoButton.value = "Go!";
+        frameGoButton.name = this.chartName;
+        frameGoButton.onclick = function () {
+            var framerate = parseInt(document.getElementById("frameRate" + frameButton.name).value);
+            if (!isNaN(framerate) && framerate != 0) {
+                charts[frameButton.name].frames = framerate;
+            }
+        };
+        chartElement.append(frameGoButton);
+
+        /* End Framerate */
+
+        /* Pause Button */
+
+        var pauseButton = document.createElement("input");
+        pauseButton.type = "button";
+        pauseButton.id = "pauseButton" + this.chartName;
+        pauseButton.value = "Pause/Play";
+        pauseButton.name = this.chartName;
+        pauseButton.onclick = function () {
+            charts[pauseButton.name].pause = !charts[pauseButton.name].pause;
+        }
+        chartElement.append(pauseButton);
+
+        /* End Pause Button */
+
+        /* Render FFT Button */
+
+        var fftButton = document.createElement("input");
+        fftButton.type = "button";
+        fftButton.id = "fftButton" + this.chartName;
+        fftButton.value = "Render FFT";
+        fftButton.name = this.chartName;
+        fftButton.onclick = function () {
+            drawFFT(charts[fftButton.name]);
+        }
+        chartElement.append(fftButton);
+
+        /* End FFT Button */
+
+
+
+        /* Create charts */
         this.htmlChart = document.createElement("div");
         this.htmlChart.id = this.chartName;
         this.htmlChart.style = "width: 900px; height: 500px";
-        var chartElement = document.getElementById("charts");
-        chartElement.appendChild(this.htmlChart);
-        
-        this.googleChart = new google.visualization.LineChart(document.getElementById(this.chartName));
-        this.options = {
-            title: this.chartName, hAxis: { title: this.xlabel }, vAxis: { title: this.ylabel }, curveType: 'function', legend: { position: 'bottom' }
-        };
         this.FFTChart = document.createElement("div");
         this.FFTChart.id = this.chartName + "FFT";
         this.FFTChart.style = "width: 900px; height: 500px";
+
+        chartElement.appendChild(this.htmlChart);
         chartElement.appendChild(this.FFTChart);
+
+        this.options = {
+            title: this.chartName, hAxis: { title: this.xlabel }, vAxis: { title: this.ylabel }, curveType: 'function', legend: { position: 'bottom' }
+        };
         this.FFTOptions = {
             title: 'FFT Chart', hAxis: { title: 'Frequency' }, vAxis: { title: 'Amplitude' }, curveType: 'function', legend: { position: 'bottom' }
         };
+        console.log(document.getElementById(this.chartName));
+        this.googleChart = new google.visualization.LineChart(document.getElementById(this.chartName));
         this.FFTGoogleChart = new google.visualization.LineChart(document.getElementById(this.chartName + "FFT"));
-
+        /* End creation of charts */
     }
 }
 
 function getTopNums(chart) {
     var tempArray2 = [];
-    chart.points.slice(0, numToDraw).forEach(function (element) {
+    chart.points.slice(0, chart.numToDraw).forEach(function (element) {
         tempArray2.push([element[0], element[1]]);
     });
     return tempArray2;
 }
 function getTop(chart) {
-    var tempArray = chart.points.slice(0, numToDraw);
+    var tempArray = chart.points.slice(0, chart.numToDraw);
     tempArray.unshift(chart.headers);
     return tempArray;
 }
 
 function load() {
-    // Called when a new message is received.
-    // This method accepts an array of strings for header information and an array of strings for inputs.
-    connection.on("ReceiveInput", (obj) => {
-        const Msg = JSON.parse(obj);
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(function () {
+        // Called when a new message is received.
+        // This method accepts an array of strings for header information and an array of strings for inputs.
+        connection.on("ReceiveInput", (obj) => {
+            const Msg = JSON.parse(obj);
 
-        // First, check if we have this chart already and it's just an update.
+            // First, check if we have this chart already and it's just an update.
 
-        var messageArray = Msg.messages;
-        for (var i = 0; i < messageArray.length; i++) {
-            var chart = messageArray[i];
-            if (!charts.hasOwnProperty(chart.chartName)) {
-                // Does not exist, so let's create it.
-                charts[chart.chartName] = new Chart(chart);
-            }
-            else {
-                charts[chart.chartName].updatePoints(chart.points);
-            }
-        }
-
-        if (!pause && frameNum % frames == 0) { // Draw charts if user wants
+            var messageArray = Msg.messages;
             for (var i = 0; i < messageArray.length; i++) {
-                drawChart(charts[messageArray[i].chartName]);
+                var chart = messageArray[i];
+                if (!charts.hasOwnProperty(chart.chartName)) {
+                    // Does not exist, so let's create it.
+                    charts[chart.chartName] = new Chart(chart);
+                }
+                else {
+                    charts[chart.chartName].updatePoints(chart.points);
+                }
+                // Draw charts if user wants
+                chart = charts[chart.chartName];
+                if (!chart.pause && chart.frameNum % chart.frames == 0) {
+                    drawChart(chart);
+                }
+                chart.frameNum += 1;
             }
-        }
-        frameNum += 1
+        });
     });
+    
 }
 
-// Helper function to change the framerate
-document.getElementById("frameButton").addEventListener("click", event => {
-    var framerate = parseInt(document.getElementById("frameRate").value);
-    if (!isNaN(framerate) && framerate != 0) {
-        frames = framerate;
-    }
-});
 
-document.getElementById("pauseButton").addEventListener("click", event => {
-    pause = !pause;
-});
-
-document.getElementById("fftButton").addEventListener("click", event => {
-    drawFFT(charts["Chart1"]);
-})
-
-var fft = FFTNayuki(numToDraw);
-
-// Since the number of elements to display must be a power of 2, we use the sliding
-// bar to determine the exponent of number to display.
-document.getElementById("displayNum").addEventListener("click",
-    event => {
-        var display = document.getElementById("displayNum");
-        numToDraw = Math.pow(2, parseInt(display.value));
-        fft = FFTNayuki(numToDraw);
-    });
 
 // This actually draws the chart. Possible parameterization: allow the user to determine
 // How many elements to pull out.
@@ -141,9 +191,14 @@ function drawChart(chart) {
     var dataTable = google.visualization.arrayToDataTable(top); // This takes care of the first chart
 
     chart.googleChart.clearChart();
+    chart.googleChart.hv = {};
+    chart.googleChart.iv = {};
+    chart.googleChart.jv = {};
     chart.googleChart.draw(dataTable, chart.options);
 }
 function drawFFT(chart) {
+    var fft = FFTNayuki(chart.numToDraw);
+    
     /* Processing for FFT */
     var topNumbers = getTopNums(chart);
     var reals = [];
@@ -163,6 +218,9 @@ function drawFFT(chart) {
     var dataFFTTable = google.visualization.arrayToDataTable(result);
 
     chart.FFTGoogleChart.clearChart();
+    chart.FFTGoogleChart.hv = {};
+    chart.FFTGoogleChart.iv = {};
+    chart.FFTGoogleChart.jv = {};
     chart.FFTGoogleChart.draw(dataFFTTable, chart.FFTOptions);
 }
 

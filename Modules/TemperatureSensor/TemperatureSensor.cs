@@ -119,8 +119,16 @@ namespace Modules
                 m1.chartName = "Chart1";
                 visMessages.messages[0] = m1;
                 await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
-                await Task.Delay(100);
 
+                if (valueCounter > 200)
+                {
+                    m1.chartName = "Chart2";
+                    visMessages.messages[0] = m1;
+                    await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
+                }
+
+
+                await Task.Delay(100);
                 valueCounter++;
 
             }
