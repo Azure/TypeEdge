@@ -13,7 +13,7 @@ namespace Modules
         public double[][] points;
         public String[] headers;
         public Boolean append;
-        public Boolean fft;
+        public Boolean anomaly;
     }
     public class VisMessage
     {

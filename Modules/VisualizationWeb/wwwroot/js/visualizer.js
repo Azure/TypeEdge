@@ -13,6 +13,21 @@ var charts = {};
 class Chart {    
     updatePoints(newPoints) {
         if (this.append === true) {
+            for (var i = 0; i < newPoints.length; i++) {
+                newPoints[i] = newPoints[i].concat(["null"]);
+            }
+            this.points = newPoints.concat(this.points);
+        }
+        else {
+            this.points = newPoints;
+        }
+        this.points = this.points.slice(0, this.numToDraw);
+    }
+    updateAnomaly(newPoints) {
+        if (this.append === true) {
+            for (var i = 0; i < newPoints.length; i++) {
+                newPoints[i] = newPoints[i].concat(['point { size: 18; shape-type: star; fill-color: #a52714; }']);
+            }
             this.points = newPoints.concat(this.points);
         }
         else {
@@ -21,14 +36,12 @@ class Chart {
         this.points = this.points.slice(0, this.numToDraw);
     }
     constructor(chart) {
-        if (!document || !google || !google.visualization) {
-            return;
-        }
         this.chartName = chart.chartName;
         this.xlabel = chart.xlabel;
         this.ylabel = chart.ylabel;
-        this.headers = chart.headers;
-        this.points = chart.points;
+        this.headers = chart.headers.concat([{ 'type': 'string', 'role': 'style' }]);
+        console.log(this.headers);
+        this.points = [];
         this.append = chart.append;
 
         /* Set up JavaScript variables */
@@ -115,21 +128,21 @@ class Chart {
         /* Create charts */
         this.htmlChart = document.createElement("div");
         this.htmlChart.id = this.chartName;
-        this.htmlChart.style = "width: 900px; height: 500px";
+        this.htmlChart.style = "width: 1400px; height: 500px";
         this.FFTChart = document.createElement("div");
         this.FFTChart.id = this.chartName + "FFT";
-        this.FFTChart.style = "width: 900px; height: 500px";
+        this.FFTChart.style = "width: 1400px; height: 500px";
 
         chartElement.appendChild(this.htmlChart);
         chartElement.appendChild(this.FFTChart);
 
         this.options = {
-            title: this.chartName, hAxis: { title: this.xlabel }, vAxis: { title: this.ylabel }, curveType: 'function', legend: { position: 'bottom' }
+            title: this.chartName, hAxis: { title: this.xlabel }, vAxis: { title: this.ylabel }, curveType: 'function', legend: { position: 'bottom' }, pointSize: 1
         };
         this.FFTOptions = {
             title: 'FFT Chart', hAxis: { title: 'Frequency' }, vAxis: { title: 'Amplitude' }, curveType: 'function', legend: { position: 'bottom' }
         };
-        console.log(document.getElementById(this.chartName));
+        //console.log(document.getElementById(this.chartName));
         this.googleChart = new google.visualization.LineChart(document.getElementById(this.chartName));
         this.FFTGoogleChart = new google.visualization.LineChart(document.getElementById(this.chartName + "FFT"));
         /* End creation of charts */
@@ -166,9 +179,14 @@ function load() {
                     // Does not exist, so let's create it.
                     charts[chart.chartName] = new Chart(chart);
                 }
+                
+                if (chart.anomaly) {
+                    charts[chart.chartName].updateAnomaly(chart.points);
+                }
                 else {
                     charts[chart.chartName].updatePoints(chart.points);
                 }
+
                 // Draw charts if user wants
                 chart = charts[chart.chartName];
                 if (!chart.pause && chart.frameNum % chart.frames == 0) {
@@ -187,13 +205,16 @@ function load() {
 // How many elements to pull out.
 function drawChart(chart) {
     var top = getTop(chart);
-    
+    //console.log(top);
     var dataTable = google.visualization.arrayToDataTable(top); // This takes care of the first chart
 
+    /* Clear the chart, releasing resources */
     chart.googleChart.clearChart();
     chart.googleChart.hv = {};
     chart.googleChart.iv = {};
     chart.googleChart.jv = {};
+
+    /* With resources cleared, redraw */
     chart.googleChart.draw(dataTable, chart.options);
 }
 function drawFFT(chart) {
@@ -217,10 +238,13 @@ function drawFFT(chart) {
     result.unshift(["Timestamp", "Real", "Imag"]);
     var dataFFTTable = google.visualization.arrayToDataTable(result);
 
+    /* Clear the chart, releasing resources */
     chart.FFTGoogleChart.clearChart();
     chart.FFTGoogleChart.hv = {};
     chart.FFTGoogleChart.iv = {};
     chart.FFTGoogleChart.jv = {};
+
+    /* With resources cleared, redraw */
     chart.FFTGoogleChart.draw(dataFFTTable, chart.FFTOptions);
 }
 

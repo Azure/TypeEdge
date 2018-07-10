@@ -114,10 +114,14 @@ namespace Modules
                     "value1",
                     "Val2"
                 };
-                m1.fft = true;
+                m1.anomaly = false;
                 m1.append = true;
                 m1.chartName = "Chart1";
                 visMessages.messages[0] = m1;
+                if((valueCounter % 100) == 0)
+                {
+                    m1.anomaly = true;
+                }
                 await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
 
                 if (valueCounter > 200)
@@ -126,7 +130,7 @@ namespace Modules
                     visMessages.messages[0] = m1;
                     await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
                 }
-
+                
 
                 await Task.Delay(100);
                 valueCounter++;
