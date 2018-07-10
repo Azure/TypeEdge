@@ -35,3 +35,10 @@ body {
         display: none;
     }
 }
+
+.center-div p {
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    margin: -100px 0 0 -150px;
+}

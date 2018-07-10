@@ -91,32 +91,48 @@ namespace Modules
             while (true)
             {
                 var newValue = dataGenerator.Read();
-                VisClientMessage m = new VisClientMessage();
-                m.NewVal.Headers = new String[]
-                {
-                    "Timestamp",
-                    "Value"
-                };
 
-                m.NewVal.Inputs = new double[]
+                // Todo: Generalize this!
+                VisMessage visMessages = new VisMessage();
+                Message m1 = new Message();
+                visMessages.messages = new Message[1];
+
+                m1 = new Message();
+                m1.points = new double[1][];
+
+                m1.points[0] = new double[]
                 {
                     valueCounter,
-                    newValue
+                    newValue,
+                    newValue*2
                 };
-             
-
-                fft.Next(newValue);
-                m.FFTResult = fft.curResult;
-                m.SubtractionGraphResult = new double[128];
-
-                for (int i = 0; i < 128; i++)
+                m1.xlabel = "Timestamp";
+                m1.ylabel = "Value";
+                m1.headers = new string[]
                 {
-                    m.SubtractionGraphResult[i] = 0;
+                    "Timestamp",
+                    "value1",
+                    "Val2"
+                };
+                m1.anomaly = false;
+                m1.append = true;
+                m1.chartName = "Chart1";
+                visMessages.messages[0] = m1;
+                if((valueCounter % 100) == 0)
+                {
+                    m1.anomaly = true;
                 }
+                await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
 
-                await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(m));
+                if (valueCounter > 200)
+                {
+                    m1.chartName = "Chart2";
+                    visMessages.messages[0] = m1;
+                    await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
+                }
+                
+
                 await Task.Delay(100);
-
                 valueCounter++;
 
             }
