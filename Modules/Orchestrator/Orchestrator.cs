@@ -19,7 +19,7 @@ namespace Modules
     {
         public Output<Temperature> Training { get; set; }
         public Output<Temperature> Detection { get; set; }
-        public Output<Temperature> Visualization { get; set; }
+        public Output<VisualizationData> Visualization { get; set; }
         public ModuleTwin<OrchestratorTwin> Twin { get; set; }
 
         public Orchestrator(ITemperatureSensor proxy)
@@ -52,16 +52,18 @@ namespace Modules
             });
         }
 
-        private Task RouteMessage(Temperature signal, Routing mode)
+        /* We'll need to change the definition here */
+        private Task RouteMessage(EdgeMessage signal, Routing mode)
         {
+            System.Console.WriteLine("Got new message");
             switch (mode)
             {
                 case Routing.Train:
-                    return Training.PublishAsync(signal);
+                    return Training.PublishAsync((Temperature) signal);
                 case Routing.Detect:
-                    return Detection.PublishAsync(signal);
+                    return Detection.PublishAsync((Temperature) signal);
                 case Routing.Visualize:
-                    return Visualization.PublishAsync(signal);
+                    return Visualization.PublishAsync((VisualizationData) signal);
             }
             return null;
         }

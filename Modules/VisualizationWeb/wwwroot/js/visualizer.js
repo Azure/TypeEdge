@@ -175,6 +175,7 @@ function load() {
             var messageArray = Msg.messages;
             for (var i = 0; i < messageArray.length; i++) {
                 var chart = messageArray[i];
+                console.log(chart);
                 if (!charts.hasOwnProperty(chart.chartName)) {
                     // Does not exist, so let's create it.
                     charts[chart.chartName] = new Chart(chart);
