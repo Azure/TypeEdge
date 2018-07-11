@@ -23,6 +23,28 @@ The minimum requirements to get started with **TypeEdge.AnomalyDetection** are:
   <img width="80%" height="100%" src="images/VisualizationGraphs.PNG" style="max-width:600px">
 </p>
 
+## Preface
+
+Although Anomaly Detection is a well-studied AI/ML field, Edge introduces a multi-constraint hosting environment that need to be investigated en bloc. Anomaly Detection, as with every other compute-intensive processing on the Edge, is a highly tailored, scenario specific balance of trade-offs, such as performance, accuracy, latency, robustness and maintainability. These constraints arise from the nature of the Edge: in contrast to Cloud ML, the Edge ML usually has a non-scalable and fixed size compute capacity, limited memory and storage capabilities, with a possibly unreliable connectivity.
+
+As with most ML on the Edge scenarios, Anomaly Detection on the Edge is assumed to be part of a bigger, composite Cloud+Edge solution. The main reason for having a composite ML solution, is the clear need to leverage the scaling flexibility of the Cloud by offloading there the training stage, and shipping afterwards the pre-calculated ML models on the Edge. This new composite ML application paradigm introduces the need of defining the patterns of operationalization, and proposing a reference DevOps scheme.
+
+## Homoiconicity and ML on the Edge
+
+ML heavily relies on data and data transformations. In it's most abstract form can be annotated as:
+
+<p align="center">
+  <img width="85%" src="images/homoiconicity.png" style="max-width:700px">
+</p>
+
+<!-- $$y = f([x_{1},x_{2} .. x_{n}]) \text{ where}\ x_{n}: \text{input data at}\ t_{n}\text{,}\ y: \text{result} \text{,}\ f: \text{trained model}\ $$ -->
+
+>Note: for temporal input processing, using a set input eliminates the need for state.
+
+This annotation is a clear indication that the ML trained models should not be considered as application data, but rather as code, raising the need for a DevOps pipeline that includes the the ML models as a first-class citizen. As a matter of fact, there are cases where a typical ML model defined as a data structure, is transformed to native, highly optimized source code to achieve better performance.
+
+Having defined a DevOps pipeline that includes the ML model as part of the ML Edge application, simplifies the Anomaly Detection ALM model in continuous training scenarios. The basic premise here is that these ML applications evolve over time, perhaps on a faster pace compared to the traditional non-ML apps. Retraining can happen both on the Edge and on the Cloud, usually with different datasets and frequencies. The hypothesis of the fundamental purpose for training on the Edge is that the Edge needs to be able to minimize the false positives by recognizing the normal (non-anomalous) changes of a signal behavior, while maintaining the same accuracy. This decision of course cannot be generalized to all ML cases, but is part of the aforementioned trade-offs balance that depends on the scenario specific constraints (connectivity, latency, accuracy, etc.)
+
 ## High Level Architecture
 
 This is the high level architecture. This diagram depicts all of the logical components of a complete Anomaly Detection on the Edge application, including a cloud pipeline as a reference.
@@ -55,7 +77,7 @@ A Dirac delta distribution is defined as:
   <img width="35%" src="images/dirac.png" style="max-width:250px">
 </p>
 
-where f(t) is smooth function.
+where $f(t)$ is smooth function.
 
 The Fourier transformation of the Dirac delta function is:
 
