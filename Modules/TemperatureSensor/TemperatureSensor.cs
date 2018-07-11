@@ -47,26 +47,7 @@ namespace Modules
         }
         public override async Task<ExecutionResult> RunAsync()
         {
-            
-
-            //begin simple generator
-            var comps = new WaveConfig[3];
-            comps[0] = new WaveConfig(WaveType.Sine, 0.0001, 70);
-            comps[1] = new WaveConfig(WaveType.Sine, 0.001, 30);
-            comps[2] = new WaveConfig(WaveType.Flat, 1, 1)
-            {
-                VerticalShift = 130
-            };
-            var dataGenerator = new WaveGenerator.WaveGenerator(comps);
-
-            var valueCounter = 0;
-
-            //somehow instantiate chart?
-            
-            var newValue = dataGenerator.Read();
-            //Somehow send data
-
-            return newValue;
+            return 0;
         }
     }
 }
