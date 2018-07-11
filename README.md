@@ -33,13 +33,17 @@ As with most ML on the Edge scenarios, Anomaly Detection on the Edge is assumed 
 
 ML heavily relies on data and data transformations. In it's most abstract form can be annotated as:
 
-$$y = f([x_{1},x_{2} .. x_{n}])$$
-where $x_{n}:$ input data at $t_{n}$, $y:$ is the outcome data and $f$ is the trained ML model
->Note: for temporal ML models, using a windowed input eliminates the need for state.
+<p align="center">
+  <img width="85%" src="images/homoiconicity.png" style="max-width:700px">
+</p>
 
-The basis here is that the ML models should not be considered as application data, but rather as code, raising the need for a DevOps pipeline that includes the ML models as a first-class citizen. As a matter of fact, there are cases where a typical ML model, defined as in a data structure is transformed to native highly optimized source code to achieve better performance.
- 
-Having defined a DevOps pipeline that includes the ML model as part of the ML Edge application, simplifies the Anomaly Detection ALM model in continuous training scenarios. The basic premise here is that these ML applications evolve over time, perhaps on a faster pace compared to the traditional non-ML apps. Retraining can happen both on the Edge and on the Cloud, usually with different datasets. The hypothesis for training on the Edge is that the Edge needs to be able to minimize the false positives by recognizing the normal (non-anomalous) changes of a signal behavior, while maintaining the same accuracy. This decision is cannot be generalized, but is part of the aforementioned trade-offs balance, based of the scenario specific constraints (connectivity, latency, accuracy, etc.)
+<!-- $$y = f([x_{1},x_{2} .. x_{n}]) \text{ where}\ x_{n}: \text{input data at}\ t_{n}\text{,}\ y: \text{result} \text{,}\ f: \text{trained model}\ $$ -->
+
+>Note: for temporal input processing, using a set input eliminates the need for state.
+
+This annotation is a clear indication that the ML trained models should not be considered as application data, but rather as code, raising the need for a DevOps pipeline that includes the the ML models as a first-class citizen. As a matter of fact, there are cases where a typical ML model defined as a data structure, is transformed to native, highly optimized source code to achieve better performance.
+
+Having defined a DevOps pipeline that includes the ML model as part of the ML Edge application, simplifies the Anomaly Detection ALM model in continuous training scenarios. The basic premise here is that these ML applications evolve over time, perhaps on a faster pace compared to the traditional non-ML apps. Retraining can happen both on the Edge and on the Cloud, usually with different datasets and frequencies. The hypothesis of the fundamental purpose for training on the Edge is that the Edge needs to be able to minimize the false positives by recognizing the normal (non-anomalous) changes of a signal behavior, while maintaining the same accuracy. This decision of course cannot be generalized to all ML cases, but is part of the aforementioned trade-offs balance that depends on the scenario specific constraints (connectivity, latency, accuracy, etc.)
 
 ## High Level Architecture
 
