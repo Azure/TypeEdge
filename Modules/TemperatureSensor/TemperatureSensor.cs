@@ -11,6 +11,7 @@ using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using WaveGenerator;
+using Newtonsoft.Json;
 
 namespace Modules
 {
@@ -24,6 +25,7 @@ namespace Modules
 
         public Output<Temperature> Temperature { get; set; }
         public ModuleTwin<TemperatureTwin> Twin { get; set; }
+        public VisualizationData Visualization { get; set; }
 
         public TemperatureSensor()
         {
@@ -47,6 +49,70 @@ namespace Modules
         }
         public override async Task<ExecutionResult> RunAsync()
         {
+            HubConnection connection = await ConnectAsync("http://127.0.0.1:5000/visualizerhub");
+
+            //begin simple generator
+            var comps = new WaveConfig[3];
+            comps[0] = new WaveConfig(WaveType.Sine, 0.0001, 70);
+            comps[1] = new WaveConfig(WaveType.Sine, 0.001, 30);
+            comps[2] = new WaveConfig(WaveType.Flat, 1, 1)
+            {
+                VerticalShift = 130
+            };
+            var dataGenerator = new WaveGenerator.WaveGenerator(comps);
+
+            //intitialize FFT object, which encapsulates the whole business
+            FFT fft = new FFT(128, 10);
+
+            var valueCounter = 0;
+            while (true)
+            {
+                var newValue = dataGenerator.Read();
+
+                // Todo: Generalize this!
+                VisMessage visMessages = new VisMessage();
+                Message m1 = new Message();
+                visMessages.messages = new Message[1];
+
+                m1 = new Message();
+                m1.points = new double[1][];
+
+                m1.points[0] = new double[]
+                {
+                    valueCounter,
+                    newValue,
+                    newValue*2
+                };
+                m1.xlabel = "Timestamp";
+                m1.ylabel = "Value";
+                m1.headers = new string[]
+                {
+                    "Timestamp",
+                    "value1",
+                    "Val2"
+                };
+                m1.anomaly = false;
+                m1.append = true;
+                m1.chartName = "Chart1";
+                visMessages.messages[0] = m1;
+                if ((valueCounter % 100) == 0)
+                {
+                    m1.anomaly = true;
+                }
+                await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
+
+                if (valueCounter > 200)
+                {
+                    m1.chartName = "Chart2";
+                    visMessages.messages[0] = m1;
+                    await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
+                }
+
+
+                await Task.Delay(100);
+                valueCounter++;
+
+            }
             return 0;
         }
     }
