@@ -19,6 +19,9 @@ class Chart {
             this.points = newPoints.concat(this.points);
         }
         else {
+            for (var i = 0; i < newPoints.length; i++) {
+                newPoints[i] = newPoints[i].concat(["null"]);
+            }
             this.points = newPoints;
         }
         this.points = this.points.slice(0, this.numToDraw);
@@ -31,6 +34,9 @@ class Chart {
             this.points = newPoints.concat(this.points);
         }
         else {
+            for (var i = 0; i < newPoints.length; i++) {
+                newPoints[i] = newPoints[i].concat(['point { size: 18; shape-type: star; fill-color: #a52714; }']);
+            }
             this.points = newPoints;
         }
         this.points = this.points.slice(0, this.numToDraw);
