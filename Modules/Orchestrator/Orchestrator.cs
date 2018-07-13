@@ -21,6 +21,7 @@ namespace Modules
         public Output<Temperature> Detection { get; set; }
         public Output<VisualizationData> Visualization { get; set; }
         public ModuleTwin<OrchestratorTwin> Twin { get; set; }
+        public Output<InputToFFTData> SignalData { get; set; }
 
         public Orchestrator(ITemperatureSensor proxy)
         {

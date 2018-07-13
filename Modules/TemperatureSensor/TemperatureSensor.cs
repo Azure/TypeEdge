@@ -10,8 +10,11 @@ using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
-using WaveGenerator;
+
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using WaveGenerator;
 
 namespace Modules
 {
@@ -25,7 +28,6 @@ namespace Modules
 
         public Output<Temperature> Temperature { get; set; }
         public ModuleTwin<TemperatureTwin> Twin { get; set; }
-        public VisualizationData Visualization { get; set; }
 
         public TemperatureSensor()
         {
@@ -40,7 +42,28 @@ namespace Modules
                 return TwinResult.Ok;
             });
         }
-        
+
+        // This method connects to a url for SignalR to send data.
+        public static async Task<HubConnection> ConnectAsync(string baseUrl)
+        {
+            // Keep trying to until we can start
+            while (true)
+            {
+                var connection = new HubConnectionBuilder()
+                                .WithUrl(baseUrl)
+                                .Build();
+                try
+                {
+                    await connection.StartAsync();
+                    return connection;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    await Task.Delay(1000);
+                }
+            }
+        }
         public void GenerateAnomaly(int value)
         {
             Console.WriteLine($"GenerateAnomaly called with value:{value}");
@@ -61,9 +84,6 @@ namespace Modules
             };
             var dataGenerator = new WaveGenerator.WaveGenerator(comps);
 
-            //intitialize FFT object, which encapsulates the whole business
-            FFT fft = new FFT(128, 10);
-
             var valueCounter = 0;
             while (true)
             {
@@ -73,8 +93,8 @@ namespace Modules
                 VisMessage visMessages = new VisMessage();
                 Message m1 = new Message();
                 visMessages.messages = new Message[1];
-
                 m1 = new Message();
+
                 m1.points = new double[1][];
 
                 m1.points[0] = new double[]
@@ -95,25 +115,16 @@ namespace Modules
                 m1.append = true;
                 m1.chartName = "Chart1";
                 visMessages.messages[0] = m1;
-                if ((valueCounter % 100) == 0)
+                if((valueCounter % 100) == 0)
                 {
                     m1.anomaly = true;
                 }
-                await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
-
-                if (valueCounter > 200)
-                {
-                    m1.chartName = "Chart2";
-                    visMessages.messages[0] = m1;
-                    await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));
-                }
-
+                await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));               
 
                 await Task.Delay(100);
                 valueCounter++;
 
             }
-            return 0;
         }
     }
 }
