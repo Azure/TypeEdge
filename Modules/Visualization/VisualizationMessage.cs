@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Modules
 {
-    public class VisMessage
+    public class VisualizationMessage
     {
-        public Message[] messages;
+        public RenderData[] messages;
     }
 }

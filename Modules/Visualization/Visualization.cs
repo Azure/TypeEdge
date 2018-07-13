@@ -56,11 +56,11 @@ namespace Modules
             // Todo: Generalize this!
             // Parse the chart and the update into an understandable message, then send it 
 
-            VisMessage visualizationMessage = new VisMessage();
-            Message m1 = new Message();
-            visualizationMessage.messages = new Message[1]; // This method only allows for a single message, but users could create their own with more if needed
+            VisualizationMessage visualizationMessage = new VisualizationMessage();
+            RenderData m1 = new RenderData();
+            visualizationMessage.messages = new RenderData[1];
 
-            m1.chartName = data.Metadata.Y_Label;
+            m1.chartName = data.Metadata.Name;
             m1.xlabel = data.Metadata.X_Label;
             m1.ylabel = data.Metadata.Y_Label;
             m1.headers = data.Metadata.Headers;

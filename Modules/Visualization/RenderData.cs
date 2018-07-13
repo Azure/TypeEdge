@@ -6,7 +6,7 @@ namespace Modules
     // to the JavaScript. VisMessage is an array of Messages, which is sent to the user. We 
     // have to build this object every time we want to send an update, but we don't want to 
     // make the user feel like they have to.
-    public class Message
+    public class RenderData
     {
         public String chartName;
         public String xlabel;
