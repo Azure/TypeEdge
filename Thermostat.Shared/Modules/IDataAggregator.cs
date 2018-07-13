@@ -6,8 +6,8 @@ using ThermostatApplication.Messages;
 namespace ThermostatApplication.Modules
 {
     [TypeModule]
-    public interface IDataSampling 
+    public interface IDataAggregator 
     {
-        Output<Reference<Sample>> Samples { get; set; }
+        Output<Reference<DataAggregate>> Aggregate { get; set; }
     }
 }

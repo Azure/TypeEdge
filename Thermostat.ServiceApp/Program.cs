@@ -25,13 +25,13 @@ namespace Thermostat.ServiceApp
 
             while (true)
             {
-                Console.WriteLine("Select Action: (T)win, (A)nomaly, (E)xit");
+                Console.WriteLine("Select Action: (O)rchestratorTwin, (A)nomaly, (E)xit");
 
                 var res = Console.ReadLine();
                 switch (res.ToUpper())
                 {
-                    case "T":
-                        await SetTwin();
+                    case "O":
+                        await SetOrchestratorTwin();
                         break;
                     case "A":
                         ProxyFactory.GetModuleProxy<ITemperatureSensor>().GenerateAnomaly(40);
@@ -45,7 +45,7 @@ namespace Thermostat.ServiceApp
             }
         }
 
-        private static async Task SetTwin()
+        private static async Task SetOrchestratorTwin()
         {
             var routing = PromptRoutingMode();
 
@@ -63,16 +63,19 @@ namespace Thermostat.ServiceApp
         {
             Routing result = 0;
 
-            Console.WriteLine("Select Processor routing modes (multiple choices are allowed) : (T)rain, (D)etect, (V)isualization, empty for none");
+            Console.WriteLine("Select Processor routing modes (multiple choices are allowed) : (S)ampling, (D)etect, (V)isualize, (F)eatureExtraction,  empty for none");
             var res = Console.ReadLine();
             if (!string.IsNullOrEmpty(res))
             {
-                if (res.Contains("T"))
-                    result |= Routing.Train;
+                if (res.Contains("S"))
+                    result |= Routing.Sampling;
                 if (res.Contains("D"))
                     result |= Routing.Detect;
                 if (res.Contains("V"))
                     result |= Routing.Visualize;
+                if (res.Contains("F"))
+                    result |= Routing.FeatureExtraction;
+                
             }
             return result;
         }
