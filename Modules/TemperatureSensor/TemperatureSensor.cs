@@ -13,6 +13,8 @@ using ThermostatApplication.Twins;
 
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using WaveGenerator;
 
 namespace Modules
 {
@@ -70,44 +72,59 @@ namespace Modules
         }
         public override async Task<ExecutionResult> RunAsync()
         {
-            double frequency = 2.0;
-            int amplitute = 5;
-            int samplingRate = 100;
-            // Connect to Host
             HubConnection connection = await ConnectAsync("http://127.0.0.1:5000/visualizerhub");
-            int i = 0;
+
+            //begin simple generator
+            var comps = new WaveConfig[3];
+            comps[0] = new WaveConfig(WaveType.Sine, 0.0001, 70);
+            comps[1] = new WaveConfig(WaveType.Sine, 0.001, 30);
+            comps[2] = new WaveConfig(WaveType.Flat, 1, 1)
+            {
+                VerticalShift = 130
+            };
+            var dataGenerator = new WaveGenerator.WaveGenerator(comps);
+
+            var valueCounter = 0;
             while (true)
             {
-                Temperature message = null;
-                
-                lock (_sync)
+                var newValue = dataGenerator.Read();
+
+                // Todo: Generalize this!
+                VisMessage visMessages = new VisMessage();
+                Message m1 = new Message();
+                visMessages.messages = new Message[1];
+                m1 = new Message();
+
+                m1.points = new double[1][];
+
+                m1.points[0] = new double[]
                 {
-                    var sin = Math.Sin(2 * Math.PI * frequency * DateTime.Now.TimeOfDay.TotalSeconds);
-                    var value = amplitute * sin + (_maximum + _minimum) / 2 + _anomalyOffset;
-                    _anomalyOffset = 0.0;
-
-                    message = new Temperature
-                    {
-                        Scale = TemperatureScale.Celsius,
-                        Value = value,
-                        Minimum = _minimum,
-                        Maximum = _maximum
-                    };
-
-                    int left = 40;
-                    //var text = new string('-', (int)((value - +(_maximum + _minimum) / 2) / amplitute * left / 2) + left);
-                    //Console.WriteLine($"{value.ToString("F2")} {text}");
-                    Console.WriteLine(i);
-                    connection.InvokeAsync("SendMessage", i.ToString(), (int)((value - +(_maximum + _minimum) / 2) / amplitute * left / 2) + left);
-                    i = i + 1;
-                    System.Threading.Thread.Sleep(50);
+                    valueCounter,
+                    newValue,
+                    newValue*2
+                };
+                m1.xlabel = "Timestamp";
+                m1.ylabel = "Value";
+                m1.headers = new string[]
+                {
+                    "Timestamp",
+                    "value1",
+                    "Val2"
+                };
+                m1.anomaly = false;
+                m1.append = true;
+                m1.chartName = "Chart1";
+                visMessages.messages[0] = m1;
+                if((valueCounter % 100) == 0)
+                {
+                    m1.anomaly = true;
                 }
-                await Temperature.PublishAsync(message);
+                await connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visMessages));               
 
-                Thread.Sleep(1000 / samplingRate);
+                await Task.Delay(100);
+                valueCounter++;
+
             }
-            return await base.RunAsync();
         }
-
     }
 }
