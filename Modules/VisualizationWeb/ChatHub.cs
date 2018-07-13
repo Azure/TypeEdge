@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
 namespace SignalRChat.Hubs
@@ -8,9 +7,9 @@ namespace SignalRChat.Hubs
     {
         // Called when one client tries to send a message. It will then broadcast
         // To all clients with that data.
-        public async Task SendInput(String input)
+        public async Task SendMessage(string user, string message)
         {
-            await Clients.All.SendAsync("ReceiveInput", input);
+            await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
     }
 }
