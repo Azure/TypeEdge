@@ -8,7 +8,7 @@ namespace ThermostatApplication.Messages
 {
     public class VisualizationData : EdgeMessage
     {
-        public Chart chart { get; set; }
-        public Update update { get; set; }
+        public Chart Metadata { get; set; }
+        public GraphData Data { get; set; }
     }
 }

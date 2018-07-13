@@ -20,9 +20,9 @@ namespace Modules
         public Output<Anomaly> Anomaly { get; set; }
 
 
-        public AnomalyDetection(IOrchestrator preprocessor, IDataSampling trainer)
+        public AnomalyDetection(IOrchestrator orcherstratorProxy, IDataAggregator aggregatorProxy)
         {
-            preprocessor.Detection.Subscribe(this, async signal =>
+            orcherstratorProxy.Detection.Subscribe(this, async signal =>
             {
                 int cluster = 0;
                 if (_kMeansClustering != null)
@@ -38,7 +38,7 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            trainer.Samples.Subscribe(this, async (sampleReference) =>
+            aggregatorProxy.Aggregate.Subscribe(this, async (sampleReference) =>
             {
                 //if the messages has been stored and forwarded, but the file has been deleted (e.g. a restart)
                 //then the message can be empty (null)
@@ -48,7 +48,7 @@ namespace Modules
                 System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
                 lock (_syncSample)
-                    _sample = sampleReference.Message.Data.Select(e => new double[] { e.Value, e.Minimum, e.Maximum }).ToArray();
+                    _sample = sampleReference.Message.Values.Select(e => new double[] { e }).ToArray();
 
                 lock (_syncClustering)
                     _kMeansClustering = new KMeansClustering(_sample, _numClusters);

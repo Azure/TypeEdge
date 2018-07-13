@@ -7,9 +7,10 @@ namespace ThermostatApplication.Twins
     public enum Routing : int
     {
         None = 1 << 0,
-        Train = 1 << 1,
+        Sampling = 1 << 1,
         Detect = 1 << 2,
-        Visualize = 1 << 3
+        Visualize = 1 << 3,
+        FeatureExtraction = 1 << 4
     }
 
     public class OrchestratorTwin : TypeModuleTwin
