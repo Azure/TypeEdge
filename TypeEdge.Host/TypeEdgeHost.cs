@@ -173,12 +173,16 @@ namespace TypeEdge.Host
             //Calculate the Hub Enviroment Varialbes
             var currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
+            Environment.SetEnvironmentVariable(HubService.Constants.EdgeHubServerCertificateFileKey,
+                Path.Combine(currentLocation, @"Certificates/edge-hub-server/cert/edge-hub-server.cert.pfx"));
+
             Environment.SetEnvironmentVariable(HubService.Constants.SslCertEnvName,
                 "edge-hub-server.cert.pfx");
+
             Environment.SetEnvironmentVariable(HubService.Constants.SslCertPathEnvName,
                 Path.Combine(currentLocation, @"Certificates/edge-hub-server/cert"));
 
-            Environment.SetEnvironmentVariable("EdgeModuleHubServerCAChainCertificateFile",
+            Environment.SetEnvironmentVariable(HubService.Constants.EdgeHubServerCAChainCertificateFileKey,
                 Path.Combine(currentLocation, @"Certificates/edge-chain-ca/cert/edge-chain-ca.cert.pem"));
 
             var storageFolder = Path.Combine(currentLocation, @"Storage");
