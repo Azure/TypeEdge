@@ -19,7 +19,7 @@ namespace Modules
     {
         public Output<Temperature> Sampling { get; set; }
         public Output<Temperature> Detection { get; set; }
-        public Output<VisualizationData> Visualization { get; set; }
+        public Output<GraphData> Visualization { get; set; }
         public Output<DataAggregate> FeatureExtraction { get; set; }
 
         public ModuleTwin<OrchestratorTwin> Twin { get; set; }
@@ -71,14 +71,13 @@ namespace Modules
                             switch (item)
                             {
                                 case Routing.Visualize:
-                                    messages.Add(Visualization.PublishAsync(new VisualizationData()
-                                    {
-                                        Data = new GraphData()
+                                    messages.Add(Visualization.PublishAsync(
+                                    new GraphData()
                                         {
                                             CorrelationID = aggregate.Message.CorrelationID,
                                             Values = aggregate.Message.Values
                                         }
-                                    }));
+                                    ));
                                     break;
                                 case Routing.FeatureExtraction:
                                     messages.Add(FeatureExtraction.PublishAsync(new DataAggregate()

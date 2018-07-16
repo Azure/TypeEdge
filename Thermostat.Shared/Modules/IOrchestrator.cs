@@ -11,7 +11,7 @@ namespace ThermostatApplication.Modules
     {
         Output<Temperature> Sampling { get; set; }
         Output<Temperature> Detection { get; set; }
-        Output<VisualizationData> Visualization { get; set; }
+        Output<GraphData> Visualization { get; set; }
 
         ModuleTwin<OrchestratorTwin> Twin { get; set; }
     }
