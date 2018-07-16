@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using TypeEdge.Enums;
 using TypeEdge.Modules;
 using TypeEdge.Modules.Endpoints;
 using TypeEdge.Modules.Enums;
 using TypeEdge.Twins;
-using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using WaveGenerator;
-using Microsoft.Extensions.Configuration;
 
 namespace Modules
 {
