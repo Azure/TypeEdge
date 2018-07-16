@@ -53,9 +53,8 @@ namespace Thermostat.ServiceApp
 
             var twin = await processor.Twin.GetAsync();
             twin.Scale = TemperatureScale.Celsius;
-
-
             twin.RoutingMode = routing;
+
             await processor.Twin.PublishAsync(twin);
         }
 

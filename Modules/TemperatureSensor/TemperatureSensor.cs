@@ -72,7 +72,7 @@ namespace Modules
         {
             double frequency = 2.0;
             int amplitute = 5;
-            int samplingRate = 100;
+            int samplingRate = 500;
             // Connect to Host
             HubConnection connection = await ConnectAsync("http://127.0.0.1:5000/visualizerhub");
             int i = 0;

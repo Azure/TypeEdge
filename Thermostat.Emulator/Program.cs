@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Modules;
 using ThermostatApplication.Modules;
 using TypeEdge.DovEnv;
+using System.IO;
 
 namespace ThermostatApplication
 {
@@ -29,7 +30,9 @@ namespace ThermostatApplication
 
             host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
-            host.Build();
+            var manifest = host.Build();
+
+            File.WriteAllText("../../../manifest.json", manifest);
 
             await host.RunAsync();
 
