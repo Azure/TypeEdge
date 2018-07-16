@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using ThermostatApplication;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
+using ThermostatApplication.Messages;
 
 namespace Thermostat.ServiceApp
 {
@@ -25,13 +26,16 @@ namespace Thermostat.ServiceApp
 
             while (true)
             {
-                Console.WriteLine("Select Action: (O)rchestratorTwin, (A)nomaly, (E)xit");
+                Console.WriteLine("Select Action: (O)rchestratorTwin, (A)nomaly, (V)isualizer, (E)xit");
 
                 var res = Console.ReadLine();
                 switch (res.ToUpper())
                 {
                     case "O":
                         await SetOrchestratorTwin();
+                        break;
+                    case "V":
+                        await SetVisualizerTwin();
                         break;
                     case "A":
                         ProxyFactory.GetModuleProxy<ITemperatureSensor>().GenerateAnomaly(40);
@@ -43,6 +47,39 @@ namespace Thermostat.ServiceApp
 
                 }
             }
+        }
+
+        private static async Task SetVisualizerTwin()
+        {
+            Chart chart = new Chart();
+            Console.WriteLine("Enter Chart name:");
+            chart.Name = Console.ReadLine();
+            Console.WriteLine("Enter x-axis label");
+            chart.X_Label = Console.ReadLine();
+            Console.WriteLine("Enter y-axis label");
+            chart.Y_Label = Console.ReadLine();
+            List<String> Headers = new List<string>();
+            string Header = "";
+            do
+            {
+                Console.WriteLine("Enter next series header, or None to finish");
+                Header = Console.ReadLine();
+                Headers.Append(Header);
+
+            } while (!string.IsNullOrEmpty(Header));
+            chart.Headers = Headers.ToArray();
+            Console.WriteLine("Enter any character to set append to true");
+            if (!string.IsNullOrEmpty(Console.ReadLine()))
+            {
+                chart.Append = true;
+            }
+            else
+            {
+                chart.Append = false;
+            }
+
+            //Todo: publish this chart
+
         }
 
         private static async Task SetOrchestratorTwin()

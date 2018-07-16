@@ -107,7 +107,7 @@ namespace Modules
 
         private static void Preprocess(Temperature signal, OrchestratorTwin twin)
         {
-            if (signal.Scale != twin.Scale)
+            //if (signal.Scale != twin.Scale)
                 if (twin.Scale == TemperatureScale.Celsius)
                     signal.Value = signal.Value * 9 / 5 + 32;
         }
