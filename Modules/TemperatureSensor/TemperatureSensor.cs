@@ -25,7 +25,9 @@ namespace Modules
         double _anomalyOffset = 0.0;
         double _minimum = 60.0;
         double _maximum = 80.0;
-
+        double _sampleRateHz;
+        WaveGenerator.WaveGenerator _dataGenerator;
+        WaveGenerator.WaveConfig[] _waveConfiguration;
 
         public Output<Temperature> Temperature { get; set; }
         public ModuleTwin<TemperatureTwin> Twin { get; set; }
@@ -38,10 +40,17 @@ namespace Modules
                 {
                     _minimum = twin.DesiredMaximum;
                     _maximum = twin.DesiredMaximum;
+                    _sampleRateHz = twin.SampleRateHz;
+                    _waveConfiguration = new WaveConfig[] {
+                        twin.WaveConfig
+                    };
                 }
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
+
+            _dataGenerator = new WaveGenerator.WaveGenerator(_waveConfiguration);
+            
         }
 
         // This method connects to a url for SignalR to send data.
@@ -74,24 +83,19 @@ namespace Modules
         }
         public override async Task<ExecutionResult> RunAsync()
         {
-            //begin simple generator
-            var comps = new WaveConfig[3];
-            comps[0] = new WaveConfig(WaveType.Sine, 0.0001, 70);
-            comps[1] = new WaveConfig(WaveType.Sine, 0.001, 30);
-            comps[2] = new WaveConfig(WaveType.Flat, 1, 1)
-            {
-                VerticalShift = 130
-            };
-            var dataGenerator = new WaveGenerator.WaveGenerator(comps);
 
-            var valueCounter = 0;
+            var dateTime = new DateTime();
             while (true)
             {
-                var newValue = dataGenerator.Read();
+                var newValue = _dataGenerator.Read();
+                PublishResult publishResult = await Temperature.PublishAsync(new Temperature()
+                {
+                    Value = newValue,
+                    TimeStamp = dateTime.Millisecond
+                });
 
-                await Task.Delay(100);
-                valueCounter++;
 
+                await Task.Delay((int) (1.0 / _sampleRateHz));
             }
         }
     }
