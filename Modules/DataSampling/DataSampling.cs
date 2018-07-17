@@ -5,10 +5,10 @@ using TypeEdge.Modules.Messages;
 using System.Collections.Generic;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
-using Thermostat.Shared.Twins;
+using ThermostatApplication.Twins;
 using TypeEdge.Twins;
 using TypeEdge.Modules.Enums;
-
+using System;
 
 namespace Modules
 {
@@ -29,6 +29,7 @@ namespace Modules
 
             Twin.Subscribe(async twin =>
             {
+                
                 lock (_sync)
                 {
                     _aggregationSize = twin.AggregationSize;
@@ -52,7 +53,7 @@ namespace Modules
                         {
                             Message = new DataAggregate()
                             {
-                                Values = _sample.Select(e => e.Value).ToArray(),
+                                Values = _sample.Select(e => new double[2] { e.TimeStamp, e.Value }).ToArray(),
                                 CorrelationID = "IOrchestrator.Sampling"
                             }
                         };

@@ -28,17 +28,19 @@ namespace Modules
         {
             temperatureProxy.Temperature.Subscribe(this, async signal =>
             {
+                
                 var twin = Twin.LastKnownTwin;
                 if (twin != null)
                 {
+                    
                     Preprocess(signal, twin);
-
                     List<Task> messages = new List<Task>();
                     foreach (Routing item in Enum.GetValues(typeof(Routing)))
                         if (twin.RoutingMode.HasFlag(item))
                             switch (item)
                             {
                                 case Routing.Sampling:
+                                    Console.WriteLine("Aggregating");
                                     messages.Add(Sampling.PublishAsync(signal));
                                     break;
                                 case Routing.Detect:
@@ -58,11 +60,12 @@ namespace Modules
 
             aggregatorProxy.Aggregate.Subscribe(this, async aggregate =>
             {
-
+                
                 if (aggregate == null)
                     return MessageResult.Ok;
 
                 var twin = Twin.LastKnownTwin;
+                Console.WriteLine(twin);
                 if (twin != null)
                 {
                     List<Task> messages = new List<Task>();
@@ -71,6 +74,7 @@ namespace Modules
                             switch (item)
                             {
                                 case Routing.Visualize:
+                                    Console.WriteLine("Visualizing");
                                     messages.Add(Visualization.PublishAsync(
                                     new GraphData()
                                         {
@@ -80,11 +84,11 @@ namespace Modules
                                     ));
                                     break;
                                 case Routing.FeatureExtraction:
-                                    messages.Add(FeatureExtraction.PublishAsync(new DataAggregate()
-                                    {
-                                        CorrelationID = aggregate.Message.CorrelationID,
-                                        Values = aggregate.Message.Values
-                                    }));
+                                    //messages.Add(FeatureExtraction.PublishAsync(new DataAggregate()
+                                    //{
+                                    //    CorrelationID = aggregate.Message.CorrelationID,
+                                    //    Values = aggregate.Message.Values
+                                    //}));
                                     break;
 
                                 default:
@@ -107,9 +111,9 @@ namespace Modules
 
         private static void Preprocess(Temperature signal, OrchestratorTwin twin)
         {
-            if (signal.Scale != twin.Scale)
+            //if (signal.Scale != twin.Scale)
                 if (twin.Scale == TemperatureScale.Celsius)
-                    signal.Value = signal.Value * 9 / 5 + 32;
+                    signal.Value = signal.Value * (9.0 / 5.0) + 32;
         }
 
         public override async Task<ExecutionResult> RunAsync()

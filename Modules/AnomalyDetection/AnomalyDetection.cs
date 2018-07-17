@@ -28,7 +28,7 @@ namespace Modules
                 if (_kMeansClustering != null)
                     lock (_syncClustering)
                         if (_kMeansClustering != null)
-                            cluster = _kMeansClustering.Classify(new double[] { signal.Value, signal.Minimum, signal.Maximum });
+                            cluster = _kMeansClustering.Classify(new double[] { signal.Value });
 
                 if (cluster < 0)
                 {
@@ -48,7 +48,7 @@ namespace Modules
                 System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
                 lock (_syncSample)
-                    _sample = sampleReference.Message.Values.Select(e => new double[] { e }).ToArray();
+                    _sample = sampleReference.Message.Values;
 
                 lock (_syncClustering)
                     _kMeansClustering = new KMeansClustering(_sample, _numClusters);

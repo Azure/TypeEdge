@@ -1,7 +1,7 @@
 ﻿using TypeEdge.Twins;
 
 
-namespace Thermostat.Shared.Twins
+namespace ThermostatApplication.Twins
 {
     public class DataAggregatorTwin : TypeModuleTwin
     {
