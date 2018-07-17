@@ -28,17 +28,19 @@ namespace Modules
         {
             temperatureProxy.Temperature.Subscribe(this, async signal =>
             {
+                
                 var twin = Twin.LastKnownTwin;
                 if (twin != null)
                 {
+                    
                     Preprocess(signal, twin);
-
                     List<Task> messages = new List<Task>();
                     foreach (Routing item in Enum.GetValues(typeof(Routing)))
                         if (twin.RoutingMode.HasFlag(item))
                             switch (item)
                             {
                                 case Routing.Sampling:
+                                    Console.WriteLine("Aggregating");
                                     messages.Add(Sampling.PublishAsync(signal));
                                     break;
                                 case Routing.Detect:
@@ -70,6 +72,7 @@ namespace Modules
                             switch (item)
                             {
                                 case Routing.Visualize:
+                                    Console.WriteLine("Visualizing");
                                     messages.Add(Visualization.PublishAsync(
                                     new GraphData()
                                     {

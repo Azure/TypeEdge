@@ -8,7 +8,7 @@ namespace ThermostatApplication.Messages
     public class GraphData : EdgeMessage
     {
         public Boolean Anomaly { get; set; }
-        public double[] Values { get; set; }
+        public double[][] Values { get; set; }
         public string CorrelationID { get; set; }
     }
 }
