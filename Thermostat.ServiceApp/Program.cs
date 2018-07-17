@@ -123,6 +123,7 @@ namespace Thermostat.ServiceApp
             twin.Headers = Headers;
             Console.WriteLine("Enter \"F\" or \"f\" to replace all chart data upon reception of new data package. Otherwise data will be shifted in a rolling window.");
             string Append = Console.ReadLine();
+            Append.ToUpper();
             if (!string.IsNullOrEmpty(Append))
             {
                 if (Append.Equals("F"))
