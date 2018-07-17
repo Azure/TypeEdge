@@ -1,12 +1,16 @@
 ﻿using TypeEdge.Attributes;
 using TypeEdge.Modules.Endpoints;
-using TypeEdge.Modules.Messages;
+using TypeEdge.Twins;
 using ThermostatApplication.Messages;
+using ThermostatApplication.Twins;
 
 namespace ThermostatApplication.Modules
 {
     [TypeModule]
     public interface IVisualization 
-    {        
+    {
+
+        ModuleTwin<VisualizationTwin> Twin { get; set; }
+
     }
 }
