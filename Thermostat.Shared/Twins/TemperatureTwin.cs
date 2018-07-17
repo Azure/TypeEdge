@@ -1,4 +1,5 @@
 ﻿using TypeEdge.Twins;
+using WaveGenerator;
 
 namespace ThermostatApplication.Twins
 {
@@ -6,5 +7,7 @@ namespace ThermostatApplication.Twins
     {
         public double DesiredMaximum { get; set; }
         public double DesiredMinimum { get; set; }
+        public double SampleRateHz { get; set; }
+        public WaveGenerator.WaveConfig WaveConfig { get; set; }
     }
 }

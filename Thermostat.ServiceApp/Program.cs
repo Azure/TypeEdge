@@ -15,7 +15,7 @@ namespace Thermostat.ServiceApp
         private static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
-              .AddJsonFile("appsettings.json")
+              .AddJsonFile("appsettings.json") 
               .AddEnvironmentVariables()
               .Build();
 
@@ -72,7 +72,7 @@ namespace Thermostat.ServiceApp
                 if (res.Contains("D"))
                     result |= Routing.Detect;
                 if (res.Contains("V"))
-                    result |= Routing.Visualize;
+                    result |= Routing.Visualize; 
                 if (res.Contains("F"))
                     result |= Routing.FeatureExtraction;
                 
