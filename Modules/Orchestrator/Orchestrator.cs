@@ -58,7 +58,6 @@ namespace Modules
 
             aggregatorProxy.Aggregate.Subscribe(this, async aggregate =>
             {
-
                 if (aggregate == null)
                     return MessageResult.Ok;
 
@@ -73,10 +72,10 @@ namespace Modules
                                 case Routing.Visualize:
                                     messages.Add(Visualization.PublishAsync(
                                     new GraphData()
-                                        {
-                                            CorrelationID = aggregate.Message.CorrelationID,
-                                            Values = aggregate.Message.Values
-                                        }
+                                    {
+                                        CorrelationID = aggregate.Message.CorrelationID,
+                                        Values = aggregate.Message.Values
+                                    }
                                     ));
                                     break;
                                 case Routing.FeatureExtraction:
@@ -107,9 +106,8 @@ namespace Modules
 
         private static void Preprocess(Temperature signal, OrchestratorTwin twin)
         {
-            //if (signal.Scale != twin.Scale)
-                if (twin.Scale == TemperatureScale.Celsius)
-                    signal.Value = signal.Value * 9 / 5 + 32;
+            if (twin.Scale == TemperatureScale.Celsius)
+                signal.Value = signal.Value * 9 / 5 + 32;
         }
 
         public override async Task<ExecutionResult> RunAsync()

@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-
+using ThermostatApplication.Messages.Visualization;
 
 namespace Modules
 {
@@ -63,27 +63,19 @@ namespace Modules
         private async Task RenderAsync(GraphData data)
         {
             // You need to have a graph already registered to use this function
-
-
-            // Parse the chart and the update into an understandable message, then send it 
             if (_graphDataDictionary.ContainsKey(data.CorrelationID))
             {
                 Chart chart = _graphDataDictionary[data.CorrelationID];
                 VisualizationMessage visualizationMessage = new VisualizationMessage();
-                RenderData m1 = new RenderData();
-                visualizationMessage.messages = new RenderData[1];
+                ChartData chartData = new ChartData();
+                visualizationMessage.messages = new ChartData[1];
 
-                m1.chartName = chart.Name;
-                m1.xlabel = chart.X_Label;
-                m1.ylabel = chart.Y_Label;
-                m1.headers = chart.Headers;
-                m1.append = chart.Append;
+                chartData.Chart = chart;
+                chartData.Points = new double[1][];
+                chartData.Points[0] = data.Values;
+                chartData.IsAnomaly = data.Anomaly;
 
-                m1.points = new double[1][];
-                m1.points[0] = data.Values;
-                m1.anomaly = data.Anomaly;
-
-                visualizationMessage.messages[0] = m1;
+                visualizationMessage.messages[0] = chartData;
 
                 // Todo: Directly make this call, rather than using SignalR to do it
                 await _connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visualizationMessage));

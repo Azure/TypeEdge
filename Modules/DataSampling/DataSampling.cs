@@ -33,7 +33,7 @@ namespace Modules
                             Message = new DataAggregate()
                             {
                                 Values = _sample.Select(e => e.Value).ToArray(),
-                                CorrelationID = "IOrchestrator.Sampling"
+                                CorrelationID = "IDataAggregator.Sampling"
                             }
                         };
                         for (int i = 0; i < _maxDelayPercentage * _windowMaxSamples / 100; i++)

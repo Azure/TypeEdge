@@ -1,7 +1,7 @@
 ﻿using System;
 using TypeEdge.Modules.Messages;
 
-namespace ThermostatApplication.Messages
+namespace ThermostatApplication.Messages.Visualization
 {
     public class Chart
     {
