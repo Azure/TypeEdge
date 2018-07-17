@@ -8,7 +8,7 @@ using TypeEdge.DovEnv;
 
 namespace ThermostatApplication
 {
-    internal class Program
+    internal class Program 
     {
         private static async Task Main(string[] args) 
         {

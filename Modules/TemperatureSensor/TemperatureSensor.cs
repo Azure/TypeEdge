@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using TypeEdge.Enums;
 using TypeEdge.Modules;
 using TypeEdge.Modules.Endpoints;
 using TypeEdge.Modules.Enums;
 using TypeEdge.Twins;
-using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using WaveGenerator;
-using Microsoft.Extensions.Configuration;
-
 namespace Modules
 {
     public class TemperatureSensor : EdgeModule, ITemperatureSensor
@@ -25,15 +19,19 @@ namespace Modules
         double _anomalyOffset = 0.0;
         double _minimum = 60.0;
         double _maximum = 80.0;
-        double _sampleRateHz;
+        double _sampleRateHz = 100.0;
         WaveGenerator.WaveGenerator _dataGenerator;
-        WaveGenerator.WaveConfig[] _waveConfiguration;
+        WaveConfig[] _waveConfiguration = new WaveConfig[] {
+             new WaveConfig()
+        };
 
         public Output<Temperature> Temperature { get; set; }
         public ModuleTwin<TemperatureTwin> Twin { get; set; }
 
         public TemperatureSensor()
         {
+            _dataGenerator = new WaveGenerator.WaveGenerator(_waveConfiguration);
+
             Twin.Subscribe(async twin =>
             {
                 lock (_sync)
@@ -49,32 +47,7 @@ namespace Modules
                 return TwinResult.Ok;
             });
 
-            _dataGenerator = new WaveGenerator.WaveGenerator(_waveConfiguration);
-            
-        }
-
-        // This method connects to a url for SignalR to send data.
-        public static async Task<HubConnection> ConnectAsync(string baseUrl)
-        {
-            // Keep trying to until we can start
-            while (true)
-            {
-                var connection = new HubConnectionBuilder()
-                                .WithUrl(baseUrl)
-                                .Build();
-                try
-                {
-                    await connection.StartAsync();
-                    return connection;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    await Task.Delay(1000);
-                }
-            }
-        }
-     
+        }     
         public void GenerateAnomaly(int value)
         {
             Console.WriteLine($"GenerateAnomaly called with value:{value}");
@@ -83,19 +56,19 @@ namespace Modules
         }
         public override async Task<ExecutionResult> RunAsync()
         {
-
-            var dateTime = new DateTime();
+            double i = 0;
             while (true)
             {
                 var newValue = _dataGenerator.Read();
                 PublishResult publishResult = await Temperature.PublishAsync(new Temperature()
                 {
                     Value = newValue,
-                    TimeStamp = dateTime.Millisecond
+                    TimeStamp = i
                 });
 
-
-                await Task.Delay((int) (1.0 / _sampleRateHz));
+                var t3 = Task.Delay(1000);
+                await Task.WhenAll(t3);
+                i += 1;
             }
         }
     }

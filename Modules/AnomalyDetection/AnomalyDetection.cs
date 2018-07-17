@@ -48,7 +48,7 @@ namespace Modules
                 System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
                 lock (_syncSample)
-                    _sample = sampleReference.Message.Values.Select(e => new double[] { e }).ToArray();
+                    _sample = sampleReference.Message.Values;
 
                 lock (_syncClustering)
                     _kMeansClustering = new KMeansClustering(_sample, _numClusters);

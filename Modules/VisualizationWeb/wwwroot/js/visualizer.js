@@ -24,7 +24,8 @@ class Chart {
             }
             this.points = newPoints;
         }
-        this.points = this.points.slice(0, this.numToDraw);
+        this.points = this.points.sort(function (a, b) { return a[0] - b[0] }).reverse().slice(0, this.numToDraw);
+        console.log(this.points);
     }
     updateAnomaly(newPoints) {
         if (this.append === true) {
@@ -46,7 +47,6 @@ class Chart {
         this.xlabel = chart.xlabel;
         this.ylabel = chart.ylabel;
         this.headers = chart.headers.concat([{ 'type': 'string', 'role': 'style' }]);
-        console.log(this.headers);
         this.points = [];
         this.append = chart.append;
 
@@ -181,7 +181,6 @@ function load() {
             var messageArray = Msg.messages;
             for (var i = 0; i < messageArray.length; i++) {
                 var chart = messageArray[i];
-                console.log(chart);
                 if (!charts.hasOwnProperty(chart.chartName)) {
                     // Does not exist, so let's create it.
                     charts[chart.chartName] = new Chart(chart);
