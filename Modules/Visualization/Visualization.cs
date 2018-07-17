@@ -65,12 +65,13 @@ namespace Modules
             // You need to have a graph already registered to use this function
             if (_graphDataDictionary.ContainsKey(data.CorrelationID))
             {
-                Chart chart = _graphDataDictionary[data.CorrelationID];
-                VisualizationMessage visualizationMessage = new VisualizationMessage();
-                ChartData chartData = new ChartData();
-                visualizationMessage.messages = new ChartData[1];
+                var chartConfig = _graphDataDictionary[data.CorrelationID];
 
-                chartData.Chart = chart;
+                var visualizationMessage = new VisualizationMessage();
+                visualizationMessage.messages = new ChartData[1];
+                var chartData = new ChartData();
+
+                chartData.Chart = chartConfig;
                 chartData.Points = new double[1][];
                 chartData.Points[0] = data.Values;
                 chartData.IsAnomaly = data.Anomaly;

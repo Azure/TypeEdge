@@ -8,6 +8,7 @@ using ThermostatApplication;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using ThermostatApplication.Messages;
+using ThermostatApplication.Messages.Visualization;
 
 namespace Thermostat.ServiceApp
 {

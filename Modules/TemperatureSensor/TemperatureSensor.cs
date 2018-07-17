@@ -9,6 +9,7 @@ using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using WaveGenerator;
+using Microsoft.Extensions.Configuration;
 
 namespace Modules
 {
@@ -28,21 +29,28 @@ namespace Modules
         {
             Twin.Subscribe(async twin =>
             {
-                lock (_sync)
-                {
-                    _sampleRateHz = twin.SampleRateHz;
-                    _waveConfiguration = new WaveConfig[] {
-                        twin.WaveConfig
-                    };
-                }
-                _dataGenerator = new WaveGenerator.WaveGenerator(_waveConfiguration);
-
+                ConfigureGenerator(twin);
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
-
         }
 
+        public override CreationResult Configure(IConfigurationRoot configuration)
+        {
+            var twin = Twin.GetAsync().Result;
+            ConfigureGenerator(twin);
+            return CreationResult.Ok;
+        }
+        void ConfigureGenerator(TemperatureTwin twin)
+        {
+            lock (_sync)
+            {
+                _sampleRateHz = twin.SampleRateHz;
+                _waveConfiguration = new WaveConfig[] { twin.WaveConfig };
+                _dataGenerator = new WaveGenerator.WaveGenerator(_waveConfiguration);
+            }
+
+        }
         public void GenerateAnomaly(int value)
         {
             Console.WriteLine($"GenerateAnomaly called with value:{value}");
@@ -57,23 +65,24 @@ namespace Modules
                 double newValue;
                 double offset;
                 int sleepTimeMs = 0;
-
-                lock (_sync)
+                if (_dataGenerator != null)
                 {
-                    offset = _anomalyOffset;
-                    newValue = _dataGenerator.Read();
-                    sleepTimeMs = (int)(1.0 / _sampleRateHz);
+                    lock (_sync)
+                    {
+                        offset = _anomalyOffset;
+                        newValue = _dataGenerator.Read();
+                        sleepTimeMs = (int)(1.0 / _sampleRateHz);
+                    }
+
+                    PublishResult publishResult = await Temperature.PublishAsync(new Temperature()
+                    {
+                        Value = newValue + offset,
+                        TimeStamp = DateTime.Now.Millisecond
+                    });
                 }
-
-                PublishResult publishResult = await Temperature.PublishAsync(new Temperature()
-                {
-                    Value = newValue + offset,
-                    TimeStamp = DateTime.Now.Millisecond
-                });
-
-
                 await Task.Delay(sleepTimeMs);
             }
+            return ExecutionResult.Ok;
         }
     }
 }
