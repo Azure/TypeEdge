@@ -28,6 +28,11 @@ namespace Modules
         public override CreationResult Configure(IConfigurationRoot configuration)
         {
             _graphDataDictionary = new Dictionary<string, Chart>();
+            /* Hi Archer, I hope you're having a wonderful day
+             * Here's where I've hardcoded stuff. If you could write the twin to prompt the user
+             * about the fields so they could update it, that'd be awesome! We might want to 
+             * add something to detect how large the array is, too. */
+            
             _graphDataDictionary["IOrchestrator.Sampling"] = new Chart()
             {
                 Append = false,
@@ -74,7 +79,8 @@ namespace Modules
         private async Task RenderAsync(GraphData data)
         {
             await _connection.StartAsync();
-            // You need to have a graph already registered to use this function
+            // You need to have a graph already registered to use this function (which is why hardcoding is bad)
+
 
             // Parse the chart and the update into an understandable message, then send it 
             if (_graphDataDictionary.ContainsKey(data.CorrelationID))
