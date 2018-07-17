@@ -50,39 +50,6 @@ namespace Thermostat.ServiceApp
             }
         }
 
-        private static async Task SetVisualizerTwin()
-        {
-            Chart chart = new Chart();
-            Console.WriteLine("Enter Chart name:");
-            chart.Name = Console.ReadLine();
-            Console.WriteLine("Enter x-axis label");
-            chart.X_Label = Console.ReadLine();
-            Console.WriteLine("Enter y-axis label");
-            chart.Y_Label = Console.ReadLine();
-            List<String> Headers = new List<string>();
-            string Header = "";
-            do
-            {
-                Console.WriteLine("Enter next series header, or None to finish");
-                Header = Console.ReadLine();
-                Headers.Append(Header);
-
-            } while (!string.IsNullOrEmpty(Header));
-            chart.Headers = Headers.ToArray();
-            Console.WriteLine("Enter any character to set append to true");
-            if (!string.IsNullOrEmpty(Console.ReadLine()))
-            {
-                chart.Append = true;
-            }
-            else
-            {
-                chart.Append = false;
-            }
-
-            //Todo: publish this chart
-
-        }
-
         private static async Task SetOrchestratorTwin()
         {
             var routing = PromptRoutingMode();
@@ -141,7 +108,6 @@ namespace Thermostat.ServiceApp
                 twin.Append = true;
             }
 
-            twin.RoutingMode = routing;
             await processor.Twin.PublishAsync(twin);
         }
 

@@ -15,6 +15,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using ThermostatApplication.Messages.Visualization;
+using ThermostatApplication.Twins;
+using TypeEdge.Twins;
 
 namespace Modules
 {
@@ -23,6 +25,8 @@ namespace Modules
         IWebHost _webHost;
         HubConnection _connection;
         Dictionary<string, Chart> _graphDataDictionary;
+
+        public ModuleTwin<VisualizationTwin> Twin { get; set; }
 
         public override CreationResult Configure(IConfigurationRoot configuration)
         {
@@ -62,7 +66,6 @@ namespace Modules
         }
         public Visualization(IOrchestrator proxy)
         {
-            
             proxy.Visualization.Subscribe(this, async (e) =>
             {
                 await RenderAsync(e);
@@ -91,8 +94,7 @@ namespace Modules
                 var chartData = new ChartData();
 
                 chartData.Chart = chartConfig;
-                chartData.Points = new double[1][];
-                chartData.Points[0] = data.Values;
+                chartData.Points = data.Values;
                 chartData.IsAnomaly = data.Anomaly;
 
                 visualizationMessage.messages[0] = chartData;
