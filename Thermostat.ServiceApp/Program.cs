@@ -87,6 +87,7 @@ namespace Thermostat.ServiceApp
                 Console.WriteLine("Enter next series header, or None to finish");
                 Header = Console.ReadLine();
                 Headers.Add(count, Header);
+                count++;
             } while (!string.IsNullOrEmpty(Header));
             twin.Headers = Headers;
             Console.WriteLine("Enter \"F\" or \"f\" to replace all chart data upon reception of new data package. Otherwise data will be shifted in a rolling window.");
