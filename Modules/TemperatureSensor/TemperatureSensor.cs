@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using TypeEdge.Enums;
 using TypeEdge.Modules;
 using TypeEdge.Modules.Endpoints;
 using TypeEdge.Modules.Enums;
 using TypeEdge.Twins;
-using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using WaveGenerator;
-using Microsoft.Extensions.Configuration;
 
 namespace Modules
 {
@@ -19,10 +16,9 @@ namespace Modules
     {
         object _sync = new object();
         double _anomalyOffset = 0.0;
-        double _sampleRateHz;
+        double _samplingRateHz = 0.0;
 
         WaveGenerator.WaveGenerator _dataGenerator;
-        WaveGenerator.WaveConfig[] _waveConfiguration;
 
         public Output<Temperature> Temperature { get; set; }
         public ModuleTwin<TemperatureTwin> Twin { get; set; }
@@ -31,49 +27,61 @@ namespace Modules
         {
             Twin.Subscribe(async twin =>
             {
+                Console.WriteLine($"TemperatureSensor:: new twin update");
+
                 ConfigureGenerator(twin);
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
         }
 
-        public override CreationResult Configure(IConfigurationRoot configuration)
-        {
-            var twin = Twin.GetAsync().Result;
-            ConfigureGenerator(twin);
-            return CreationResult.Ok;
-        }
+
         void ConfigureGenerator(TemperatureTwin twin)
         {
             lock (_sync)
             {
-                _sampleRateHz = twin.SampleRateHz;
-                _waveConfiguration = new WaveConfig[] { twin.WaveConfig };
-                _dataGenerator = new WaveGenerator.WaveGenerator(_waveConfiguration);
+                if (twin == null
+                    || twin.SamplingHz <= 0
+                    || twin.Amplitude <= 0
+                    || twin.Frequency <= 0)
+                    return;
+                _samplingRateHz = twin.SamplingHz;
+                var waveConfiguration = new WaveConfig[] { new WaveConfig() {
+                    Amplitude = twin.Amplitude,
+                    Frequency = twin.Frequency,
+                    WaveType = (WaveType)(int)twin.WaveType,
+                    VerticalShift = twin.VerticalShift,
+                } };
+                _dataGenerator = new WaveGenerator.WaveGenerator(waveConfiguration);
             }
 
         }
         public void GenerateAnomaly(int value)
         {
-            Console.WriteLine($"GenerateAnomaly called with value:{value}");
+            Console.WriteLine($"TemperatureSensor::GenerateAnomaly called with value:{value}");
+
             lock (_sync)
                 _anomalyOffset = value;
         }
 
         public override async Task<ExecutionResult> RunAsync()
         {
+            var twin = Twin.GetAsync().Result;
+            ConfigureGenerator(twin);
+
             while (true)
             {
                 double newValue;
                 double offset;
-                int sleepTimeMs = 0;
+                double sleepTimeMs = 0;
                 if (_dataGenerator != null)
                 {
                     lock (_sync)
                     {
                         offset = _anomalyOffset;
                         newValue = _dataGenerator.Read();
-                        sleepTimeMs = (int)(1.0 / _sampleRateHz);
+                        sleepTimeMs = 1.0 / _samplingRateHz;
+                        _anomalyOffset = 0.0;
                     }
 
                     PublishResult publishResult = await Temperature.PublishAsync(new Temperature()
@@ -82,7 +90,7 @@ namespace Modules
                         TimeStamp = DateTime.Now.Millisecond
                     });
                 }
-                await Task.Delay(sleepTimeMs);
+                await Task.Delay((int)sleepTimeMs);
             }
             return ExecutionResult.Ok;
         }

@@ -15,8 +15,9 @@ namespace Modules
     public class DataSampling : EdgeModule, IDataAggregator
     {
         object _sync = new object();
-        int _aggregationSize;
-        int _maxDelayPercentage;
+
+        int _aggregationSize = 100;
+        int _tumblingWindowPercentage = 10;
 
         Queue<Temperature> _sample;
 
@@ -26,21 +27,19 @@ namespace Modules
 
         public DataSampling(IOrchestrator proxy)
         {
+            _sample = new Queue<Temperature>();
 
             Twin.Subscribe(async twin =>
             {
-                
                 lock (_sync)
                 {
                     _aggregationSize = twin.AggregationSize;
-                    _maxDelayPercentage = twin.MaxDelayPercentage;
+                    _tumblingWindowPercentage = twin.TumblingWindowPercentage;
                 }
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
 
-
-            _sample = new Queue<Temperature>();
             proxy.Sampling.Subscribe(this, async signal =>
             {
                 Reference<DataAggregate> message = null;
@@ -57,7 +56,7 @@ namespace Modules
                                 CorrelationID = "IDataAggregator.Sampling"
                             }
                         };
-                        for (int i = 0; i < _maxDelayPercentage * _aggregationSize / 100; i++)
+                        for (int i = 0; i < _tumblingWindowPercentage * _aggregationSize / 100; i++)
                             _sample.Dequeue();
                     }
                 }

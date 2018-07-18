@@ -11,7 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="TypeEdge" Version="0.2.1" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
-    <PackageReference Include="WaveGenerator" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

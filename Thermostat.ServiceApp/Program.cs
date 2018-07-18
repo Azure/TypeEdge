@@ -17,7 +17,7 @@ namespace Thermostat.ServiceApp
         private static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
-              .AddJsonFile("appsettings.json") 
+              .AddJsonFile("appsettings.json")
               .AddEnvironmentVariables()
               .Build();
 
@@ -27,13 +27,16 @@ namespace Thermostat.ServiceApp
 
             while (true)
             {
-                Console.WriteLine("Select Action: (O)rchestratorTwin, (A)nomaly, (V)isualizerTwin, (E)xit");
+                Console.WriteLine("Select Action: (T)emperatureSensorTwin, (O)rchestratorTwin, (V)isualizerTwin, (A)nomaly, (E)xit");
 
                 var res = Console.ReadLine();
                 switch (res.ToUpper())
                 {
                     case "O":
                         await SetOrchestratorTwin();
+                        break;
+                    case "T":
+                        await SetTemperatureSensorTwin();
                         break;
                     case "V":
                         await SetVisualizerTwin();
@@ -47,6 +50,27 @@ namespace Thermostat.ServiceApp
                         break;
 
                 }
+            }
+        }
+
+        private static async Task SetTemperatureSensorTwin()
+        {
+            var temperatureSensor = ProxyFactory.GetModuleProxy<ITemperatureSensor>();
+
+            TemperatureTwin twin = await temperatureSensor.Twin.GetAsync();
+
+            Console.WriteLine($"Set Default?(Y/N)");
+            var res = Console.ReadLine();
+            if (!string.IsNullOrEmpty(res) && res.ToUpper() == "Y")
+            {
+                twin.SamplingHz = 5;
+                //twin.Waveform = new Waveform();
+                twin.Amplitude = 10;
+                twin.Frequency = 2;
+                twin.WaveType = WaveformType.Sine;
+                twin.VerticalShift = 60;
+
+                await temperatureSensor.Twin.PublishAsync(twin);
             }
         }
 
@@ -125,10 +149,10 @@ namespace Thermostat.ServiceApp
                 if (res.Contains("D"))
                     result |= Routing.Detect;
                 if (res.Contains("V"))
-                    result |= Routing.Visualize; 
+                    result |= Routing.VisualizeSource;
                 if (res.Contains("F"))
                     result |= Routing.FeatureExtraction;
-                
+
             }
             return result;
         }

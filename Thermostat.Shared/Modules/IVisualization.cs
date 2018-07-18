@@ -9,8 +9,6 @@ namespace ThermostatApplication.Modules
     [TypeModule]
     public interface IVisualization 
     {
-
         ModuleTwin<VisualizationTwin> Twin { get; set; }
-
     }
 }

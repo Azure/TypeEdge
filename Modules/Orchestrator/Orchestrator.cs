@@ -28,11 +28,9 @@ namespace Modules
         {
             temperatureProxy.Temperature.Subscribe(this, async signal =>
             {
-                
                 var twin = Twin.LastKnownTwin;
                 if (twin != null)
                 {
-                    
                     Preprocess(signal, twin);
                     List<Task> messages = new List<Task>();
                     foreach (Routing item in Enum.GetValues(typeof(Routing)))
@@ -71,12 +69,10 @@ namespace Modules
                         if (twin.RoutingMode.HasFlag(item))
                             switch (item)
                             {
-                                case Routing.Visualize:
-                                    Console.WriteLine("Visualizing");
-                                    messages.Add(Visualization.PublishAsync(
-                                    new GraphData()
+                                case Routing.VisualizeSource:
+                                    messages.Add(Visualization.PublishAsync(new GraphData()
                                     {
-                                        CorrelationID = aggregate.Message.CorrelationID,
+                                        CorrelationID = "Source",
                                         Values = aggregate.Message.Values
                                     }
                                     ));

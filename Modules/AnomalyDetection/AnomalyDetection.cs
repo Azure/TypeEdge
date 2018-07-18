@@ -19,7 +19,6 @@ namespace Modules
 
         public Output<Anomaly> Anomaly { get; set; }
 
-
         public AnomalyDetection(IOrchestrator orcherstratorProxy, IDataAggregator aggregatorProxy)
         {
             orcherstratorProxy.Detection.Subscribe(this, async signal =>
@@ -56,7 +55,5 @@ namespace Modules
                 return MessageResult.Ok;
             });
         }
-
-
     }
 }

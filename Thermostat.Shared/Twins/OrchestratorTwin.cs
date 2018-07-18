@@ -9,8 +9,9 @@ namespace ThermostatApplication.Twins
         None = 1 << 0,
         Sampling = 1 << 1,
         Detect = 1 << 2,
-        Visualize = 1 << 3,
-        FeatureExtraction = 1 << 4
+        VisualizeSource = 1 << 3,
+        FeatureExtraction = 1 << 4,
+        VisualizeFeature = 1 << 5,
     }
 
     public class OrchestratorTwin : TypeModuleTwin
