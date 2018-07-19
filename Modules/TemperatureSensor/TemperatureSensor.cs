@@ -54,6 +54,7 @@ namespace Modules
                 _samplingRateHz = twin.SamplingHz;
                 var waveConfiguration = new WaveConfig[] { new WaveConfig() {
                     Amplitude = twin.Amplitude,
+                    Period = 1/twin.Frequency,
                     Frequency = twin.Frequency,
                     WaveType = (WaveType)(int)twin.WaveType,
                     VerticalShift = twin.VerticalShift,
