@@ -15,19 +15,19 @@ namespace Modules
 
         double[][] _sample = null;
         int _numClusters = 3;
-        KMeansClustering _kMeansClustering;
+        KMeansScoring _kMeansScoring;
 
         public Output<Anomaly> Anomaly { get; set; }
 
-        public AnomalyDetection(IOrchestrator orcherstratorProxy, IDataAggregator aggregatorProxy)
+        public AnomalyDetection(IOrchestrator orcherstratorProxy, IModelTraining aggregatorProxy)
         {
             orcherstratorProxy.Detection.Subscribe(this, async signal =>
             {
                 int cluster = 0;
-                if (_kMeansClustering != null)
+                if (_kMeansScoring != null)
                     lock (_syncClustering)
-                        if (_kMeansClustering != null)
-                            cluster = _kMeansClustering.Classify(new double[] { signal.Value });
+                        if (_kMeansScoring != null)
+                            cluster = _kMeansScoring.Score(new double[] { signal.Value });
 
                 if (cluster < 0)
                 {
@@ -37,20 +37,29 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            aggregatorProxy.Aggregate.Subscribe(this, async (sampleReference) =>
+            aggregatorProxy.Model.Subscribe(this, async (model) =>
             {
                 //if the messages has been stored and forwarded, but the file has been deleted (e.g. a restart)
                 //then the message can be empty (null)
-                if (sampleReference == null)
+                if (model == null)
                     return MessageResult.Ok;
 
                 System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
-                lock (_syncSample)
-                    _sample = sampleReference.Message.Values;
-
                 lock (_syncClustering)
-                    _kMeansClustering = new KMeansClustering(_sample, _numClusters);
+
+                    switch (model.Message.Algorithm)
+                    {
+                        case ThermostatApplication.Algorithm.kMeans:
+                            _kMeansScoring = new KMeansScoring();
+                            _kMeansScoring.DeserializeModel(model.Message.DataJson);
+                            break;
+                        case ThermostatApplication.Algorithm.LSTM:
+                            break;
+                        default:
+                            break;
+                    }
+                
 
                 return MessageResult.Ok;
             });

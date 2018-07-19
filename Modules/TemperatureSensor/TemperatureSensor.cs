@@ -32,7 +32,7 @@ namespace Modules
 
             Twin.Subscribe(async twin =>
             {
-                Console.WriteLine($"TemperatureSensor::Twin update");
+                Console.WriteLine($"{typeof(TemperatureSensor).Name}::Twin update");
 
                 ConfigureGenerator(twin);
                 await Twin.ReportAsync(twin);

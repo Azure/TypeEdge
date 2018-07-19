@@ -25,7 +25,7 @@ namespace Modules
         public ModuleTwin<OrchestratorTwin> Twin { get; set; }
 
         //this is a temp depedency, until we get the feature extraction module
-        public Orchestrator(ITemperatureSensor temperatureProxy, IDataAggregator aggregatorProxy)
+        public Orchestrator(ITemperatureSensor temperatureProxy, IModelTraining modelTrainingProxy)
         {
             temperatureProxy.Temperature.Subscribe(this, async signal =>
             {
@@ -40,17 +40,10 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            aggregatorProxy.Aggregate.Subscribe(this, async aggregate =>
-            {
-                var twin = Twin.LastKnownTwin;
-                if (twin != null || aggregate != null)
-                    await BroadcastAggregate(aggregate, twin);
-                return MessageResult.Ok;
-            });
-
+            
             Twin.Subscribe(async twin =>
             {
-                Console.WriteLine($"Preprocessor::Twin update. Routing  = { twin.RoutingMode.ToString()}");
+                Console.WriteLine($"{typeof(OrchestratorTwin).Name}::Twin update. Routing  = { twin.RoutingMode.ToString()}");
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });

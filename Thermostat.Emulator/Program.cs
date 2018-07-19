@@ -23,7 +23,7 @@ namespace ThermostatApplication
 
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
             host.RegisterModule<IOrchestrator, Orchestrator>(); 
-            host.RegisterModule<IDataAggregator, DataSampling>();
+            host.RegisterModule<IModelTraining, ModelTraining>();
             host.RegisterModule<IVisualization, Visualization>();
             //host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
 

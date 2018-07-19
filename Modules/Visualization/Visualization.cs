@@ -56,7 +56,7 @@ namespace Modules
 
             Twin.Subscribe(async twin =>
             {
-                Console.WriteLine($"Visualization::Twin update");
+                Console.WriteLine($"{typeof(Visualization).Name}::Twin update");
 
                 lock (_sync)
                     _graphDataDictionary[twin.ChartName] = new Chart()

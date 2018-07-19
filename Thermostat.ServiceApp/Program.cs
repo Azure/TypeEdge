@@ -228,7 +228,7 @@ namespace Thermostat.ServiceApp
         {
             Console.WriteLine("Setting AggregatorDefaults");
 
-            var dataAggregator = ProxyFactory.GetModuleProxy<IDataAggregator>();
+            var dataAggregator = ProxyFactory.GetModuleProxy<IModelTraining>();
 
             var twin = await dataAggregator.Twin.GetAsync();
             twin.TumblingWindowPercentage = 10;

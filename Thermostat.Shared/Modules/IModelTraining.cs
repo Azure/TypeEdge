@@ -8,10 +8,10 @@ using ThermostatApplication.Twins;
 namespace ThermostatApplication.Modules
 {
     [TypeModule]
-    public interface IDataAggregator 
+    public interface IModelTraining 
     {
-        Output<Reference<DataAggregate>> Aggregate { get; set; }
-        ModuleTwin<DataAggregatorTwin> Twin { get; set; }
+        Output<Reference<Model>> Model { get; set; }
+        ModuleTwin<ModelTrainingTwin> Twin { get; set; }
 
     }
 }

@@ -9,10 +9,11 @@ using ThermostatApplication.Twins;
 using TypeEdge.Twins;
 using TypeEdge.Modules.Enums;
 using System;
+using AnomalyDetectionAlgorithms;
 
 namespace Modules
 {
-    public class DataSampling : EdgeModule, IDataAggregator
+    public class ModelTraining : EdgeModule, IModelTraining
     {
         object _sync = new object();
 
@@ -22,17 +23,20 @@ namespace Modules
 
         Queue<Temperature> _sample;
 
-        public Output<Reference<DataAggregate>> Aggregate { get; set; }
-        public ModuleTwin<DataAggregatorTwin> Twin { get; set; }
+        KMeansTraining _kMeansTraining;
+        int _numClusters = 3;
+
+        public Output<Reference<Model>> Model { get; set; }
+        public ModuleTwin<ModelTrainingTwin> Twin { get; set; }
 
 
-        public DataSampling(IOrchestrator proxy)
+        public ModelTraining(IOrchestrator proxy)
         {
             _sample = new Queue<Temperature>();
 
             Twin.Subscribe(async twin =>
             {
-                Console.WriteLine($"DataSampling::Twin update");
+                Console.WriteLine($"{typeof(ModelTraining).Name}::Twin update");
 
                 lock (_sync)
                 {
@@ -45,26 +49,27 @@ namespace Modules
 
             proxy.Training.Subscribe(this, async signal =>
             {
-                Reference<DataAggregate> message = null;
+                Reference<Model> model = null;
                 lock (_sample)
                 {
                     _sample.Enqueue(signal);
                     if (_sample.Count >= _aggregationSize)
                     {
-                        message = new Reference<DataAggregate>()
+                        _kMeansTraining = new KMeansTraining( _numClusters);
+                        _kMeansTraining.TrainModel(_sample.Select(e => new double[] { e.TimeStamp, e.Value }).ToArray());
+                        model = new Reference<Model>()
                         {
-                            Message = new DataAggregate()
-                            {
-                                Values = _sample.Select(e => new double[2] { e.TimeStamp, e.Value }).ToArray(),
-                                CorrelationID = "IDataAggregator.Sampling"
+                            Message = new Model() {
+                                 Algorithm = ThermostatApplication.Algorithm.kMeans,
+                                DataJson = _kMeansTraining.SerializeModel()
                             }
                         };
                         for (int i = 0; i < _tumblingWindowPercentage * _aggregationSize / 100; i++)
                             _sample.Dequeue();
                     }
                 }
-                if (message != null)
-                    await Aggregate.PublishAsync(message);
+                if (model != null)
+                    await Model.PublishAsync(model);
 
                 return MessageResult.Ok;
             });
