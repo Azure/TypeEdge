@@ -12,14 +12,13 @@ namespace Modules
     {
         object _syncSample = new object();
         object _syncClustering = new object();
-
-        double[][] _sample = null;
+        
         int _numClusters = 3;
         KMeansScoring _kMeansScoring;
 
         public Output<Anomaly> Anomaly { get; set; }
 
-        public AnomalyDetection(IOrchestrator orcherstratorProxy, IModelTraining aggregatorProxy)
+        public AnomalyDetection(IOrchestrator orcherstratorProxy)
         {
             orcherstratorProxy.Detection.Subscribe(this, async signal =>
             {
@@ -37,7 +36,7 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            aggregatorProxy.Model.Subscribe(this, async (model) =>
+            orcherstratorProxy.Model.Subscribe(this, async (model) =>
             {
                 //if the messages has been stored and forwarded, but the file has been deleted (e.g. a restart)
                 //then the message can be empty (null)
@@ -51,7 +50,7 @@ namespace Modules
                     switch (model.Message.Algorithm)
                     {
                         case ThermostatApplication.Algorithm.kMeans:
-                            _kMeansScoring = new KMeansScoring();
+                            _kMeansScoring = new KMeansScoring(_numClusters);
                             _kMeansScoring.DeserializeModel(model.Message.DataJson);
                             break;
                         case ThermostatApplication.Algorithm.LSTM:

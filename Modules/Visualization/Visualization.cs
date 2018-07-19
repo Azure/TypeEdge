@@ -25,7 +25,7 @@ namespace Modules
 
         IWebHost _webHost;
         HubConnection _connection;
-        Dictionary<string, Chart> _graphDataDictionary;
+        Dictionary<string, Chart> _chartDataDictionary;
 
         public ModuleTwin<VisualizationTwin> Twin { get; set; }
 
@@ -46,7 +46,7 @@ namespace Modules
 
         public Visualization(IOrchestrator proxy)
         {
-            _graphDataDictionary = new Dictionary<string, Chart>();
+            _chartDataDictionary = new Dictionary<string, Chart>();
 
             proxy.Visualization.Subscribe(this, async (e) =>
             {
@@ -58,21 +58,29 @@ namespace Modules
             {
                 Console.WriteLine($"{typeof(Visualization).Name}::Twin update");
 
-                lock (_sync)
-                    _graphDataDictionary[twin.ChartName] = new Chart()
-                    {
-                        Append = twin.Append,
-                        Headers = new string[2] { twin.XAxisLabel, twin.YAxisLabel },
-                        Name = twin.ChartName,
-                        X_Label = twin.XAxisLabel,
-                        Y_Label = twin.YAxisLabel
-                    };
+                ConfigureCharts(twin);
                 return TwinResult.Ok;
             });
         }
 
+        private void ConfigureCharts(VisualizationTwin twin)
+        {
+            if (twin == null)
+                return;
+            lock (_sync)
+                _chartDataDictionary[twin.ChartName] = new Chart()
+                {
+                    Append = twin.Append,
+                    Headers = new string[2] { twin.XAxisLabel, twin.YAxisLabel },
+                    Name = twin.ChartName,
+                    X_Label = twin.XAxisLabel,
+                    Y_Label = twin.YAxisLabel
+                };
+        }
+
         public override async Task<ExecutionResult> RunAsync()
         {
+            ConfigureCharts(await Twin.GetAsync());
             await _webHost.StartAsync();
             await _connection.StartAsync();
             return await base.RunAsync();
@@ -83,9 +91,9 @@ namespace Modules
             Chart chartConfig;
             lock (_sync)
             {
-                if (!_graphDataDictionary.ContainsKey(data.CorrelationID))
+                if (!_chartDataDictionary.ContainsKey(data.CorrelationID))
                     return;
-                chartConfig = _graphDataDictionary[data.CorrelationID];
+                chartConfig = _chartDataDictionary[data.CorrelationID];
             }
 
             var visualizationMessage = new VisualizationMessage();

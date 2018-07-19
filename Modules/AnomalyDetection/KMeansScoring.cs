@@ -14,6 +14,10 @@ namespace AnomalyDetectionAlgorithms
         double[] _clustersRadius;
         double[][] _means;
 
+        public KMeansScoring(int numClusters)
+        {
+            _numClusters = numClusters;
+        }
 
         public void DeserializeModel(string data)
         {

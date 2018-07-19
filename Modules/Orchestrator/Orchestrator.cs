@@ -20,6 +20,7 @@ namespace Modules
         public Output<Temperature> Training { get; set; }
         public Output<Temperature> Detection { get; set; }
         public Output<GraphData> Visualization { get; set; }
+        public Output<Reference<Model>> Model { get; set; }
         public Output<DataAggregate> FeatureExtraction { get; set; }
 
         public ModuleTwin<OrchestratorTwin> Twin { get; set; }
@@ -40,13 +41,27 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            
+            modelTrainingProxy.Model.Subscribe(this, async model =>
+            {
+
+                //forward everything for now
+                //when the cloud pipeline gets added, this part here will be more clever
+                if (model == null)
+                    return MessageResult.Ok;
+
+                await Model.PublishAsync(new Reference<Model>() { Message = model.Message });
+
+                return MessageResult.Ok;
+            });
+
             Twin.Subscribe(async twin =>
             {
                 Console.WriteLine($"{typeof(OrchestratorTwin).Name}::Twin update. Routing  = { twin.RoutingMode.ToString()}");
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
+
+
         }
 
         private async Task BroadcastAggregate(Reference<DataAggregate> aggregate, OrchestratorTwin twin)
