@@ -9,14 +9,17 @@ using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using WaveGenerator;
+using Newtonsoft.Json;
 
 namespace Modules
 {
     public class TemperatureSensor : EdgeModule, ITemperatureSensor
     {
         object _sync = new object();
+        DateTime _startTimeStamp;
+        //default values
         double _anomalyOffset = 0.0;
-        double _samplingRateHz = 0.0;
+        double _samplingRateHz = 1.0;
 
         WaveGenerator.WaveGenerator _dataGenerator;
 
@@ -25,9 +28,11 @@ namespace Modules
 
         public TemperatureSensor()
         {
+            _startTimeStamp = DateTime.Now;
+
             Twin.Subscribe(async twin =>
             {
-                Console.WriteLine($"TemperatureSensor:: new twin update");
+                Console.WriteLine($"TemperatureSensor::Twin update");
 
                 ConfigureGenerator(twin);
                 await Twin.ReportAsync(twin);
@@ -45,6 +50,7 @@ namespace Modules
                     || twin.Amplitude <= 0
                     || twin.Frequency <= 0)
                     return;
+
                 _samplingRateHz = twin.SamplingHz;
                 var waveConfiguration = new WaveConfig[] { new WaveConfig() {
                     Amplitude = twin.Amplitude,
@@ -52,6 +58,7 @@ namespace Modules
                     WaveType = (WaveType)(int)twin.WaveType,
                     VerticalShift = twin.VerticalShift,
                 } };
+
                 _dataGenerator = new WaveGenerator.WaveGenerator(waveConfiguration);
             }
 
@@ -66,7 +73,7 @@ namespace Modules
 
         public override async Task<ExecutionResult> RunAsync()
         {
-            var twin = Twin.GetAsync().Result;
+            var twin = await Twin.GetAsync();
             ConfigureGenerator(twin);
 
             while (true)
@@ -80,15 +87,18 @@ namespace Modules
                     {
                         offset = _anomalyOffset;
                         newValue = _dataGenerator.Read();
-                        sleepTimeMs = 1.0 / _samplingRateHz;
+                        sleepTimeMs = 1000.0 / _samplingRateHz;
                         _anomalyOffset = 0.0;
                     }
-
-                    PublishResult publishResult = await Temperature.PublishAsync(new Temperature()
+                    var message = new Temperature()
                     {
                         Value = newValue + offset,
-                        TimeStamp = DateTime.Now.Millisecond
-                    });
+                        TimeStamp = DateTime.Now.Subtract(_startTimeStamp).TotalMilliseconds/1000
+                    };
+
+                    await Temperature.PublishAsync(message);
+
+                    Console.WriteLine($"Temperature.PublishAsync : {JsonConvert.SerializeObject(message)}");
                 }
                 await Task.Delay((int)sleepTimeMs);
             }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -20,6 +21,8 @@ namespace Modules
 {
     public class Visualization : EdgeModule, IVisualization
     {
+        object _sync = new object();
+
         IWebHost _webHost;
         HubConnection _connection;
         Dictionary<string, Chart> _graphDataDictionary;
@@ -28,21 +31,6 @@ namespace Modules
 
         public override CreationResult Configure(IConfigurationRoot configuration)
         {
-            _graphDataDictionary = new Dictionary<string, Chart>();
-            /* Hi Archer, I hope you're having a wonderful day
-             * Here's where I've hardcoded stuff. If you could write the twin to prompt the user
-             * about the fields so they could update it, that'd be awesome! We might want to 
-             * add something to detect how large the array is, too. */
-            
-            _graphDataDictionary["IOrchestrator.Sampling"] = new Chart()
-            {
-                Append = false,
-                Headers = new string[2] { "TS", "val1" },
-                Name = "IOrchestrator.Sampling",
-                X_Label = "Timestamp",
-                Y_Label = "Value"
-
-            };
             _webHost = new WebHostBuilder()
                 .UseConfiguration(configuration)
                 .UseKestrel()
@@ -51,51 +39,68 @@ namespace Modules
                 .UseStartup<Startup>()
                 .Build();
 
-            _connection = new HubConnectionBuilder().WithUrl("http://127.0.0.1:5000/visualizerhub").Build();
+            _connection = new HubConnectionBuilder().WithUrl($"{configuration["server.urls"].Split(';')[0]}/visualizerhub").Build();
             
             return base.Configure(configuration);
-        }
-        public override async Task<ExecutionResult> RunAsync()
-        {
-            await _webHost.RunAsync();
-            return ExecutionResult.Ok;
         }
 
         public Visualization(IOrchestrator proxy)
         {
+            _graphDataDictionary = new Dictionary<string, Chart>();
+
             proxy.Visualization.Subscribe(this, async (e) =>
             {
                 await RenderAsync(e);
                 return MessageResult.Ok;
             });
+
+            Twin.Subscribe(async twin =>
+            {
+                Console.WriteLine($"Visualization::Twin update");
+
+                lock (_sync)
+                    _graphDataDictionary[twin.ChartName] = new Chart()
+                    {
+                        Append = twin.Append,
+                        Headers = new string[2] { twin.XAxisLabel, twin.YAxisLabel },
+                        Name = twin.ChartName,
+                        X_Label = twin.XAxisLabel,
+                        Y_Label = twin.YAxisLabel
+                    };
+                return TwinResult.Ok;
+            });
         }
 
-        private void RegisterGraph(Chart metadata, string correlationID)
+        public override async Task<ExecutionResult> RunAsync()
         {
-            _graphDataDictionary[correlationID] = metadata;
+            await _webHost.StartAsync();
+            await _connection.StartAsync();
+            return await base.RunAsync();
         }
-        
+
         private async Task RenderAsync(GraphData data)
         {
-            await _connection.StartAsync();
-
-            if (_graphDataDictionary.ContainsKey(data.CorrelationID))
+            Chart chartConfig;
+            lock (_sync)
             {
-                var chartConfig = _graphDataDictionary[data.CorrelationID];
-
-                var visualizationMessage = new VisualizationMessage();
-                visualizationMessage.messages = new ChartData[1];
-                var chartData = new ChartData();
-
-                chartData.Chart = chartConfig;
-                chartData.Points = data.Values;
-                chartData.IsAnomaly = data.Anomaly;
-
-                visualizationMessage.messages[0] = chartData;
-
-                // Todo: Directly make this call, rather than using SignalR to do it
-                await _connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visualizationMessage));
+                if (!_graphDataDictionary.ContainsKey(data.CorrelationID))
+                    return;
+                chartConfig = _graphDataDictionary[data.CorrelationID];
             }
+
+            var visualizationMessage = new VisualizationMessage();
+            visualizationMessage.messages = new ChartData[1];
+            var chartData = new ChartData();
+
+            chartData.Chart = chartConfig;
+            chartData.Points = data.Values;
+            chartData.IsAnomaly = data.Anomaly;
+
+            visualizationMessage.messages[0] = chartData;
+
+            // Todo:  make this an in-proc call, rather than SignalR
+
+            await _connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visualizationMessage));
 
         }
     }

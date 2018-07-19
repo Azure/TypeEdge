@@ -9,7 +9,6 @@ namespace ThermostatApplication.Twins
         public string ChartName {get; set;}
         public string XAxisLabel {get; set;}
         public string YAxisLabel {get; set;}
-        public Dictionary<int, string> Headers { get; set; }
-        public Boolean Append;
+        public bool Append { get; set; }
     }
 }

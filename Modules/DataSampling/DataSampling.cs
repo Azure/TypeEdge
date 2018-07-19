@@ -16,8 +16,9 @@ namespace Modules
     {
         object _sync = new object();
 
-        int _aggregationSize = 100;
-        int _tumblingWindowPercentage = 10;
+        //default values
+        int _aggregationSize = 10;
+        int _tumblingWindowPercentage = 50;
 
         Queue<Temperature> _sample;
 
@@ -31,6 +32,8 @@ namespace Modules
 
             Twin.Subscribe(async twin =>
             {
+                Console.WriteLine($"DataSampling::Twin update");
+
                 lock (_sync)
                 {
                     _aggregationSize = twin.AggregationSize;
@@ -40,7 +43,7 @@ namespace Modules
                 return TwinResult.Ok;
             });
 
-            proxy.Sampling.Subscribe(this, async signal =>
+            proxy.Training.Subscribe(this, async signal =>
             {
                 Reference<DataAggregate> message = null;
                 lock (_sample)
