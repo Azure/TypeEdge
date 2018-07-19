@@ -228,7 +228,6 @@ function drawChart(chart) {
     chart.googleChart.draw(dataTable, chart.options);
 }
 function drawFFT(chart) {
-    console.log(chart);
     var fft = FFTNayuki(chart.numToDraw);
     
     /* Processing for FFT */
