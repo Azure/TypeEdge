@@ -8,7 +8,7 @@ using TypeEdge.DovEnv;
 
 namespace ThermostatApplication
 {
-    internal class Program
+    internal class Program 
     {
         private static async Task Main(string[] args) 
         {
@@ -24,10 +24,10 @@ namespace ThermostatApplication
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
             host.RegisterModule<IOrchestrator, Orchestrator>(); 
             host.RegisterModule<IDataAggregator, DataSampling>();
-            //host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
             host.RegisterModule<IVisualization, Visualization>();
+            //host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
 
-            //host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
+            //host.Upstream.Subscribe(host.GetProxy<IOrchestrator>().Temperature);
 
             host.Build();
 

@@ -5,38 +5,61 @@ using TypeEdge.Modules.Messages;
 using System.Collections.Generic;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
+using ThermostatApplication.Twins;
+using TypeEdge.Twins;
+using TypeEdge.Modules.Enums;
+using System;
 
 namespace Modules
 {
     public class DataSampling : EdgeModule, IDataAggregator
     {
-        const int _windowMaxSamples = 1000;
-        const int _maxDelayPercentage = 10;
+        object _sync = new object();
+
+        //default values
+        int _aggregationSize = 10;
+        int _tumblingWindowPercentage = 50;
 
         Queue<Temperature> _sample;
 
         public Output<Reference<DataAggregate>> Aggregate { get; set; }
+        public ModuleTwin<DataAggregatorTwin> Twin { get; set; }
+
 
         public DataSampling(IOrchestrator proxy)
         {
             _sample = new Queue<Temperature>();
-            proxy.Sampling.Subscribe(this, async signal =>
+
+            Twin.Subscribe(async twin =>
+            {
+                Console.WriteLine($"DataSampling::Twin update");
+
+                lock (_sync)
+                {
+                    _aggregationSize = twin.AggregationSize;
+                    _tumblingWindowPercentage = twin.TumblingWindowPercentage;
+                }
+                await Twin.ReportAsync(twin);
+                return TwinResult.Ok;
+            });
+
+            proxy.Training.Subscribe(this, async signal =>
             {
                 Reference<DataAggregate> message = null;
                 lock (_sample)
                 {
                     _sample.Enqueue(signal);
-                    if (_sample.Count >= _windowMaxSamples)
+                    if (_sample.Count >= _aggregationSize)
                     {
                         message = new Reference<DataAggregate>()
                         {
                             Message = new DataAggregate()
                             {
-                                Values = _sample.Select(e => e.Value).ToArray(),
-                                CorrelationID = "IOrchestrator.Sampling"
+                                Values = _sample.Select(e => new double[2] { e.TimeStamp, e.Value }).ToArray(),
+                                CorrelationID = "IDataAggregator.Sampling"
                             }
                         };
-                        for (int i = 0; i < _maxDelayPercentage * _windowMaxSamples / 100; i++)
+                        for (int i = 0; i < _tumblingWindowPercentage * _aggregationSize / 100; i++)
                             _sample.Dequeue();
                     }
                 }
@@ -45,6 +68,7 @@ namespace Modules
 
                 return MessageResult.Ok;
             });
+
 
         }
     }

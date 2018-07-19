@@ -19,9 +19,13 @@ class Chart {
             this.points = newPoints.concat(this.points);
         }
         else {
+            for (var i = 0; i < newPoints.length; i++) {
+                newPoints[i] = newPoints[i].concat(["null"]);
+            }
             this.points = newPoints;
         }
-        this.points = this.points.slice(0, this.numToDraw);
+        this.points = this.points.sort(function (a, b) { return a[0] - b[0] }).reverse().slice(0, this.numToDraw);
+        console.log(this.points);
     }
     updateAnomaly(newPoints) {
         if (this.append === true) {
@@ -31,18 +35,20 @@ class Chart {
             this.points = newPoints.concat(this.points);
         }
         else {
+            for (var i = 0; i < newPoints.length; i++) {
+                newPoints[i] = newPoints[i].concat(['point { size: 18; shape-type: star; fill-color: #a52714; }']);
+            }
             this.points = newPoints;
         }
         this.points = this.points.slice(0, this.numToDraw);
     }
     constructor(chart) {
-        this.chartName = chart.chartName;
-        this.xlabel = chart.xlabel;
-        this.ylabel = chart.ylabel;
-        this.headers = chart.headers.concat([{ 'type': 'string', 'role': 'style' }]);
-        console.log(this.headers);
+        this.chartName = chart.Name;
+        this.xlabel = chart.X_Label;
+        this.ylabel = chart.Y_Label;
+        this.headers = chart.Headers.concat([{ 'type': 'string', 'role': 'style' }]);
         this.points = [];
-        this.append = chart.append;
+        this.append = chart.Append;
 
         /* Set up JavaScript variables */
         this.numToDraw = 32; // Note: needs to be a power of 2
@@ -174,26 +180,25 @@ function load() {
 
             var messageArray = Msg.messages;
             for (var i = 0; i < messageArray.length; i++) {
-                var chart = messageArray[i];
-                console.log(chart);
-                if (!charts.hasOwnProperty(chart.chartName)) {
+                var msg = messageArray[i];
+                if (!charts.hasOwnProperty(msg.Chart.Name)) {
                     // Does not exist, so let's create it.
-                    charts[chart.chartName] = new Chart(chart);
+                    charts[msg.Chart.Name] = new Chart(msg.Chart);
                 }
                 
-                if (chart.anomaly) {
-                    charts[chart.chartName].updateAnomaly(chart.points);
+                if (msg.IsAnomaly) {
+                    charts[msg.Chart.Name].updateAnomaly(msg.Points);
                 }
                 else {
-                    charts[chart.chartName].updatePoints(chart.points);
+                    charts[msg.Chart.Name].updatePoints(msg.Points);
                 }
 
                 // Draw charts if user wants
-                chart = charts[chart.chartName];
-                if (!chart.pause && chart.frameNum % chart.frames == 0) {
-                    drawChart(chart);
+                var internal_msg = charts[msg.Chart.Name];
+                if (!internal_msg.pause && internal_msg.frameNum % internal_msg.frames == 0) {
+                    drawChart(internal_msg);
                 }
-                chart.frameNum += 1;
+                internal_msg.frameNum += 1;
             }
         });
     });

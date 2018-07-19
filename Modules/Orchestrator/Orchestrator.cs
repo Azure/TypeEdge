@@ -17,13 +17,14 @@ namespace Modules
 {
     public class Orchestrator : EdgeModule, IOrchestrator
     {
-        public Output<Temperature> Sampling { get; set; }
+        public Output<Temperature> Training { get; set; }
         public Output<Temperature> Detection { get; set; }
-        public Output<VisualizationData> Visualization { get; set; }
+        public Output<GraphData> Visualization { get; set; }
         public Output<DataAggregate> FeatureExtraction { get; set; }
 
         public ModuleTwin<OrchestratorTwin> Twin { get; set; }
 
+        //this is a temp depedency, until we get the feature extraction module
         public Orchestrator(ITemperatureSensor temperatureProxy, IDataAggregator aggregatorProxy)
         {
             temperatureProxy.Temperature.Subscribe(this, async signal =>
@@ -31,86 +32,89 @@ namespace Modules
                 var twin = Twin.LastKnownTwin;
                 if (twin != null)
                 {
-                    Preprocess(signal, twin);
+                    if (twin.Scale == TemperatureScale.Celsius)
+                        signal.Value = signal.Value * 9 / 5 + 32;
 
-                    List<Task> messages = new List<Task>();
-                    foreach (Routing item in Enum.GetValues(typeof(Routing)))
-                        if (twin.RoutingMode.HasFlag(item))
-                            switch (item)
-                            {
-                                case Routing.Sampling:
-                                    messages.Add(Sampling.PublishAsync(signal));
-                                    break;
-                                case Routing.Detect:
-                                    messages.Add(Detection.PublishAsync(signal));
-                                    break;
-                                default:
-                                    continue;
-
-                            }
-
-                    if (messages.Count > 0)
-                        await Task.WhenAll(messages);
+                    await BroadcastMessage(signal, twin);
                 }
                 return MessageResult.Ok;
             });
 
-
             aggregatorProxy.Aggregate.Subscribe(this, async aggregate =>
             {
-
-                if (aggregate == null)
-                    return MessageResult.Ok;
-
                 var twin = Twin.LastKnownTwin;
-                if (twin != null)
-                {
-                    List<Task> messages = new List<Task>();
-                    foreach (Routing item in Enum.GetValues(typeof(Routing)))
-                        if (twin.RoutingMode.HasFlag(item))
-                            switch (item)
-                            {
-                                case Routing.Visualize:
-                                    messages.Add(Visualization.PublishAsync(new VisualizationData()
-                                    {
-                                        Data = new GraphData()
-                                        {
-                                            CorrelationID = aggregate.Message.CorrelationID,
-                                            Values = aggregate.Message.Values
-                                        }
-                                    }));
-                                    break;
-                                case Routing.FeatureExtraction:
-                                    messages.Add(FeatureExtraction.PublishAsync(new DataAggregate()
-                                    {
-                                        CorrelationID = aggregate.Message.CorrelationID,
-                                        Values = aggregate.Message.Values
-                                    }));
-                                    break;
-
-                                default:
-                                    continue;
-                            }
-
-                    if (messages.Count > 0)
-                        await Task.WhenAll(messages);
-                }
+                if (twin != null || aggregate != null)
+                    await BroadcastAggregate(aggregate, twin);
                 return MessageResult.Ok;
             });
 
             Twin.Subscribe(async twin =>
             {
-                System.Console.WriteLine($"Preprocessor: new routing : { twin.RoutingMode.ToString()}");
+                Console.WriteLine($"Preprocessor::Twin update. Routing  = { twin.RoutingMode.ToString()}");
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
         }
 
-        private static void Preprocess(Temperature signal, OrchestratorTwin twin)
+        private async Task BroadcastAggregate(Reference<DataAggregate> aggregate, OrchestratorTwin twin)
         {
-            if (signal.Scale != twin.Scale)
-                if (twin.Scale == TemperatureScale.Celsius)
-                    signal.Value = signal.Value * 9 / 5 + 32;
+            List<Task> messages = new List<Task>();
+            foreach (Routing item in Enum.GetValues(typeof(Routing)))
+                if (twin.RoutingMode.HasFlag(item))
+                    switch (item)
+                    {
+                        case Routing.VisualizeFeature:
+                            messages.Add(Visualization.PublishAsync(new GraphData()
+                            {
+                                CorrelationID = "Feature",
+                                Values = aggregate.Message.Values
+                            }
+                            ));
+                            break;
+                        case Routing.FeatureExtraction:
+                            messages.Add(FeatureExtraction.PublishAsync(new DataAggregate()
+                            {
+                                CorrelationID = "Feature",
+                                Values = aggregate.Message.Values
+                            }));
+                            break;
+
+                        default:
+                            continue;
+                    }
+
+            if (messages.Count > 0)
+                await Task.WhenAll(messages);
+        }
+
+        private async Task BroadcastMessage(Temperature signal, OrchestratorTwin twin)
+        {
+            List<Task> messages = new List<Task>();
+            foreach (Routing item in Enum.GetValues(typeof(Routing)))
+                if (twin.RoutingMode.HasFlag(item))
+                    switch (item)
+                    {
+                        case Routing.Train:
+                            messages.Add(Training.PublishAsync(signal));
+                            break;
+                        case Routing.Detect:
+                            messages.Add(Detection.PublishAsync(signal));
+                            break;
+                        case Routing.VisualizeSource:
+                            messages.Add(Visualization.PublishAsync(new GraphData()
+                            {
+                                CorrelationID = "Source",
+                                Values = new double[1][] { new double[2] { signal.TimeStamp, signal.Value } }
+                            }
+                            ));
+                            break;
+                        default:
+                            continue;
+
+                    }
+
+            if (messages.Count > 0)
+                await Task.WhenAll(messages);
         }
 
         public override async Task<ExecutionResult> RunAsync()
