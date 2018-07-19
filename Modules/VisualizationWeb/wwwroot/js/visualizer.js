@@ -25,7 +25,6 @@ class Chart {
             this.points = newPoints;
         }
         this.points = this.points.sort(function (a, b) { return a[0] - b[0] }).reverse().slice(0, this.numToDraw);
-        console.log(this.points);
     }
     updateAnomaly(newPoints) {
         if (this.append === true) {
@@ -53,6 +52,7 @@ class Chart {
         /* Set up JavaScript variables */
         this.numToDraw = 32; // Note: needs to be a power of 2
         this.pause = false;
+        this.toDrawfft = false;
         this.frames = 1;
         this.frameNum = 0;
         var chartElement = document.getElementById("charts");
@@ -120,10 +120,10 @@ class Chart {
         var fftButton = document.createElement("input");
         fftButton.type = "button";
         fftButton.id = "fftButton" + this.chartName;
-        fftButton.value = "Render FFT";
+        fftButton.value = "Render FFT Pause/Play";
         fftButton.name = this.chartName;
         fftButton.onclick = function () {
-            drawFFT(charts[fftButton.name]);
+            charts[fftButton.name].toDrawfft = !charts[pauseButton.name].toDrawfft;
         }
         chartElement.append(fftButton);
 
@@ -197,6 +197,9 @@ function load() {
                 var internal_msg = charts[msg.Chart.Name];
                 if (!internal_msg.pause && internal_msg.frameNum % internal_msg.frames == 0) {
                     drawChart(internal_msg);
+                    if (internal_msg.toDrawfft) {
+                        drawFFT(internal_msg);
+                    }
                 }
                 internal_msg.frameNum += 1;
             }
@@ -210,6 +213,7 @@ function load() {
 // This actually draws the chart. Possible parameterization: allow the user to determine
 // How many elements to pull out.
 function drawChart(chart) {
+    
     var top = getTop(chart);
     //console.log(top);
     var dataTable = google.visualization.arrayToDataTable(top); // This takes care of the first chart
@@ -230,13 +234,13 @@ function drawFFT(chart) {
     var topNumbers = getTopNums(chart);
     var reals = [];
     var imags = [];
-
     // Format array correctly and send to FFT. We send 0 for the imaginaries.
     topNumbers.forEach((val, i) => { reals.push(val[1]); imags.push(0); });
     forward(reals, imags);
 
     // Format array for graph 
     var result = [];
+    
     for (var idx = 1; idx < reals.length; idx++) {
         result.push([topNumbers[idx][0], reals[idx], imags[idx]]);
     }
