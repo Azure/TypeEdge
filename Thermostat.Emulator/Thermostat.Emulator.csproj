@@ -26,7 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\TypeEdge.Host\TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
     <ProjectReference Include="..\Modules\AnomalyDetection\AnomalyDetection.csproj" />
-    <ProjectReference Include="..\Modules\DataSampling\DataSampling.csproj" />
+    <ProjectReference Include="..\Modules\ModelTraining\ModelTraining.csproj" />
     <ProjectReference Include="..\Modules\Orchestrator\Orchestrator.csproj" />
     <ProjectReference Include="..\Modules\TemperatureSensor\TemperatureSensor.csproj" />
     <ProjectReference Include="..\Modules\Visualization\Visualization.csproj" />

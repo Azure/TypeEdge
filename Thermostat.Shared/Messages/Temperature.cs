@@ -8,9 +8,7 @@ namespace ThermostatApplication.Messages
 {
     public class Temperature : EdgeMessage
     {
-        public TemperatureScale Scale { get; set; }
         public double Value { get; set; }
-        public double Minimum { get; set; }
-        public double Maximum { get; set; }
+        public double TimeStamp { get; set; }
     }
 }

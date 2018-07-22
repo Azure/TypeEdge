@@ -5,6 +5,7 @@ using TypeEdge.Modules.Endpoints;
 using TypeEdge.Modules.Messages;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
+using System;
 
 namespace Modules
 {
@@ -12,51 +13,64 @@ namespace Modules
     {
         object _syncSample = new object();
         object _syncClustering = new object();
-
-        double[][] _sample = null;
+        
         int _numClusters = 3;
-        KMeansClustering _kMeansClustering;
+        KMeansScoring _kMeansScoring;
 
         public Output<Anomaly> Anomaly { get; set; }
 
-
-        public AnomalyDetection(IOrchestrator preprocessor, IDataSampling trainer)
+        public AnomalyDetection(IOrchestrator orcherstratorProxy, IModelTraining modelTrainingProxy)
         {
-            preprocessor.Detection.Subscribe(this, async signal =>
+            orcherstratorProxy.Detection.Subscribe(this, async signal =>
             {
-                int cluster = 0;
-                if (_kMeansClustering != null)
-                    lock (_syncClustering)
-                        if (_kMeansClustering != null)
-                            cluster = _kMeansClustering.Classify(new double[] { signal.Value, signal.Minimum, signal.Maximum });
-
-                if (cluster < 0)
+                try
                 {
-                    System.Console.WriteLine("_____________________________Anomaly detected__________________________________");
-                    await Anomaly.PublishAsync(new Anomaly() { Temperature = signal });
+                    int cluster = 0;
+                    if (_kMeansScoring != null)
+                        lock (_syncClustering)
+                            if (_kMeansScoring != null)
+                                cluster = _kMeansScoring.Score(new double[] { signal.Value });
+
+                    if (cluster < 0)
+                        await Anomaly.PublishAsync(new Anomaly() { Temperature = signal });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
                 }
                 return MessageResult.Ok;
             });
 
-            trainer.Samples.Subscribe(this, async (sampleReference) =>
+            modelTrainingProxy.Model.Subscribe(this, async (model) =>
             {
                 //if the messages has been stored and forwarded, but the file has been deleted (e.g. a restart)
                 //then the message can be empty (null)
-                if (sampleReference == null)
+                if (model == null)
                     return MessageResult.Ok;
 
-                System.Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+                try
+                {
+                    lock (_syncClustering)
 
-                lock (_syncSample)
-                    _sample = sampleReference.Message.Data.Select(e => new double[] { e.Value, e.Minimum, e.Maximum }).ToArray();
-
-                lock (_syncClustering)
-                    _kMeansClustering = new KMeansClustering(_sample, _numClusters);
+                        switch (model.Algorithm)
+                        {
+                            case ThermostatApplication.Algorithm.kMeans:
+                                _kMeansScoring = new KMeansScoring(_numClusters);
+                                _kMeansScoring.DeserializeModel(model.DataJson);
+                                break;
+                            case ThermostatApplication.Algorithm.LSTM:
+                                break;
+                            default:
+                                break;
+                        }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
 
                 return MessageResult.Ok;
             });
         }
-
-
     }
 }

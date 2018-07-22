@@ -2,12 +2,16 @@
 using TypeEdge.Modules.Endpoints;
 using TypeEdge.Modules.Messages;
 using ThermostatApplication.Messages;
+using TypeEdge.Twins;
+using ThermostatApplication.Twins;
 
 namespace ThermostatApplication.Modules
 {
     [TypeModule]
-    public interface IDataSampling 
+    public interface IModelTraining 
     {
-        Output<Reference<Sample>> Samples { get; set; }
+        Output<Model> Model { get; set; }
+        ModuleTwin<ModelTrainingTwin> Twin { get; set; }
+
     }
 }

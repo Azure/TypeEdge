@@ -9,7 +9,7 @@ using System.IO;
 
 namespace ThermostatApplication
 {
-    internal class Program
+    internal class Program 
     {
         private static async Task Main(string[] args) 
         {
@@ -24,9 +24,9 @@ namespace ThermostatApplication
 
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
             host.RegisterModule<IOrchestrator, Orchestrator>(); 
-            host.RegisterModule<IDataSampling, DataSampling>();
-            host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
+            host.RegisterModule<IModelTraining, ModelTraining>();
             host.RegisterModule<IVisualization, Visualization>();
+            host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
 
             host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 

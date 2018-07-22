@@ -1,113 +1,106 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using TypeEdge.Enums;
 using TypeEdge.Modules;
 using TypeEdge.Modules.Endpoints;
 using TypeEdge.Modules.Enums;
 using TypeEdge.Twins;
-using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
-
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Logging;
+using WaveGenerator;
+using Newtonsoft.Json;
+using System.Threading;
 
 namespace Modules
 {
     public class TemperatureSensor : EdgeModule, ITemperatureSensor
     {
         object _sync = new object();
+        DateTime _startTimeStamp;
+        //default values
         double _anomalyOffset = 0.0;
-        double _minimum = 60.0;
-        double _maximum = 80.0;
+        double _samplingRateHz = 1.0;
 
+        WaveGenerator.WaveGenerator _dataGenerator;
 
         public Output<Temperature> Temperature { get; set; }
         public ModuleTwin<TemperatureTwin> Twin { get; set; }
 
         public TemperatureSensor()
         {
+            _startTimeStamp = DateTime.Now;
+
             Twin.Subscribe(async twin =>
             {
-                lock (_sync)
-                {
-                    _minimum = twin.DesiredMaximum;
-                    _maximum = twin.DesiredMaximum;
-                }
+                Console.WriteLine($"{typeof(TemperatureSensor).Name}::Twin update");
+
+                ConfigureGenerator(twin);
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
         }
 
-        // This method connects to a url for SignalR to send data.
-        public static async Task<HubConnection> ConnectAsync(string baseUrl)
+
+        void ConfigureGenerator(TemperatureTwin twin)
         {
-            // Keep trying to until we can start
-            while (true)
+            lock (_sync)
             {
-                var connection = new HubConnectionBuilder()
-                                .WithUrl(baseUrl)
-                                .Build();
-                try
-                {
-                    await connection.StartAsync();
-                    return connection;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    await Task.Delay(1000);
-                }
+                if (twin == null
+                    || twin.SamplingHz <= 0
+                    || twin.Amplitude <= 0
+                    || twin.Frequency <= 0)
+                    return;
+
+                _samplingRateHz = twin.SamplingHz;
+                var waveConfiguration = new WaveConfig[] { new WaveConfig() {
+                    Amplitude = twin.Amplitude,
+                    FrequencyInKilohertz = twin.Frequency/1000,
+                    WaveType = (WaveType)(int)twin.WaveType,
+                    Offset = twin.Offset,
+                } };
+
+                _dataGenerator = new WaveGenerator.WaveGenerator(waveConfiguration);
             }
         }
         public void GenerateAnomaly(int value)
         {
-            Console.WriteLine($"GenerateAnomaly called with value:{value}");
+            Console.WriteLine($"TemperatureSensor::GenerateAnomaly called with value:{value}");
+
             lock (_sync)
                 _anomalyOffset = value;
         }
+
         public override async Task<ExecutionResult> RunAsync()
         {
-            double frequency = 2.0;
-            int amplitute = 5;
-            int samplingRate = 500;
-            // Connect to Host
-            HubConnection connection = await ConnectAsync("http://127.0.0.1:5000/visualizerhub");
-            int i = 0;
+            var twin = await Twin.GetAsync();
+            ConfigureGenerator(twin);
+
             while (true)
             {
-                Temperature message = null;
-                
-                lock (_sync)
+                double newValue;
+                double offset;
+                double sleepTimeMs = 0;
+                if (_dataGenerator != null)
                 {
-                    var sin = Math.Sin(2 * Math.PI * frequency * DateTime.Now.TimeOfDay.TotalSeconds);
-                    var value = amplitute * sin + (_maximum + _minimum) / 2 + _anomalyOffset;
-                    _anomalyOffset = 0.0;
-
-                    message = new Temperature
+                    lock (_sync)
                     {
-                        Scale = TemperatureScale.Celsius,
-                        Value = value,
-                        Minimum = _minimum,
-                        Maximum = _maximum
+                        offset = _anomalyOffset;
+                        newValue = _dataGenerator.Read();
+                        sleepTimeMs = 1000.0 / _samplingRateHz;
+                        _anomalyOffset = 0.0;
+                    }
+                    var message = new Temperature()
+                    {
+                        Value = newValue + offset,
+                        TimeStamp = DateTime.Now.Subtract(_startTimeStamp).TotalMilliseconds/1000
                     };
 
-                    int left = 40;
-                    //var text = new string('-', (int)((value - +(_maximum + _minimum) / 2) / amplitute * left / 2) + left);
-                    //Console.WriteLine($"{value.ToString("F2")} {text}");
-                    Console.WriteLine(i);
-                    connection.InvokeAsync("SendMessage", i.ToString(), (int)((value - +(_maximum + _minimum) / 2) / amplitute * left / 2) + left);
-                    i = i + 1;
-                    System.Threading.Thread.Sleep(50);
+                    await Temperature.PublishAsync(message);                    
                 }
-                await Temperature.PublishAsync(message);
-
-                Thread.Sleep(1000 / samplingRate);
+                await Task.Delay((int)sleepTimeMs);
             }
-            return await base.RunAsync();
+            return ExecutionResult.Ok;
         }
-
     }
 }

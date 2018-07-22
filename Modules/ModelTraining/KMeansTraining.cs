@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Newtonsoft.Json;
+using System;
+using ThermostatApplication.ML;
 
 namespace AnomalyDetectionAlgorithms
 {
-    public class KMeansClustering
+    public class KMeansTraining : ITrainer
     {
         int _numClusters;
 
@@ -19,14 +19,17 @@ namespace AnomalyDetectionAlgorithms
 
         double[] _clustersRadius;
 
-        public KMeansClustering(double[][] rawData, int numClusters)
+        public KMeansTraining( int numClusters)
+        {
+            _numClusters = numClusters;
+        }
+
+        public void TrainModel(double[][] rawData)
         {
             _rawData = rawData;
-            _numClusters = numClusters;
 
             ProcessData();
         }
-
         private void ProcessData()
         {
             _normalizedData = NormalizeData();
@@ -83,24 +86,16 @@ namespace AnomalyDetectionAlgorithms
             return result;
         }
 
-        internal int Classify(double[] point)
+        public string SerializeModel()
         {
-            //normalize
-            for (int j = 0; j < point.Length; ++j) // each col
-                point[j] = (point[j] - _sampleMeans[j]) / _sampleStandardDeviations[j];
-
-            double[] distances = new double[_numClusters]; // distances from curr tuple to each mean
-
-            for (int k = 0; k < _numClusters; ++k)
-                distances[k] = Distance(point, _means[k]); // compute distances from curr tuple to all k means
-
-            int clusterID = MinIndex(distances);
-
-            //is it inside the cluster?
-            if (distances[clusterID] > 1.2 * _clustersRadius[clusterID])
-                return -1;
-
-            return clusterID;
+            var model = new {
+                Means = _means,
+                SampleMeans = _sampleMeans,
+                StandardDeviations = _sampleStandardDeviations,
+                ClusterRadii = _clustersRadius,
+                NumberOfClusters = _numClusters
+            };
+            return JsonConvert.SerializeObject(model);
         }
 
         private int[] InitializeClusters(int randomSeed = 0)

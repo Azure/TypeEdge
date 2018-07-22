@@ -3,6 +3,7 @@ using TypeEdge.Modules.Endpoints;
 using TypeEdge.Twins;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Twins;
+using TypeEdge.Modules.Messages;
 
 namespace ThermostatApplication.Modules
 {
@@ -11,8 +12,8 @@ namespace ThermostatApplication.Modules
     {
         Output<Temperature> Training { get; set; }
         Output<Temperature> Detection { get; set; }
-        Output<Temperature> Visualization { get; set; }
-
+        Output<GraphData> Visualization { get; set; }
+        Output<Model> Model { get; set; }
         ModuleTwin<OrchestratorTwin> Twin { get; set; }
     }
 }

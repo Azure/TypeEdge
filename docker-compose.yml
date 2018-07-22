@@ -28,11 +28,11 @@ services:
     volumes:
     - env:/app/env
 
-  datasampling:
-    image: ${DOCKER_REGISTRY}datasampling
+  modeltraining:
+    image: ${DOCKER_REGISTRY}modeltraining
     build:
       context: .
-      dockerfile: Modules/DataSampling/Dockerfile
+      dockerfile: Modules/ModelTraining/Dockerfile
     volumes:
     - env:/app/env
 
