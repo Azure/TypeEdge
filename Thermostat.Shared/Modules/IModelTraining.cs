@@ -10,7 +10,7 @@ namespace ThermostatApplication.Modules
     [TypeModule]
     public interface IModelTraining 
     {
-        Output<Reference<Model>> Model { get; set; }
+        Output<Model> Model { get; set; }
         ModuleTwin<ModelTrainingTwin> Twin { get; set; }
 
     }

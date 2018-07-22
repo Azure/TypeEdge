@@ -65,7 +65,7 @@ namespace Modules
 
         private void ConfigureCharts(VisualizationTwin twin)
         {
-            if (twin == null)
+            if (twin == null|| string.IsNullOrEmpty(twin.ChartName))
                 return;
             lock (_sync)
                 _chartDataDictionary[twin.ChartName] = new Chart()

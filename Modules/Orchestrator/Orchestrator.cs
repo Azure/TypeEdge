@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using TypeEdge.Enums;
 using TypeEdge.Modules;
@@ -12,6 +11,7 @@ using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
+using Newtonsoft.Json;
 
 namespace Modules
 {
@@ -20,13 +20,13 @@ namespace Modules
         public Output<Temperature> Training { get; set; }
         public Output<Temperature> Detection { get; set; }
         public Output<GraphData> Visualization { get; set; }
-        public Output<Reference<Model>> Model { get; set; }
+        public Output<Model> Model { get; set; }
         public Output<DataAggregate> FeatureExtraction { get; set; }
 
         public ModuleTwin<OrchestratorTwin> Twin { get; set; }
 
         //this is a temp depedency, until we get the feature extraction module
-        public Orchestrator(ITemperatureSensor temperatureProxy, IModelTraining modelTrainingProxy)
+        public Orchestrator(ITemperatureSensor temperatureProxy)
         {
             temperatureProxy.Temperature.Subscribe(this, async signal =>
             {
@@ -38,19 +38,6 @@ namespace Modules
 
                     await BroadcastMessage(signal, twin);
                 }
-                return MessageResult.Ok;
-            });
-
-            modelTrainingProxy.Model.Subscribe(this, async model =>
-            {
-
-                //forward everything for now
-                //when the cloud pipeline gets added, this part here will be more clever
-                if (model == null)
-                    return MessageResult.Ok;
-
-                await Model.PublishAsync(new Reference<Model>() { Message = model.Message });
-
                 return MessageResult.Ok;
             });
 
@@ -97,6 +84,8 @@ namespace Modules
 
         private async Task BroadcastMessage(Temperature signal, OrchestratorTwin twin)
         {
+            Console.WriteLine($"Orchestrator.BroadcastMessage : {JsonConvert.SerializeObject(signal)}");
+
             List<Task> messages = new List<Task>();
             foreach (Routing item in Enum.GetValues(typeof(Routing)))
                 if (twin.RoutingMode.HasFlag(item))
@@ -118,11 +107,10 @@ namespace Modules
                             break;
                         default:
                             continue;
-
                     }
 
             if (messages.Count > 0)
-                await Task.WhenAll(messages);
+                await Task.WhenAll(messages).ConfigureAwait(false);
         }
 
         public override async Task<ExecutionResult> RunAsync()

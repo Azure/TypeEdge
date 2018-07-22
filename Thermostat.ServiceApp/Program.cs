@@ -26,8 +26,8 @@ namespace Thermostat.ServiceApp
             {
                 Console.WriteLine("Select Action: (D)efault Twins, (T)emperatureSensorTwin, (O)rchestratorTwin, (V)isualizerTwin, (A)nomaly, (E)xit");
 
-                var res = Console.ReadLine();
-                switch (res.ToUpper())
+                var res = Console.ReadLine()?.ToUpper();
+                switch (res)
                 {
                     case "O":
                         await SetOrchestratorTwin();
@@ -65,8 +65,8 @@ namespace Thermostat.ServiceApp
         private static async Task SetTemperatureSensorTwin()
         {
             Console.WriteLine($"Set Default?(Y/N)");
-            var res = Console.ReadLine();
-            if (!string.IsNullOrEmpty(res) && res.ToUpper() == "Y")
+            var res = Console.ReadLine()?.ToUpper();
+            if (res == "Y")
             {
                 await SetTemperatureDefaults();
                 return;
@@ -94,10 +94,10 @@ namespace Thermostat.ServiceApp
             if (!string.IsNullOrEmpty(res))
                 twin.WaveType = (WaveformType)Enum.Parse(typeof(WaveformType), res);
 
-            Console.WriteLine($"Set the VerticalShift:{twin.VerticalShift}");
+            Console.WriteLine($"Set the VerticalShift:{twin.Offset}");
             res = Console.ReadLine();
             if (!string.IsNullOrEmpty(res))
-                twin.VerticalShift = double.Parse(res);
+                twin.Offset = double.Parse(res);
 
 
             Console.WriteLine(JsonConvert.SerializeObject(twin, Formatting.Indented));
@@ -107,8 +107,8 @@ namespace Thermostat.ServiceApp
         private static async Task SetOrchestratorTwin()
         {
             Console.WriteLine($"Set Default?(Y/N)");
-            var res = Console.ReadLine();
-            if (!string.IsNullOrEmpty(res) && res.ToUpper() == "Y")
+            var res = Console.ReadLine()?.ToUpper();
+            if (res == "Y")
             {
                 await SetOrchestratorDefaults();
                 return;
@@ -127,8 +127,8 @@ namespace Thermostat.ServiceApp
         private static async Task SetVisualizerTwin()
         {
             Console.WriteLine($"Set Default?(Y/N)");
-            var res = Console.ReadLine();
-            if (!string.IsNullOrEmpty(res) && res.ToUpper() == "Y")
+            var res = Console.ReadLine()?.ToUpper();
+            if (res == "Y")
             {
                 await SetVisualizerDefaults();
                 return;
@@ -147,24 +147,13 @@ namespace Thermostat.ServiceApp
             Console.WriteLine("Enter y-axis label");
             twin.YAxisLabel = Console.ReadLine();
 
-            Console.WriteLine("Enter \"F\" or \"f\" to replace all chart data upon reception of new data package. Otherwise data will be shifted in a rolling window.");
-            string Append = Console.ReadLine();
-            Append.ToUpper();
-            if (!string.IsNullOrEmpty(Append))
-            {
-                if (Append.Equals("F"))
-                {
-                    twin.Append = false;
-                }
-                else
-                {
-                    twin.Append = true;
-                }
-            }
+            Console.WriteLine("Enter \"F\" to replace all chart data upon reception of new data package. Otherwise data will be shifted in a rolling window.");
+            string Append = Console.ReadLine()?.ToUpper();
+
+            if (Append == ("F"))
+                twin.Append = false;
             else
-            {
                 twin.Append = true;
-            }
 
             await processor.Twin.PublishAsync(twin);
         }
@@ -174,10 +163,9 @@ namespace Thermostat.ServiceApp
             Routing result = 0;
 
             Console.WriteLine("Select Processor routing modes (multiple choices are allowed) : (T)rain, (D)etect, Visualize(S)ource, (F)eatureExtraction, (V)isualizeFeature,  empty for None");
-            var res = Console.ReadLine();
+            var res = Console.ReadLine()?.ToUpper();
             if (!string.IsNullOrEmpty(res))
             {
-                res = res.ToUpper();
                 if (res.Contains("T"))
                     result |= Routing.Train;
                 if (res.Contains("D"))
@@ -215,11 +203,11 @@ namespace Thermostat.ServiceApp
             var temperatureSensor = ProxyFactory.GetModuleProxy<ITemperatureSensor>();
 
             var twin = await temperatureSensor.Twin.GetAsync();
-            twin.SamplingHz = 1;
+            twin.SamplingHz = 10;
             twin.Amplitude = 10;
-            twin.Frequency = 0.2;
+            twin.Frequency = 2;
             twin.WaveType = WaveformType.Sine;
-            twin.VerticalShift = 60;
+            twin.Offset = 60;
 
             var res = await temperatureSensor.Twin.PublishAsync(twin);
             Console.WriteLine(JsonConvert.SerializeObject(twin, Formatting.Indented));
@@ -239,14 +227,13 @@ namespace Thermostat.ServiceApp
         }
         private static async Task SetOrchestratorDefaults()
         {
-
             Console.WriteLine("Setting Orchestrator");
 
             var processor = ProxyFactory.GetModuleProxy<IOrchestrator>();
 
             var twin = await processor.Twin.GetAsync();
             twin.Scale = TemperatureScale.Celsius;
-            twin.RoutingMode = Routing.VisualizeSource;
+            twin.RoutingMode = Routing.VisualizeSource | Routing.Train | Routing.Detect;
 
             var res = await processor.Twin.PublishAsync(twin);
             Console.WriteLine(JsonConvert.SerializeObject(res, Formatting.Indented));

@@ -10,6 +10,7 @@ using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using WaveGenerator;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace Modules
 {
@@ -54,15 +55,13 @@ namespace Modules
                 _samplingRateHz = twin.SamplingHz;
                 var waveConfiguration = new WaveConfig[] { new WaveConfig() {
                     Amplitude = twin.Amplitude,
-                    Period = 1/twin.Frequency,
-                    Frequency = twin.Frequency,
+                    FrequencyInKilohertz = twin.Frequency/1000,
                     WaveType = (WaveType)(int)twin.WaveType,
-                    VerticalShift = twin.VerticalShift,
+                    Offset = twin.Offset,
                 } };
 
                 _dataGenerator = new WaveGenerator.WaveGenerator(waveConfiguration);
             }
-
         }
         public void GenerateAnomaly(int value)
         {
@@ -97,9 +96,7 @@ namespace Modules
                         TimeStamp = DateTime.Now.Subtract(_startTimeStamp).TotalMilliseconds/1000
                     };
 
-                    await Temperature.PublishAsync(message);
-
-                    Console.WriteLine($"Temperature.PublishAsync : {JsonConvert.SerializeObject(message)}");
+                    await Temperature.PublishAsync(message);                    
                 }
                 await Task.Delay((int)sleepTimeMs);
             }

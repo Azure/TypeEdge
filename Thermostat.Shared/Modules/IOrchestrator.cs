@@ -13,7 +13,7 @@ namespace ThermostatApplication.Modules
         Output<Temperature> Training { get; set; }
         Output<Temperature> Detection { get; set; }
         Output<GraphData> Visualization { get; set; }
-        Output<Reference<Model>> Model { get; set; }
+        Output<Model> Model { get; set; }
         ModuleTwin<OrchestratorTwin> Twin { get; set; }
     }
 }

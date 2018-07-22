@@ -25,10 +25,10 @@ namespace AnomalyDetectionAlgorithms
 
             lock (sync)
             {
-                _means = model.Means;
-                _sampleMeans = model.SampleMeans;
-                _sampleStandardDeviations = model.StandardDeviations;
-                _clustersRadius = model.ClusterRadii;
+                _means = model.Means.ToObject<double[][]>();
+                _sampleMeans = model.SampleMeans.ToObject<double[]>();
+                _sampleStandardDeviations = model.StandardDeviations.ToObject<double[]>();
+                _clustersRadius = model.ClusterRadii.ToObject<double[]>();
                 _numClusters = model.NumberOfClusters;
             }
         }

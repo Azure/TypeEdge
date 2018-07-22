@@ -25,9 +25,9 @@ namespace ThermostatApplication
             host.RegisterModule<IOrchestrator, Orchestrator>(); 
             host.RegisterModule<IModelTraining, ModelTraining>();
             host.RegisterModule<IVisualization, Visualization>();
-            //host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
+            host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
 
-            //host.Upstream.Subscribe(host.GetProxy<IOrchestrator>().Temperature);
+            host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
             host.Build();
 

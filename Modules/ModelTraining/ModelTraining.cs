@@ -18,15 +18,15 @@ namespace Modules
         object _sync = new object();
 
         //default values
-        int _aggregationSize = 10;
-        int _tumblingWindowPercentage = 50;
+        int _aggregationSize = 1000;
+        int _tumblingWindowPercentage = 10;
 
         Queue<Temperature> _sample;
 
         KMeansTraining _kMeansTraining;
         int _numClusters = 3;
 
-        public Output<Reference<Model>> Model { get; set; }
+        public Output<Model> Model { get; set; }
         public ModuleTwin<ModelTrainingTwin> Twin { get; set; }
 
 
@@ -49,27 +49,25 @@ namespace Modules
 
             proxy.Training.Subscribe(this, async signal =>
             {
-                Reference<Model> model = null;
+                Model model = null;
                 lock (_sample)
                 {
                     _sample.Enqueue(signal);
                     if (_sample.Count >= _aggregationSize)
                     {
-                        _kMeansTraining = new KMeansTraining( _numClusters);
+                        _kMeansTraining = new KMeansTraining(_numClusters);
                         _kMeansTraining.TrainModel(_sample.Select(e => new double[] { e.TimeStamp, e.Value }).ToArray());
-                        model = new Reference<Model>()
+                        model = new Model()
                         {
-                            Message = new Model() {
-                                 Algorithm = ThermostatApplication.Algorithm.kMeans,
-                                DataJson = _kMeansTraining.SerializeModel()
-                            }
+                            Algorithm = ThermostatApplication.Algorithm.kMeans,
+                            DataJson = _kMeansTraining.SerializeModel()
                         };
                         for (int i = 0; i < _tumblingWindowPercentage * _aggregationSize / 100; i++)
                             _sample.Dequeue();
                     }
                 }
                 if (model != null)
-                    await Model.PublishAsync(model);
+                    await Model.PublishAsync(model).ConfigureAwait(false);
 
                 return MessageResult.Ok;
             });
