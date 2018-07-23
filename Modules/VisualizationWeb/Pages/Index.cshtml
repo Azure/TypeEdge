@@ -14,11 +14,6 @@
     <div class="row">&nbsp;</div>
     <div class="row">
         <div class="col-6">&nbsp;</div>
-        <div class="col-6">
-            <input type="range" min="1" max="8" value="5" class="slider" id="displayNum">
-            <input type="button" id="downloadButton" value="Download Log" />
-            <input type="button" id="pauseButton" value="Pause/Play" />
-        </div>
     </div>
     <div class="row">
         <div class="col-12">
@@ -31,9 +26,10 @@
 </div>
 <script src="~/lib/signalr/signalr.js"></script>
 <script src="~/js/visualizer.js"></script>
-@*<script src="~/js/es5-chat.js"></script>*@
+@*
+<script src="~/js/es5-chat.js"></script>*@
 
-<body>
-    <div id="curve_chart" style="width: 900px; height: 500px"></div>
-    <div id="fft_chart" style="width: 900px; height: 500px"></div>
+<body onload="load()">
+    <div id="charts">
+    </div>
 </body>

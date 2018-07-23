@@ -24,7 +24,7 @@ namespace Thermostat.ServiceApp
 
             while (true)
             {
-                Console.WriteLine("Select Action: (D)efault Twins, (T)emperatureSensorTwin, (O)rchestratorTwin, (V)isualizerTwin, (A)nomaly, (E)xit");
+                Console.WriteLine("Select Action: (D)efault Twins, (T)emperatureSensorTwin, (O)rchestratorTwin, (V)isualizerTwin, (A)nomaly, (M)odelTrainer, (E)xit");
 
                 var res = Console.ReadLine()?.ToUpper();
                 switch (res)
@@ -41,6 +41,9 @@ namespace Thermostat.ServiceApp
                     case "A":
                         ProxyFactory.GetModuleProxy<ITemperatureSensor>().GenerateAnomaly(40);
                         break;
+                    case "M":
+                        await SetTrainerDefaults();
+                        return;
                     case "E":
                         return;
                     case "D":
@@ -57,7 +60,7 @@ namespace Thermostat.ServiceApp
         {
             //the order matters, reverse dependencies
             await SetVisualizerDefaults();
-            await SetAggregatorDefaults();
+            await SetTrainerDefaults();
             await SetOrchestratorDefaults();
             await SetTemperatureDefaults();
         }
@@ -212,17 +215,17 @@ namespace Thermostat.ServiceApp
             var res = await temperatureSensor.Twin.PublishAsync(twin);
             Console.WriteLine(JsonConvert.SerializeObject(twin, Formatting.Indented));
         }
-        private static async Task SetAggregatorDefaults()
+        private static async Task SetTrainerDefaults()
         {
-            Console.WriteLine("Setting AggregatorDefaults");
+            Console.WriteLine("Setting TrainerDefaults");
 
-            var dataAggregator = ProxyFactory.GetModuleProxy<IModelTraining>();
+            var dataTrainer = ProxyFactory.GetModuleProxy<IModelTraining>();
 
-            var twin = await dataAggregator.Twin.GetAsync();
+            var twin = await dataTrainer.Twin.GetAsync();
             twin.TumblingWindowPercentage = 10;
             twin.AggregationSize = 100;
 
-            var res = await dataAggregator.Twin.PublishAsync(twin);
+            var res = await dataTrainer.Twin.PublishAsync(twin);
             Console.WriteLine(JsonConvert.SerializeObject(res, Formatting.Indented));
         }
         private static async Task SetOrchestratorDefaults()

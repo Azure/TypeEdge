@@ -11,7 +11,6 @@ services:
     volumes:
     - env:/app/env
 
-
   preprocessor:  
     image: ${DOCKER_REGISTRY}orchestrator
     build:
@@ -41,5 +40,13 @@ services:
     build:
       context: .
       dockerfile: Modules/AnomalyDetection/Dockerfile
+    volumes:
+    - env:/app/env
+
+  visualization:
+    image: ${DOCKER_REGISTRY}visualization
+    build:
+      context: .
+      dockerfile: Modules/Visualization/Dockerfile
     volumes:
     - env:/app/env
