@@ -10,7 +10,7 @@ var charts = {};
 // header information, all data points, a function to return all points (getLog)
 // and functions to get the top Ten or top 100 points so far. Archer has mentioned
 // storing this in a database instead, which would help reduce space concerns.
-class Chart {    
+class Chart {
     updatePoints(newPoints) {
         if (this.append === true) {
             for (var i = 0; i < newPoints.length; i++) {
@@ -185,7 +185,7 @@ function load() {
                     // Does not exist, so let's create it.
                     charts[msg.Chart.Name] = new Chart(msg.Chart);
                 }
-                
+
                 if (msg.IsAnomaly) {
                     charts[msg.Chart.Name].updateAnomaly(msg.Points);
                 }
@@ -205,7 +205,7 @@ function load() {
             }
         });
     });
-    
+
 }
 
 
@@ -213,7 +213,7 @@ function load() {
 // This actually draws the chart. Possible parameterization: allow the user to determine
 // How many elements to pull out.
 function drawChart(chart) {
-    
+
     var top = getTop(chart);
     //console.log(top);
     var dataTable = google.visualization.arrayToDataTable(top); // This takes care of the first chart
@@ -229,7 +229,7 @@ function drawChart(chart) {
 }
 function drawFFT(chart) {
     var fft = FFTNayuki(chart.numToDraw);
-    
+
     /* Processing for FFT */
     var topNumbers = getTopNums(chart);
     var reals = [];
@@ -240,7 +240,7 @@ function drawFFT(chart) {
 
     // Format array for graph 
     var result = [];
-    
+
     for (var idx = 1; idx < reals.length; idx++) {
         result.push([topNumbers[idx][0], reals[idx], imags[idx]]);
     }

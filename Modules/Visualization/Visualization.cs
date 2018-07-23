@@ -107,9 +107,11 @@ namespace Modules
             visualizationMessage.messages[0] = chartData;
 
             // Todo:  make this an in-proc call, rather than SignalR
-
-            await _connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visualizationMessage));
-
+            try
+            {
+                await _connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visualizationMessage));
+            }
+            catch (Exception ex) { }
         }
     }
 }
