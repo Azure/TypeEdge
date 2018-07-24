@@ -67,8 +67,8 @@ move /Y *.nupkg ..\..\TypeEdgeNuGets
 
 REM nuget.exe push ..\..\TypeEdgeNuGets\*%version%.nupkg -ApiKey VSTS
 
-dotnet nuget locals http-cache --clear
-dotnet new --debug:reinit
+REM dotnet nuget locals http-cache --clear
+REM dotnet new --debug:reinit
 
 REM dotnet new -i TypeEdge.Application::*
 REM dotnet new -i TypeEdge.ML::*

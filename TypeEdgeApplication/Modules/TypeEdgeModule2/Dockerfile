@@ -5,7 +5,6 @@ FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
 COPY Modules/TypeEdgeModule2/TypeEdgeModule2.csproj Modules/TypeEdgeModule2/
 COPY TypeEdgeApplication.Shared/TypeEdgeApplication.Shared.csproj TypeEdgeApplication.Shared/
-COPY NuGet.Config ./
 RUN dotnet restore Modules/TypeEdgeModule2/TypeEdgeModule2.csproj
 COPY . .
 WORKDIR /src/Modules/TypeEdgeModule2

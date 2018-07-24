@@ -23,6 +23,7 @@ namespace TypeEdgeApplication.Proxy
 
             //TODO: Get your module proxies by contract
             var proxy = ProxyFactory.GetModuleProxy<ITypeEdgeModule1>();
+            proxy.ResetModule(100);
 
             Console.WriteLine("Press <ENTER> to exit..");
             Console.ReadLine();
