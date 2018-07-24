@@ -15,26 +15,21 @@ namespace TypeEdge.Volumes
             Module.RegisterVolume(Name);
         }
 
-        public bool TryWrite(T data, out string fileName)
-        {
-            var fn = $@"{DateTime.Now.Ticks}";
-            if (Module.SetFileData(Name, fn, data))
-            {
-                fileName = fn;
-                return true;
-            }
-            fileName = null;
+        public bool TryWrite(T data, string fileName)
+        {            
+            if (Module.SetReferenceData(Name, fileName, data))            
+                return true;                        
             return false;
         }
 
         public T Read(string fileName)
         {
-            return Module.GetFileData<T>(Name, fileName);
+            return Module.GetReferenceData<T>(Name, fileName);
         }
 
         public bool Delete(string fileName)
         {
-            return Module.DeleteFile(Name, fileName);
+            return Module.DeleteReference(Name, fileName);
         }
     }
 }

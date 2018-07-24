@@ -26,8 +26,8 @@ namespace TypeEdge.Modules.Endpoints
         {
             if (_volume != null)
             {
-                string fileName;
-                if (_volume.TryWrite(message, out fileName))
+                string fileName = $@"{DateTime.Now.Ticks}"; ;
+                if (_volume.TryWrite(message, fileName))
                 {
                     typeof(T).GetProperty("FileName").SetValue(message, fileName);
                     typeof(T).GetProperty("Message").SetValue(message, null);

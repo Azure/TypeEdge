@@ -358,16 +358,17 @@ namespace TypeEdge.Modules
             Volumes[volumeName] = volumePath;
         }
 
-        internal T GetFileData<T>(string name, string index)
-            where T : class, new()
+        internal T GetReferenceData<T>(string name, string index)
+            where T : class, IEdgeMessage, new()
         {
             try
             {
                 var path = Path.Combine(Volumes[name], index);
                 if (File.Exists(path))
                 {
+                    var result = new T();
                     var bytes = File.ReadAllBytes(path);
-                    var result = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes));
+                    result.SetBytes(bytes);
                     return result;
                 }
             }
@@ -378,13 +379,13 @@ namespace TypeEdge.Modules
             return null;
         }
 
-        internal bool SetFileData<T>(string name, string index, T value)
-            where T : class, new()
+        internal bool SetReferenceData<T>(string name, string index, T value)
+            where T : class, IEdgeMessage, new()
         {
             try
             {
                 var path = Path.Combine(Volumes[name], index);
-                var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value));
+                var bytes = value.GetBytes();
 
                 File.WriteAllBytes(path, bytes);
 
@@ -397,7 +398,7 @@ namespace TypeEdge.Modules
             return false;
         }
 
-        internal bool DeleteFile(string name, string index)
+        internal bool DeleteReference(string name, string index)
         {
             try
             {
