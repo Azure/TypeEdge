@@ -94,7 +94,7 @@
     <file src="TypeEdge.Host.targets" target="build\TypeEdge.Host.targets" />
     <file src="Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" target="build\Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" />
     <file src="Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem" target="build\Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem" />
-    <file src="Certificates\edge-hub-server\cert\edge-hub-server.cert.pem" target="build\Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" />
+    <file src="Certificates\edge-hub-server\cert\edge-hub-server.cert.pem" target="build\Certificates\edge-hub-server\cert\edge-hub-server.cert.pem" />
 
     <file src="appsettings_hub.json" target="build\Config\appsettings_hub.json" />
 
