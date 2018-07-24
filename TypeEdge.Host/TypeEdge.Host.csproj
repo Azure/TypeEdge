@@ -1,11 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>TypeEdge.Host</PackageId>
-    <Version>0.1.0</Version>
-    <Authors>paloukari</Authors>
-    <Company>Microsoft</Company>
-
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
 
