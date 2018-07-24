@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="paloukari.Python.Runtime" Version="2.4.64" />
-    <PackageReference Include="TypeEdge" Version="0.2.3" />
+    <PackageReference Include="TypeEdge" Version="0.2.4" />
   </ItemGroup>
   
   <ItemGroup>
