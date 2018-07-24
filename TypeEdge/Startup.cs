@@ -62,7 +62,7 @@ namespace TypeEdge
 
                 //check the file system, we are in docker-compose mode
                 var fileName = Path.Combine(Constants.ComposeConfigurationPath, $"{moduleName}.env");
-                var remainingSeconds = 30;
+                var remainingSeconds = 100;
                 while (remainingSeconds-- > 0)
                 {
                     if (File.Exists(fileName))
