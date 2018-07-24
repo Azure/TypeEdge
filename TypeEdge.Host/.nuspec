@@ -57,7 +57,7 @@
       <files include="build/Config/appsettings_hub.json" buildAction="None" copyToOutput="true"/>
       <files include="build/Certificates/edge-chain-ca/cert/edge-chain-ca.cert.pem" buildAction="None" copyToOutput="true" />
       <files include="build/Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem" buildAction="None" copyToOutput="true" />
-      <files include="build/Certificates/edge-hub-server/cert/edge-hub-server.cert.pfx" buildAction="None" copyToOutput="true" />
+      <files include="build/Certificates/edge-hub-server/cert/edge-hub-server.cert.pem" buildAction="None" copyToOutput="true" />
     </contentFiles>
   </metadata>
   <files>
