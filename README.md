@@ -16,7 +16,7 @@ Here is a quick video that demonstrates the value of **TypeEdge**
 ## Prerequisites
 
 The minimum requirements to get started with **TypeEdge** are:
- - The latest [.NET Core SDK](https://github.com/dotnet/core/blob/master/release-notes/download-archives/2.1.0-download.md) (version 2.1.300). To find your current version, run 
+ - The latest [.NET Core SDK](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.302) (version 2.1.302). To find your current version, run 
 `dotnet --version`
  -  An [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) 
 

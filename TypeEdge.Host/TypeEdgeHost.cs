@@ -207,6 +207,7 @@ namespace TypeEdge.Host
                 value: edgeConnectionString);
 
             var edgeHubConfiguration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -253,7 +254,9 @@ namespace TypeEdge.Host
                         moduleConnectionString);
 
                     var moduleConfiguration = new ConfigurationBuilder()
-                        .AddJsonFile("appsettings.json")
+                        
+                        .AddJsonFile($"{module.Name}Settings.json", true)
+                        .AddJsonFile("appsettings.json", true)
                         .AddEnvironmentVariables()
                         .Build();
 

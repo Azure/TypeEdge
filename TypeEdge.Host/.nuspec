@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>TypeEdge.Host</id>
-    <version>0.2.4</version>
+    <version>0.2.45</version>
     <authors>paloukari</authors>
     <owners>paloukari</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Package Description</description>
     <dependencies>
       <group targetFramework=".NETCoreApp2.1">
-        <dependency id="TypeEdge" version="0.2.4" exclude="Build,Analyzers" />
+        <dependency id="TypeEdge" version="0.2.45" exclude="Build,Analyzers" />
         <dependency id="Serilog.Extensions.Logging" version="1.4.0" exclude="Build,Analyzers" />
         <dependency id="Serilog.Sinks.Console" version="2.1.0" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.DependencyInjection" version="2.1.1" exclude="Build,Analyzers" />
@@ -57,7 +57,7 @@
       <files include="build/Config/appsettings_hub.json" buildAction="None" copyToOutput="true"/>
       <files include="build/Certificates/edge-chain-ca/cert/edge-chain-ca.cert.pem" buildAction="None" copyToOutput="true" />
       <files include="build/Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem" buildAction="None" copyToOutput="true" />
-      <files include="build/Certificates/edge-hub-server/cert/edge-hub-server.cert.pem" buildAction="None" copyToOutput="true" />
+      <files include="build/Certificates/edge-hub-server/cert/edge-hub-server.cert.pfx" buildAction="None" copyToOutput="true" />
     </contentFiles>
   </metadata>
   <files>
@@ -94,7 +94,7 @@
     <file src="TypeEdge.Host.targets" target="build\TypeEdge.Host.targets" />
     <file src="Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" target="build\Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" />
     <file src="Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem" target="build\Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem" />
-    <file src="Certificates\edge-hub-server\cert\edge-hub-server.cert.pem" target="build\Certificates\edge-hub-server\cert\edge-hub-server.cert.pem" />
+    <file src="Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" target="build\Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" />
 
     <file src="appsettings_hub.json" target="build\Config\appsettings_hub.json" />
 

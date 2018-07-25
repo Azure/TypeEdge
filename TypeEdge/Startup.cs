@@ -31,6 +31,7 @@ namespace TypeEdge
             containerBuilder.RegisterBuildCallback(c => { });
 
             var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
@@ -50,6 +51,13 @@ namespace TypeEdge
                 }
             }
 
+            configuration = new ConfigurationBuilder()
+             .AddJsonFile("appsettings.json", true)
+             .AddJsonFile($"{moduleName}Settings.json", true)
+             .AddEnvironmentVariables()
+             .AddCommandLine(args)
+             .Build();
+
             var (moduleType, _) = GetModuleTypes(moduleName);
 
             if (moduleType == null)
@@ -68,6 +76,8 @@ namespace TypeEdge
                     if (File.Exists(fileName))
                     {
                         configuration = new ConfigurationBuilder()
+                            .AddJsonFile("appsettings.json", true)
+                            .AddJsonFile($"{moduleName}Settings.json", true)
                             .AddEnvironmentVariables()
                             .AddCommandLine(args)
                             .AddDotenvFile(fileName)
