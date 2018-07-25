@@ -21,7 +21,7 @@ namespace Modules
 {
     public class Visualization : EdgeModule, IVisualization
     {
-        object _sync = new object();
+        readonly object _sync = new object();
 
         IWebHost _webHost;
         HubConnection _connection;
@@ -96,13 +96,16 @@ namespace Modules
                 chartConfig = _chartDataDictionary[data.CorrelationID];
             }
 
-            var visualizationMessage = new VisualizationMessage();
-            visualizationMessage.messages = new ChartData[1];
-            var chartData = new ChartData();
-
-            chartData.Chart = chartConfig;
-            chartData.Points = data.Values;
-            chartData.IsAnomaly = data.Anomaly;
+            var visualizationMessage = new VisualizationMessage
+            {
+                messages = new ChartData[1]
+            };
+            var chartData = new ChartData
+            {
+                Chart = chartConfig,
+                Points = data.Values,
+                IsAnomaly = data.Anomaly
+            };
 
             visualizationMessage.messages[0] = chartData;
 

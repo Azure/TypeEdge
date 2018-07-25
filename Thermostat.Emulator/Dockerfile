@@ -1,4 +1,4 @@
-ARG base_tag=2.1.0-runtime-bionic
+ARG base_tag=2.1.2-runtime-bionic
 FROM microsoft/dotnet:${base_tag} AS base
 
 # Add an unprivileged user account for running Edge Hub
@@ -32,13 +32,13 @@ EXPOSE 443/tcp
  
 WORKDIR /app
 
-FROM microsoft/dotnet:2.1-sdk AS build
+FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
 COPY Thermostat.Emulator/Thermostat.Emulator.csproj Thermostat.Emulator/
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
 COPY Modules/Orchestrator/Orchestrator.csproj Modules/Orchestrator/
 COPY Modules/TemperatureSensor/TemperatureSensor.csproj Modules/TemperatureSensor/
-COPY Modules/DataSampling/DataSampling.csproj Modules/DataSampling/
+COPY Modules/ModelTraining/ModelTraining.csproj Modules/ModelTraining/
 COPY Modules/AnomalyDetection/AnomalyDetection.csproj Modules/AnomalyDetection/
 COPY Modules/Visualization/Visualization.csproj Modules/Visualization/
 COPY Modules/VisualizationWeb/VisualizationWeb.csproj Modules/VisualizationWeb/

@@ -11,7 +11,7 @@ services:
     volumes:
     - env:/app/env
 
-  preprocessor:  
+  orchestrator:  
     image: ${DOCKER_REGISTRY}orchestrator
     build:
       context: .

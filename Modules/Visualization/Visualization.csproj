@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="1.0.2" />
-    <PackageReference Include="TypeEdge" Version="0.2.4" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+    <PackageReference Include="TypeEdge" Version="0.2.45" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +27,15 @@
     <None Include="..\VisualizationWeb\wwwroot\**\*.*" CopyToOutputDirectory="PreserveNewest">
       <Link>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="visualizationsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="visualizationSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
   
 </Project>

@@ -4,7 +4,7 @@ High Frequency Unsupervised **Anomaly Detection on the Edge** using  [TypeEdge](
 
 ## Prerequisites
 The minimum requirements to get started with **TypeEdge.AnomalyDetection** are:
- - The latest [.NET Core SDK](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.301) (version 2.1.301). To find your current version, run 
+ - The latest [.NET Core SDK](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.302) (version 2.1.302). To find your current version, run 
 `dotnet --version`
  -  An [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal)
 

@@ -1,8 +1,8 @@
-ARG base_tag=2.1.0-runtime-bionic
+ARG base_tag=2.1.2-runtime-bionic
 FROM microsoft/dotnet:${base_tag} AS base
 WORKDIR /app
 
-FROM microsoft/dotnet:2.1-sdk AS build
+FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
 COPY Modules/Orchestrator/Orchestrator.csproj Modules/Orchestrator/
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/

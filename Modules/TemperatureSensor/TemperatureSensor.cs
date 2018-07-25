@@ -16,8 +16,8 @@ namespace Modules
 {
     public class TemperatureSensor : EdgeModule, ITemperatureSensor
     {
-        object _sync = new object();
-        DateTime _startTimeStamp;
+        readonly object _sync = new object();
+        readonly DateTime _startTimeStamp;
         //default values
         double _anomalyOffset = 0.0;
         double _samplingRateHz = 1.0;
