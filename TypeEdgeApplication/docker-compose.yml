@@ -9,7 +9,7 @@ services:
       context: .
       dockerfile: TypeEdgeApplication.Emulator/DockerfileEmpty
     volumes:
-    - env:/env
+    - env:/app/env
 
   module1image:
     image: ${DOCKER_REGISTRY}module1image
@@ -17,7 +17,7 @@ services:
       context: .
       dockerfile: Modules/TypeEdgeModule1/Dockerfile
     volumes:
-    - env:/env
+    - env:/app/env
 
   module2image:
     image: ${DOCKER_REGISTRY}module2image   
@@ -25,5 +25,5 @@ services:
       context: .
       dockerfile: Modules/TypeEdgeModule2/Dockerfile
     volumes:
-    - env:/env
+    - env:/app/env
 

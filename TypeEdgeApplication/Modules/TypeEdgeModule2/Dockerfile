@@ -1,7 +1,8 @@
-ARG base_tag=2.1-runtime-stretch-slim
+ARG base_tag=2.1.2-runtime-bionic
 FROM microsoft/dotnet:${base_tag} AS base
+WORKDIR /app
 
-FROM microsoft/dotnet:2.1-sdk AS build
+FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
 COPY Modules/TypeEdgeModule2/TypeEdgeModule2.csproj Modules/TypeEdgeModule2/
 COPY TypeEdgeApplication.Shared/TypeEdgeApplication.Shared.csproj TypeEdgeApplication.Shared/

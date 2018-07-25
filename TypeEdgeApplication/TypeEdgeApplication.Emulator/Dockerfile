@@ -1,4 +1,4 @@
-ARG base_tag=2.1-runtime-stretch-slim
+ARG base_tag=2.1.2-runtime-bionic
 FROM microsoft/dotnet:${base_tag} AS base
 
 # Add an unprivileged user account for running Edge Hub
@@ -21,21 +21,28 @@ RUN apt-get update && \
 # we are starting edge hub as a non-root user
 RUN setcap 'cap_net_bind_service=+ep' /usr/share/dotnet/dotnet
 
+WORKDIR /app
+
+COPY $EXE_DIR/ ./
+
 # Expose MQTT and HTTPS ports 
 EXPOSE 8883/tcp
 EXPOSE 443/tcp
 
-FROM microsoft/dotnet:2.1-sdk AS build
+ 
+WORKDIR /app
+
+FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
 COPY TypeEdgeApplication.Emulator/TypeEdgeApplication.Emulator.csproj TypeEdgeApplication.Emulator/
 COPY TypeEdgeApplication.Shared/TypeEdgeApplication.Shared.csproj TypeEdgeApplication.Shared/
 COPY Modules/TypeEdgeModule2/TypeEdgeModule2.csproj Modules/TypeEdgeModule2/
 COPY Modules/TypeEdgeModule1/TypeEdgeModule1.csproj Modules/TypeEdgeModule1/
 
+COPY ./.env Thermostat.Emulator/
 COPY NuGet.Config ./
 RUN dotnet restore TypeEdgeApplication.Emulator/TypeEdgeApplication.Emulator.csproj
 COPY . .
-COPY ./.env Thermostat.Emulator/
 WORKDIR /src/TypeEdgeApplication.Emulator
 RUN dotnet build TypeEdgeApplication.Emulator.csproj -c Release -o /app
 
