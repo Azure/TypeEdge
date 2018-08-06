@@ -99,6 +99,7 @@ namespace TypeEdge
             }
 
             containerBuilder.RegisterType(moduleType);
+            containerBuilder.RegisterInstance(configuration);
 
             var moduleDepedencies = moduleType.GetConstructors().First().GetParameters();
             var moduleDepedencyTypes = moduleDepedencies.Where(i => i.ParameterType.IsInterface &&
@@ -119,8 +120,8 @@ namespace TypeEdge
             Module = container.Resolve(moduleType) as EdgeModule;
             if (Module != null)
             {
-                Module.InternalConfigure(configuration);
-                await Module.InternalRunAsync();
+                Module._Init(configuration, container);
+                await Module._RunAsync();
             }
 
 
@@ -141,8 +142,7 @@ namespace TypeEdge
             if (moduleType == null)
                 return null;
 
-            var moduleInterfaceType = moduleType.GetProxyInterface();
-            return moduleInterfaceType.Name.Substring(1).ToLower();
+            return moduleType.GetProxyInterface().GetModuleName();
         }
 
         public static Task WhenCancelled(CancellationToken cancellationToken)
@@ -169,7 +169,7 @@ namespace TypeEdge
             var moduleType = assembly.GetTypes().SingleOrDefault(t =>
                 t.GetInterfaces().SingleOrDefault(i =>
                     i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null &&
-                    String.Equals(i.Name.Substring(1), moduleName, StringComparison.InvariantCultureIgnoreCase)) != null);
+                    String.Equals(i.GetModuleName(), moduleName, StringComparison.InvariantCultureIgnoreCase)) != null);
 
             if (moduleType == null)
             {

@@ -26,6 +26,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using HubService = Microsoft.Azure.Devices.Edge.Hub.Service;
 using Module = Microsoft.Azure.Devices.Module;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using System.Globalization;
 
 namespace TypeEdge.Host
 {
@@ -70,7 +73,16 @@ namespace TypeEdge.Host
             where TIModule : class
             where TTModule : class
         {
-            _containerBuilder.RegisterType<TTModule>();
+            var moduleName = typeof(TIModule).GetModuleName();
+
+            _containerBuilder.RegisterType<TTModule>().WithParameter(
+                (pi, ctx) => pi.ParameterType == typeof(IConfigurationRoot),
+                (pi, ctx) => new ConfigurationBuilder()
+                        .AddJsonFile($"{moduleName}Settings.json", true)
+                        .AddJsonFile("appsettings.json", true)
+                        .AddEnvironmentVariables()
+                        .Build());
+
             _containerBuilder.RegisterInstance(new ProxyGenerator()
                 .CreateInterfaceProxyWithoutTarget<TIModule>(new ModuleProxy<TIModule>()));
         }
@@ -118,7 +130,7 @@ namespace TypeEdge.Host
             //start all modules
             if (!_inContainer)
                 foreach (var module in _modules)
-                    tasks.Add(module.InternalRunAsync());
+                    tasks.Add(module._RunAsync());
 
             await Task.WhenAll(tasks.ToArray());
         }
@@ -161,9 +173,28 @@ namespace TypeEdge.Host
 
         private void BuildContainer()
         {
-            var services = new ServiceCollection().AddLogging();
+            var services = new ServiceCollection().AddSingleton(new LoggerFactory()
+                .AddConsole()
+                .AddSerilog()
+                .AddDebug());
+            services.AddLogging();
+
+            Log.Logger = new LoggerConfiguration()
+                 .MinimumLevel.Debug()
+                 .Enrich.FromLogContext()
+                 .CreateLogger();
+
             _containerBuilder.Populate(services);
             _containerBuilder.RegisterBuildCallback(c => { });
+
+            _containerBuilder.Register((ss, p) =>
+            {
+                return new ConfigurationBuilder()
+                            .AddJsonFile($"Settings.json", true)
+                            .AddJsonFile("appsettings.json", true)
+                            .AddEnvironmentVariables()
+                            .Build();
+            });
 
             _container = _containerBuilder.Build();
         }
@@ -211,7 +242,7 @@ namespace TypeEdge.Host
                 .AddEnvironmentVariables()
                 .Build();
 
-            _hub.InternalConfigure(edgeHubConfiguration);
+            _hub._Init(edgeHubConfiguration, _container);
         }
 
         private void ConfigureModules()
@@ -254,13 +285,12 @@ namespace TypeEdge.Host
                         moduleConnectionString);
 
                     var moduleConfiguration = new ConfigurationBuilder()
-                        
                         .AddJsonFile($"{module.Name}Settings.json", true)
                         .AddJsonFile("appsettings.json", true)
                         .AddEnvironmentVariables()
                         .Build();
 
-                    module.InternalConfigure(moduleConfiguration);
+                    module._Init(moduleConfiguration, _container);
                 }
             }
         }

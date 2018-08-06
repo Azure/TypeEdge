@@ -13,13 +13,13 @@ namespace TypeEdge.Host.Hub
         internal override string Name => Agent.Constants.EdgeHubModuleIdentityName;
         private IConfigurationRoot HubServiceConfiguration { get; set; }
 
-        public override CreationResult Configure(IConfigurationRoot configuration)
+        public override InitializationResult Init()
         {
             HubServiceConfiguration = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
 
-            return CreationResult.Ok;
+            return InitializationResult.Ok;
         }
 
         public override async Task<ExecutionResult> RunAsync()

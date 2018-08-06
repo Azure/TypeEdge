@@ -20,6 +20,9 @@ using TypeEdge.Twins;
 using TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Autofac;
+using Castle.DynamicProxy;
+using TypeEdge.Proxy;
 
 [assembly: InternalsVisibleTo("TypeEdge.Host")]
 [assembly: InternalsVisibleTo("TypeEdge.Proxy")]
@@ -28,13 +31,14 @@ namespace TypeEdge.Modules
 {
     public abstract class EdgeModule : IDisposable
     {
+        #region members
         private readonly Dictionary<string, MethodCallback> _methodSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> _routeSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
         private string _connectionString;
         private ModuleClient _ioTHubModuleClient;
-        
         private ITransportSettings[] _transportSettings;
+        #endregion
 
         protected EdgeModule()
         {
@@ -48,6 +52,7 @@ namespace TypeEdge.Modules
             InstantiateProperties();
         }
 
+        #region properties
         internal virtual string Name
         {
             get
@@ -60,10 +65,11 @@ namespace TypeEdge.Modules
                 return proxyInterface.Name.Substring(1).ToLower(CultureInfo.CurrentCulture);
             }
         }
-
-        internal List<string> Routes { get; set; }
-
         public Dictionary<string, string> Volumes { get; }
+        internal List<string> Routes { get; set; }
+        #endregion
+
+        #region virtual methods
 
         internal virtual Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : IModuleTwin, new()
@@ -80,18 +86,27 @@ namespace TypeEdge.Modules
             return typeTwin;
         }
 
-
         public virtual Task<ExecutionResult> RunAsync()
         {
             return Task.FromResult(ExecutionResult.Ok);
         }
 
-        public virtual CreationResult Configure(IConfigurationRoot configuration)
+        public virtual InitializationResult Init()
         {
-            return CreationResult.Ok;
+            return InitializationResult.Ok;
+        }
+        #endregion
+
+        protected T GetProxy<T>()
+            where T : class
+        {
+            var cb = new ContainerBuilder();
+            cb.RegisterInstance(new ProxyGenerator()
+                .CreateInterfaceProxyWithoutTarget<T>(new ModuleProxy<T>()));
+            return cb.Build().Resolve<T>();
         }
 
-        internal async Task<ExecutionResult> InternalRunAsync()
+        internal async Task<ExecutionResult> _RunAsync()
         {
             RegisterMethods();
 
@@ -123,43 +138,13 @@ namespace TypeEdge.Modules
             return await RunAsync();
         }
 
-        private Task<MethodResponse> MethodCallback(MethodRequest methodRequest, object userContext)
-        {
-            //Console.WriteLine($"{Name}:MethodCallback called");
-            if (!(userContext is MethodCallback callback))
-                throw new InvalidOperationException($"{Name}:UserContext doesn't contain a valid SubscriptionCallback");
-
-            var paramValues = JsonConvert.DeserializeObject<object[]>(methodRequest.DataAsJson);
-
-            try
-            {
-                var paramTypes = callback.MethodInfo.GetParameters();
-
-                for (var i = 0; i < paramTypes.Length; i++)
-                    paramValues[i] = Convert.ChangeType(paramValues[i], paramTypes[i].ParameterType);
-
-                var res = callback.MethodInfo.Invoke(this, paramValues);
-                return Task.FromResult(
-                    new MethodResponse(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(res)), 200));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{Name}:ERROR:{ex}");
-
-                // Acknowlege the direct method call with a 400 error message
-                var result = "{\"result\":\"" + ex.Message + "\"}";
-                return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 400));
-            }
-        }
-
-        internal CreationResult InternalConfigure(IConfigurationRoot configuration)
+        internal InitializationResult _Init(IConfigurationRoot configuration, IContainer container)
         {
             //Console.WriteLine($"{Name}:InternalConfigure called");
 
             _connectionString = configuration.GetValue<string>($"{Constants.EdgeHubConnectionStringKey}");
             if (string.IsNullOrEmpty(_connectionString))
                 throw new ArgumentException($"Missing {Constants.EdgeHubConnectionStringKey} in configuration for {Name}");
-
 
             // Cert verification is not yet fully functional when using Windows OS for the container
             var bypassCertVerification = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -172,7 +157,7 @@ namespace TypeEdge.Modules
                 true;
             _transportSettings = new ITransportSettings[] { settings };
 
-            return Configure(configuration);
+            return Init();
         }
 
         internal async Task<PublishResult> PublishMessageAsync<T>(string outputName, T message)
@@ -222,6 +207,130 @@ namespace TypeEdge.Modules
             //Console.WriteLine($"{Name}:SubscribeTwin called");
 
             _twinSubscriptions[name] = new SubscriptionCallback(name, handler, typeof(T));
+        }
+
+        internal async Task ReportTwinAsync<T>(string name, T twin)
+            where T : IModuleTwin
+        {
+            //Console.WriteLine($"{Name}:ReportTwinAsync called");
+            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
+        }
+
+        internal void RegisterVolume(string volumeName)
+        {
+            if (Volumes.Keys.Contains(volumeName))
+                return;
+
+            var volumePath = volumeName.ToLower();
+
+            if (!Directory.Exists(volumePath))
+            {
+                var di = Directory.CreateDirectory(volumePath);
+            }
+
+            Volumes[volumeName] = volumePath;
+        }
+
+        internal T GetReferenceData<T>(string name, string index)
+            where T : class, IEdgeMessage, new()
+        {
+            try
+            {
+                var path = Path.Combine(Volumes[name], index);
+                if (File.Exists(path))
+                {
+                    var result = new T();
+                    var bytes = File.ReadAllBytes(path);
+                    result.SetBytes(bytes);
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{Name}:ERROR:{ex}");
+            }
+            return null;
+        }
+
+        internal bool SetReferenceData<T>(string name, string index, T value)
+            where T : class, IEdgeMessage, new()
+        {
+            try
+            {
+                var path = Path.Combine(Volumes[name], index);
+                var bytes = value.GetBytes();
+
+                File.WriteAllBytes(path, bytes);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{Name}:ERROR:{ex}");
+            }
+            return false;
+        }
+
+        internal bool DeleteReferenceData(string name, string index)
+        {
+            try
+            {
+                var path = Path.Combine(Volumes[name], index);
+                if (File.Exists(path))
+                    File.Delete(path);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{Name}:ERROR:{ex}");
+            }
+            return false;
+        }
+
+        public void Dispose()
+        {
+            if (Volumes != null)
+                foreach (var item in Volumes)
+                {
+                    try
+                    {
+                        //todo:empty or not?
+                        //if (Directory.Exists(item.Value))
+                        //    Directory.Delete(item.Value);
+                    }
+                    catch { }
+                }
+        }
+
+        #region private methods
+
+        private Task<MethodResponse> MethodCallback(MethodRequest methodRequest, object userContext)
+        {
+            //Console.WriteLine($"{Name}:MethodCallback called");
+            if (!(userContext is MethodCallback callback))
+                throw new InvalidOperationException($"{Name}:UserContext doesn't contain a valid SubscriptionCallback");
+
+            var paramValues = JsonConvert.DeserializeObject<object[]>(methodRequest.DataAsJson);
+
+            try
+            {
+                var paramTypes = callback.MethodInfo.GetParameters();
+
+                for (var i = 0; i < paramTypes.Length; i++)
+                    paramValues[i] = Convert.ChangeType(paramValues[i], paramTypes[i].ParameterType);
+
+                var res = callback.MethodInfo.Invoke(this, paramValues);
+                return Task.FromResult(
+                    new MethodResponse(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(res)), 200));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"{Name}:ERROR:{ex}");
+
+                // Acknowlege the direct method call with a 400 error message
+                var result = "{\"result\":\"" + ex.Message + "\"}";
+                return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 400));
+            }
         }
 
         private async Task<MessageResponse> MessageHandler(Message message, object userContext)
@@ -336,97 +445,6 @@ namespace TypeEdge.Modules
                 _methodSubscriptions[method.Name] = new MethodCallback(method.Name, method);
         }
 
-        internal async Task ReportTwinAsync<T>(string name, T twin)
-            where T : IModuleTwin
-        {
-            //Console.WriteLine($"{Name}:ReportTwinAsync called");
-            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
-        }
-
-        internal void RegisterVolume(string volumeName)
-        {
-            if (Volumes.Keys.Contains(volumeName))
-                return;
-
-            var volumePath = volumeName.ToLower();
-
-            if (!Directory.Exists(volumePath))
-            {
-                var di = Directory.CreateDirectory(volumePath);
-            }
-
-            Volumes[volumeName] = volumePath;
-        }
-
-        internal T GetReferenceData<T>(string name, string index)
-            where T : class, IEdgeMessage, new()
-        {
-            try
-            {
-                var path = Path.Combine(Volumes[name], index);
-                if (File.Exists(path))
-                {
-                    var result = new T();
-                    var bytes = File.ReadAllBytes(path);
-                    result.SetBytes(bytes);
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{Name}:ERROR:{ex}");
-            }
-            return null;
-        }
-
-        internal bool SetReferenceData<T>(string name, string index, T value)
-            where T : class, IEdgeMessage, new()
-        {
-            try
-            {
-                var path = Path.Combine(Volumes[name], index);
-                var bytes = value.GetBytes();
-
-                File.WriteAllBytes(path, bytes);
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{Name}:ERROR:{ex}");
-            }
-            return false;
-        }
-
-        internal bool DeleteReference(string name, string index)
-        {
-            try
-            {
-                var path = Path.Combine(Volumes[name], index);
-                if (File.Exists(path))
-                    File.Delete(path);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"{Name}:ERROR:{ex}");
-            }
-            return false;
-        }
-
-        public void Dispose()
-        {
-            if (Volumes != null)
-                foreach (var item in Volumes)
-                {
-                    try
-                    {
-                        //todo:empty or not?
-                        //if (Directory.Exists(item.Value))
-                        //    Directory.Delete(item.Value);
-                    }
-                    catch { }
-                }
-        }
+        #endregion
     }
 }

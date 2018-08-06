@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -8,6 +9,11 @@ namespace TypeEdge
 {
     public static class Extensions
     {
+        public static string GetModuleName(this Type type)
+        {
+            return type.Name.Substring(1).ToLower(CultureInfo.CurrentCulture);
+        }
+
         public static T1 CopyFrom<T1, T2>(this T1 obj, T2 otherObject)
             where T1 : class
             where T2 : class
