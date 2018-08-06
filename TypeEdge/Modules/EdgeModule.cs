@@ -95,7 +95,12 @@ namespace TypeEdge.Modules
         {
             return InitializationResult.Ok;
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+        }
         #endregion
+
 
         protected T GetProxy<T>()
             where T : class
@@ -112,7 +117,7 @@ namespace TypeEdge.Modules
 
             // Open a connection to the Edge runtime
             _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, _transportSettings);
-            
+
             await _ioTHubModuleClient.OpenAsync();
             //Console.WriteLine($"{Name}:IoT Hub module client initialized.");
 
@@ -289,6 +294,8 @@ namespace TypeEdge.Modules
 
         public void Dispose()
         {
+            Dispose(true);
+
             if (Volumes != null)
                 foreach (var item in Volumes)
                 {
@@ -300,8 +307,9 @@ namespace TypeEdge.Modules
                     }
                     catch { }
                 }
-        }
 
+            GC.SuppressFinalize(this);
+        }
         #region private methods
 
         private Task<MethodResponse> MethodCallback(MethodRequest methodRequest, object userContext)
