@@ -29,7 +29,7 @@ namespace TypeEdge.Volumes
 
         public bool Delete(string fileName)
         {
-            return Module.DeleteReference(Name, fileName);
+            return Module.DeleteReferenceData(Name, fileName);
         }
     }
 }
