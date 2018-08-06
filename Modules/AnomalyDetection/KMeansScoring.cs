@@ -7,8 +7,7 @@ namespace AnomalyDetectionAlgorithms
     public class KMeansScoring : IScorer
     {
         int _numClusters;
-
-        object sync = new object();
+        readonly object sync = new object();
         double[] _sampleMeans;
         double[] _sampleStandardDeviations;
         double[] _clustersRadius;

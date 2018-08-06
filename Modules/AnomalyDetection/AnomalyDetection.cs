@@ -6,22 +6,27 @@ using TypeEdge.Modules.Messages;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace Modules
 {
     public class AnomalyDetection : EdgeModule, IAnomalyDetection
     {
-        object _syncSample = new object();
+        readonly object _syncSample = new object();
         object _syncClustering = new object();
         
-        int _numClusters = 3;
+        int kMeansClusters = 4;
         KMeansScoring _kMeansScoring;
 
         public Output<Anomaly> Anomaly { get; set; }
 
-        public AnomalyDetection(IOrchestrator orcherstratorProxy, IModelTraining modelTrainingProxy)
+        public AnomalyDetection(IConfigurationRoot config)
         {
-            orcherstratorProxy.Detection.Subscribe(this, async signal =>
+            kMeansClusters = Convert.ToInt32(config["kMeansClusters"]);
+
+            GetProxy<IOrchestrator>().Detection.Subscribe(this, async signal =>
             {
                 try
                 {
@@ -41,12 +46,12 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            modelTrainingProxy.Model.Subscribe(this, async (model) =>
+            GetProxy<IModelTraining>().Model.Subscribe(this, (model) =>
             {
                 //if the messages has been stored and forwarded, but the file has been deleted (e.g. a restart)
                 //then the message can be empty (null)
                 if (model == null)
-                    return MessageResult.Ok;
+                    return Task.FromResult(MessageResult.Ok);
 
                 try
                 {
@@ -55,7 +60,7 @@ namespace Modules
                         switch (model.Algorithm)
                         {
                             case ThermostatApplication.Algorithm.kMeans:
-                                _kMeansScoring = new KMeansScoring(_numClusters);
+                                _kMeansScoring = new KMeansScoring(kMeansClusters);
                                 _kMeansScoring.DeserializeModel(model.DataJson);
                                 break;
                             case ThermostatApplication.Algorithm.LSTM:
@@ -69,7 +74,7 @@ namespace Modules
                     Console.WriteLine(ex);
                 }
 
-                return MessageResult.Ok;
+                return Task.FromResult(MessageResult.Ok);
             });
         }
     }

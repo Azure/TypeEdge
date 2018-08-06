@@ -22,30 +22,32 @@ namespace Modules
     public class Visualization : EdgeModule, IVisualization
     {
         readonly object _sync = new object();
-
+        readonly IConfigurationRoot _configuration;
         IWebHost _webHost;
         HubConnection _connection;
         Dictionary<string, Chart> _chartDataDictionary;
 
         public ModuleTwin<VisualizationTwin> Twin { get; set; }
 
-        public override CreationResult Configure(IConfigurationRoot configuration)
+        public override InitializationResult Init()
         {
             _webHost = new WebHostBuilder()
-                .UseConfiguration(configuration)
+                .UseConfiguration(_configuration)
                 .UseKestrel()
                 .UseContentRoot(Path.Combine(Directory.GetCurrentDirectory()))
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
 
-            _connection = new HubConnectionBuilder().WithUrl($"{configuration["server.urls"].Split(';')[0]}/visualizerhub").Build();
+            _connection = new HubConnectionBuilder().WithUrl($"{_configuration["server.urls"].Split(';')[0]}/visualizerhub").Build();
             
-            return base.Configure(configuration);
+            return base.Init();
         }
 
-        public Visualization(IOrchestrator proxy)
+        public Visualization(IOrchestrator proxy, IConfigurationRoot configuration)
         {
+            _configuration = configuration;
+
             _chartDataDictionary = new Dictionary<string, Chart>();
 
             proxy.Visualization.Subscribe(this, async (e) =>
@@ -54,12 +56,12 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            Twin.Subscribe(async twin =>
+            Twin.Subscribe(twin =>
             {
                 Console.WriteLine($"{typeof(Visualization).Name}::Twin update");
 
                 ConfigureCharts(twin);
-                return TwinResult.Ok;
+                return Task.FromResult(TwinResult.Ok);
             });
         }
 
@@ -114,7 +116,7 @@ namespace Modules
             {
                 await _connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visualizationMessage));
             }
-            catch (Exception ex) { }
+            catch (Exception) { }
         }
     }
 }
