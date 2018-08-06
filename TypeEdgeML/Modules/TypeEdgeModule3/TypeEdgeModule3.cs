@@ -26,7 +26,7 @@ namespace Modules
 
         private string _code;
         private SingleThreadTaskScheduler _pythonTaskScheduler;
-        public override CreationResult Configure(IConfigurationRoot configuration)
+        public override InitializationResult Init()
         {
             var cts = new CancellationTokenSource();
             _pythonTaskScheduler = new SingleThreadTaskScheduler(cts.Token);
@@ -49,7 +49,7 @@ namespace Modules
 
             _code = File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "pythagorean.py"));
 
-            return string.IsNullOrEmpty(_code) ? CreationResult.Error : CreationResult.Ok;
+            return string.IsNullOrEmpty(_code) ? InitializationResult.Error : InitializationResult.Ok;
         }
 
         public TypeEdgeModule3(ITypeEdgeModule2 proxy)
