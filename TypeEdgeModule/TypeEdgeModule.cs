@@ -15,15 +15,14 @@ namespace Modules
         public Output<TypeEdgeModuleOutput> Output { get; set; }
         public ModuleTwin<TypeEdgeModuleTwin> Twin { get; set; }
 
-        public override async Task<ExecutionResult> RunAsync()
+        public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 await Output.PublishAsync(new TypeEdgeModuleOutput());
-                Thread.Sleep(1000);
-            }
-
-            return await base.RunAsync();
+                await Task.Delay(1000);
+            }    
+            return ExecutionResult.Ok;
         }
     }
 }

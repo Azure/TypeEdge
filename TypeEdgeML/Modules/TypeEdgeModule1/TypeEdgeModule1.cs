@@ -23,14 +23,15 @@ namespace Modules
             return true;
         }
 
-        public override async Task<ExecutionResult> RunAsync()
+        public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 await Output.PublishAsync(new TypeEdgeModule1Output {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)});
                 Console.WriteLine("TypeEdgeModule1: Generated Message");
-                Thread.Sleep(1000);
+                await Task.Delay(1000);
             }
+            return ExecutionResult.Ok;
         }
     }
 }
