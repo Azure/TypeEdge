@@ -25,6 +25,10 @@ namespace TypeEdge
 
         public static async Task DockerEntryPoint(string[] args)
         {
+            var cancellationTokenSource = new CancellationTokenSource();
+            AssemblyLoadContext.Default.Unloading += (ctx) => cancellationTokenSource.Cancel();
+            Console.CancelKeyPress += (sender, cpe) => cancellationTokenSource.Cancel();
+            
             var services = new ServiceCollection().AddLogging();
             var containerBuilder = new ContainerBuilder();
             containerBuilder.Populate(services);
@@ -121,15 +125,9 @@ namespace TypeEdge
             if (Module != null)
             {
                 Module._Init(configuration, container);
-                await Module._RunAsync();
+                await Module._RunAsync(cancellationTokenSource.Token);
             }
-
-
-            // Wait until the app unloads or is cancelled
-            var cts = new CancellationTokenSource();
-            AssemblyLoadContext.Default.Unloading += (ctx) => cts.Cancel();
-            Console.CancelKeyPress += (sender, cpe) => cts.Cancel();
-            await WhenCancelled(cts.Token);
+            await cancellationTokenSource.Token.WhenCanceled();
         }
 
         private static string DiscoverModuleName()

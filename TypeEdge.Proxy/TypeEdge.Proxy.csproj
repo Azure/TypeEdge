@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>TypeEdge.Proxy</PackageId>
-    <Version>0.2.462</Version>
+    <Version>0.2.48</Version>
     <Authors>paloukari</Authors>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

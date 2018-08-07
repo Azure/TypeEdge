@@ -4,11 +4,19 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TypeEdge
 {
     public static class Extensions
     {
+        public static Task WhenCanceled(this CancellationToken cancellationToken)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).SetResult(true), tcs);
+            return tcs.Task;
+        }
         public static string GetModuleName(this Type type)
         {
             return type.Name.Substring(1).ToLower(CultureInfo.CurrentCulture);

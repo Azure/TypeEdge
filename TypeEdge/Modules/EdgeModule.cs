@@ -86,7 +86,7 @@ namespace TypeEdge.Modules
             return typeTwin;
         }
 
-        public virtual Task<ExecutionResult> RunAsync()
+        public virtual Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(ExecutionResult.Ok);
         }
@@ -111,7 +111,7 @@ namespace TypeEdge.Modules
             return cb.Build().Resolve<T>();
         }
 
-        internal async Task<ExecutionResult> _RunAsync()
+        internal async Task<ExecutionResult> _RunAsync(CancellationToken cancellationToken)
         {
             RegisterMethods();
 
@@ -140,7 +140,7 @@ namespace TypeEdge.Modules
             }
 
             //Console.WriteLine($"{Name}:Running RunAsync..");
-            return await RunAsync();
+            return await RunAsync(cancellationToken);
         }
 
         internal InitializationResult _Init(IConfigurationRoot configuration, IContainer container)
