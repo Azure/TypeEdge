@@ -12,6 +12,7 @@ using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace Modules
 {
@@ -113,7 +114,7 @@ namespace Modules
                 await Task.WhenAll(messages).ConfigureAwait(false);
         }
 
-        public override async Task<ExecutionResult> RunAsync()
+        public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
             await Twin.GetAsync();
             return ExecutionResult.Ok;

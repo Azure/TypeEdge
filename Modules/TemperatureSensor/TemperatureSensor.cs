@@ -71,12 +71,12 @@ namespace Modules
                 _anomalyOffset = value;
         }
 
-        public override async Task<ExecutionResult> RunAsync()
+        public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
             var twin = await Twin.GetAsync();
             ConfigureGenerator(twin);
 
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 double newValue;
                 double offset;

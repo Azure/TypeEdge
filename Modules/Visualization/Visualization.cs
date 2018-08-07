@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Messages.Visualization;
@@ -80,12 +81,12 @@ namespace Modules
                 };
         }
 
-        public override async Task<ExecutionResult> RunAsync()
+        public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
             ConfigureCharts(await Twin.GetAsync());
             await _webHost.StartAsync();
             await _connection.StartAsync();
-            return await base.RunAsync();
+            return ExecutionResult.Ok;
         }
 
         private async Task RenderAsync(GraphData data)
