@@ -29,6 +29,7 @@ using Module = Microsoft.Azure.Devices.Module;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System.Globalization;
+using System.Runtime.Loader;
 
 namespace TypeEdge.Host
 {
@@ -118,19 +119,28 @@ namespace TypeEdge.Host
                 File.Delete(file);
         }
 
-
         public async Task RunAsync()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            AssemblyLoadContext.Default.Unloading += (ctx) => cancellationTokenSource.Cancel();
+            Console.CancelKeyPress += (sender, cpe) => cancellationTokenSource.Cancel();
+
+            await RunAsync(cancellationTokenSource.Token);
+        }
+        public async Task RunAsync(CancellationToken cancellationToken)
         {
             var tasks = new List<Task>
             {
                 CreateTemporaryConnection(),
-                _hub.RunAsync()
+                _hub.RunAsync(cancellationToken)
             };
 
             //start all modules
             if (!_inContainer)
                 foreach (var module in _modules)
-                    tasks.Add(module._RunAsync());
+                    tasks.Add(module._RunAsync(cancellationToken));
+
+            tasks.Add(cancellationToken.WhenCanceled());
 
             await Task.WhenAll(tasks.ToArray());
         }

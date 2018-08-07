@@ -5,6 +5,7 @@ using TypeEdge.Modules;
 using TypeEdge.Modules.Enums;
 using Microsoft.Extensions.Configuration;
 using Agent = Microsoft.Azure.Devices.Edge.Agent.Core;
+using System.Threading;
 
 namespace TypeEdge.Host.Hub
 {
@@ -22,10 +23,9 @@ namespace TypeEdge.Host.Hub
             return InitializationResult.Ok;
         }
 
-        public override async Task<ExecutionResult> RunAsync()
+        public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
-            var res = await Program.MainAsync(HubServiceConfiguration);
-            if (res == 0)
+            if (await Program.MainAsync(HubServiceConfiguration) == 0)
                 return ExecutionResult.Ok;
             return ExecutionResult.Error;
         }

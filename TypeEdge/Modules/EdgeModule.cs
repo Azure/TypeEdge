@@ -86,7 +86,7 @@ namespace TypeEdge.Modules
             return typeTwin;
         }
 
-        public virtual Task<ExecutionResult> RunAsync()
+        public virtual Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(ExecutionResult.Ok);
         }
@@ -95,7 +95,12 @@ namespace TypeEdge.Modules
         {
             return InitializationResult.Ok;
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+        }
         #endregion
+
 
         protected T GetProxy<T>()
             where T : class
@@ -106,13 +111,13 @@ namespace TypeEdge.Modules
             return cb.Build().Resolve<T>();
         }
 
-        internal async Task<ExecutionResult> _RunAsync()
+        internal async Task<ExecutionResult> _RunAsync(CancellationToken cancellationToken)
         {
             RegisterMethods();
 
             // Open a connection to the Edge runtime
             _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, _transportSettings);
-            
+
             await _ioTHubModuleClient.OpenAsync();
             //Console.WriteLine($"{Name}:IoT Hub module client initialized.");
 
@@ -135,7 +140,7 @@ namespace TypeEdge.Modules
             }
 
             //Console.WriteLine($"{Name}:Running RunAsync..");
-            return await RunAsync();
+            return await RunAsync(cancellationToken);
         }
 
         internal InitializationResult _Init(IConfigurationRoot configuration, IContainer container)
@@ -289,6 +294,8 @@ namespace TypeEdge.Modules
 
         public void Dispose()
         {
+            Dispose(true);
+
             if (Volumes != null)
                 foreach (var item in Volumes)
                 {
@@ -300,8 +307,9 @@ namespace TypeEdge.Modules
                     }
                     catch { }
                 }
-        }
 
+            GC.SuppressFinalize(this);
+        }
         #region private methods
 
         private Task<MethodResponse> MethodCallback(MethodRequest methodRequest, object userContext)
