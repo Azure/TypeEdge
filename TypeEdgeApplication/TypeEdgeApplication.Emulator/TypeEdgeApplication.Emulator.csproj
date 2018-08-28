@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
     <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
-    <PackageReference Include="TypeEdge.Host" Version="0.2.48" />
+    <PackageReference Include="TypeEdge.Host" Version="0.2.49" />
   </ItemGroup>
 
   <ItemGroup>
