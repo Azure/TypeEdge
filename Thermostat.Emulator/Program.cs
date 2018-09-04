@@ -30,7 +30,7 @@ namespace ThermostatApplication
 
             host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
-            var manifest = host.Build();
+            var manifest = host.Build(); 
 
             File.WriteAllText("../../../manifest.json", manifest);
 
