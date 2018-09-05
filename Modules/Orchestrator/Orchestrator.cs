@@ -27,7 +27,7 @@ namespace Modules
         public ModuleTwin<OrchestratorTwin> Twin { get; set; }
 
         //this is a temp depedency, until we get the feature extraction module
-        public Orchestrator(ITemperatureSensor temperatureProxy)
+        public Orchestrator(ITemperatureSensor temperatureProxy, IModelTraining trainerProxy)
         {
             temperatureProxy.Temperature.Subscribe(this, async signal =>
             {
@@ -39,6 +39,13 @@ namespace Modules
 
                     await BroadcastMessage(signal, twin);
                 }
+                return MessageResult.Ok;
+            });
+
+            trainerProxy.Model.Subscribe(this, async model =>
+            {
+                Console.WriteLine($"{typeof(OrchestratorTwin).Name}::New Trained Model for {model.Algorithm}. Updating the model in {model.Algorithm}");
+                await Model.PublishAsync(model);
                 return MessageResult.Ok;
             });
 

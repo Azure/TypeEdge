@@ -46,9 +46,9 @@ namespace Modules
                 return MessageResult.Ok;
             });
 
-            GetProxy<IModelTraining>().Model.Subscribe(this, (model) =>
+            GetProxy<IOrchestrator>().Model.Subscribe(this, (model) =>
             {
-                //if the messages has been stored and forwarded, but the file has been deleted (e.g. a restart)
+                //if the messages have been stored and forwarded, but the file has been deleted (e.g. a restart)
                 //then the message can be empty (null)
                 if (model == null)
                     return Task.FromResult(MessageResult.Ok);

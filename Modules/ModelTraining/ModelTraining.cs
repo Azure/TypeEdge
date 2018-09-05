@@ -18,7 +18,7 @@ namespace Modules
         object _sync = new object();
 
         //default values
-        int _aggregationSize = 1000;
+        int _aggregationSize = 400;
         int _tumblingWindowPercentage = 10;
 
         Queue<Temperature> _sample;
