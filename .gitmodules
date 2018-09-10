@@ -4,6 +4,9 @@
 [submodule "Examples/AnomalyDetection"]
 	path = Examples/AnomalyDetection
 	url = https://github.com/paloukari/TypeEdge.AnomalyDetection.git
+[submodule "Examples/QuickStart"]
+	path = Examples/QuickStart
+	url = https://github.com/paloukari/TypeEdge.QuickStart.git
 [submodule "Templates"]
 	path = Templates
 	url = https://github.com/paloukari/TypeEdge.Templates.git

@@ -88,27 +88,46 @@ namespace TypeEdge.Host
                 .CreateInterfaceProxyWithoutTarget<TIModule>(new ModuleProxy<TIModule>()));
         }
 
+
         public void RegisterModule<TTModule>()
             where TTModule : class
         {
             _containerBuilder.RegisterType<TTModule>();
         }
 
-        public string Build()
+        private void Init()
         {
             CleanUp();
 
-            BuildContainer();
+            BuildDIContainer();
 
             _modules = CreateModules();
+        }
+        public string GenerateDeviceManifest(Func<string, string> moduleImageVersionCallback)
+        {
+            if (_modules == null)
+                Init();
 
-            var deviceSasKey = ProvisionDeviceAsync().Result;
+            return _GenerateManifest(moduleImageVersionCallback);
+        }
+        public string ProvisionDevice(string manifest)
+        {
+            if (_modules == null)
+                Init();
+
+            var deviceSasKey = ProvisionDeviceAsync(manifest).Result;
+
+            return deviceSasKey;           
+        }
+
+        public void BuildEmulatedDevice(string deviceSasKey)
+        {
+            if (_modules == null)
+                Init();
 
             ConfigureModules();
 
             BuildHub(deviceSasKey);
-
-            return _manifest;
         }
 
         private void CleanUp()
@@ -181,7 +200,7 @@ namespace TypeEdge.Host
 
         #region Build
 
-        private void BuildContainer()
+        private void BuildDIContainer()
         {
             var services = new ServiceCollection().AddSingleton(new LoggerFactory()
                 .AddConsole()
@@ -320,20 +339,8 @@ namespace TypeEdge.Host
             return modules;
         }
 
-        private async Task<string> ProvisionDeviceAsync()
+        private string _GenerateManifest(Func<string, string> moduleImageVersion)
         {
-            Microsoft.Azure.Devices.IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
-
-            var registryManager = RegistryManager.CreateFromConnectionString(_options.IotHubConnectionString);
-            string sasKey;
-            var device = await registryManager.GetDeviceAsync(_options.DeviceId);
-            if (device == null)
-            {
-                device = await registryManager.AddDeviceAsync(
-                new Device(_options.DeviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
-            }
-            sasKey = device.Authentication.SymmetricKey.PrimaryKey;
-
             ConfigurationContent configurationContent;
             using (var stream = Assembly.GetExecutingAssembly()
                 .GetManifestResourceStream("TypeEdge.Host.deviceconfig.json"))
@@ -342,27 +349,12 @@ namespace TypeEdge.Host
                 var deviceconfig = reader.ReadToEnd();
                 configurationContent = JsonConvert.DeserializeObject<ConfigurationContent>(deviceconfig);
             }
-
             var agentDesired = JObject.FromObject(configurationContent.ModulesContent["$edgeAgent"]["properties.desired"]);
 
             if (!agentDesired.TryGetValue("modules", out JToken modules))
                 throw new Exception("Cannot read modules config from $edgeAgent");
-
             var modulesConfig = modules as JObject;
-
             var dockerRegistry = _configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
-
-
-            try
-            {
-                var oldModules = await registryManager.GetModulesOnDeviceAsync(_options.DeviceId);
-                foreach (var oldModule in oldModules)
-                    if (!oldModule.Id.StartsWith("$"))
-                        await registryManager.RemoveModuleAsync(oldModule);
-            }
-            catch
-            {
-            }
 
             foreach (var module in _modules)
             {
@@ -372,6 +364,7 @@ namespace TypeEdge.Host
                     var v = String.Join(',', module.Volumes.Select(e => $"\"{$"/env/{e.Key.ToLower()}"}\": {{}}"));
                     volumes = $", \"Volumes\": {{ {v} }}";
                 }
+                var imageVersion = moduleImageVersion != null ? ":" + moduleImageVersion(module.Name.ToLower()) : "";
                 modulesConfig?.Add(module.Name.ToLower(), JObject.FromObject(new
                 {
                     version = "1.0",
@@ -380,19 +373,11 @@ namespace TypeEdge.Host
                     restartPolicy = "on-failure",
                     settings = new
                     {
-                        image = dockerRegistry + module.Name.ToLower(),
+                        image = dockerRegistry + module.Name.ToLower() + imageVersion,
                         createOptions = "{\n  \"Env\":[\n     \"" + TypeEdge.Constants.ModuleNameConfigName + "=" +
                                             module.Name.ToLower() + $"\"\n  ]\n {volumes} }}"
                     }
                 }));
-
-                try
-                {
-                    await registryManager.AddModuleAsync(new Module(_options.DeviceId, module.Name));
-                }
-                catch (ModuleAlreadyExistsException)
-                {
-                }
             }
             agentDesired["modules"] = modulesConfig;
             configurationContent.ModulesContent["$edgeAgent"]["properties.desired"] = agentDesired;
@@ -418,12 +403,52 @@ namespace TypeEdge.Host
                 }
             };
 
-            await registryManager.ApplyConfigurationContentOnDeviceAsync(_options.DeviceId, configurationContent);
             _manifest = @"// This content was automatically generated by TypeEdge Emulator. Do not edit directly." + Environment.NewLine + Environment.NewLine;
             _manifest += JToken.Parse(configurationContent.ToJson()).ToString(Formatting.Indented);
 
             if (_options.PrintDeploymentJson.HasValue && _options.PrintDeploymentJson.Value)
                 Console.WriteLine(_manifest);
+
+            return _manifest;
+        }
+        private async Task<string> ProvisionDeviceAsync(string manifest)
+        {
+            Microsoft.Azure.Devices.IotHubConnectionStringBuilder.Create(_options.IotHubConnectionString);
+
+            var registryManager = RegistryManager.CreateFromConnectionString(_options.IotHubConnectionString);
+            string sasKey;
+            var device = await registryManager.GetDeviceAsync(_options.DeviceId);
+            if (device == null)
+            {
+                device = await registryManager.AddDeviceAsync(
+                new Device(_options.DeviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
+            }
+            sasKey = device.Authentication.SymmetricKey.PrimaryKey;
+
+            try
+            {
+                var oldModules = await registryManager.GetModulesOnDeviceAsync(_options.DeviceId);
+                foreach (var oldModule in oldModules)
+                    if (!oldModule.Id.StartsWith("$"))
+                        await registryManager.RemoveModuleAsync(oldModule);
+            }
+            catch
+            {
+            }
+
+            foreach (var module in _modules)
+            {
+                try
+                {
+                    await registryManager.AddModuleAsync(new Module(_options.DeviceId, module.Name));
+                }
+                catch (ModuleAlreadyExistsException)
+                {
+                }
+            }
+
+            await registryManager.ApplyConfigurationContentOnDeviceAsync(_options.DeviceId, 
+                manifest.FromJson<ConfigurationContent>());
 
             return sasKey;
         }
