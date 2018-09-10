@@ -37,48 +37,8 @@
             "status": "running",
             "restartPolicy": "on-failure",
             "settings": {
-              "image": "typeedge.azurecr.io/temperaturesensor",
+              "image": "typeedge.azurecr.io/temperaturesensor:1.0",
               "createOptions": "{\n  \"Env\":[\n     \"moduleName=temperaturesensor\"\n  ]\n  }"
-            }
-          },
-          "orchestrator": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "on-failure",
-            "settings": {
-              "image": "typeedge.azurecr.io/orchestrator",
-              "createOptions": "{\n  \"Env\":[\n     \"moduleName=orchestrator\"\n  ]\n  }"
-            }
-          },
-          "modeltraining": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "on-failure",
-            "settings": {
-              "image": "typeedge.azurecr.io/modeltraining",
-              "createOptions": "{\n  \"Env\":[\n     \"moduleName=modeltraining\"\n  ]\n  }"
-            }
-          },
-          "visualization": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "on-failure",
-            "settings": {
-              "image": "typeedge.azurecr.io/visualization",
-              "createOptions": "{\n  \"Env\":[\n     \"moduleName=visualization\"\n  ]\n  }"
-            }
-          },
-          "anomalydetection": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "on-failure",
-            "settings": {
-              "image": "typeedge.azurecr.io/anomalydetection",
-              "createOptions": "{\n  \"Env\":[\n     \"moduleName=anomalydetection\"\n  ]\n  }"
             }
           }
         }
@@ -88,13 +48,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "route0": "FROM /messages/modules/temperaturesensor/outputs/Temperature INTO BrokeredEndpoint(\"/modules/orchestrator/inputs/Temperature\")",
-          "route1": "FROM /messages/modules/modeltraining/outputs/Model INTO BrokeredEndpoint(\"/modules/orchestrator/inputs/Model\")",
-          "route2": "FROM /messages/modules/orchestrator/outputs/Training INTO BrokeredEndpoint(\"/modules/modeltraining/inputs/Training\")",
-          "route3": "FROM /messages/modules/orchestrator/outputs/Visualization INTO BrokeredEndpoint(\"/modules/visualization/inputs/Visualization\")",
-          "route4": "FROM /messages/modules/orchestrator/outputs/Detection INTO BrokeredEndpoint(\"/modules/anomalydetection/inputs/Detection\")",
-          "route5": "FROM /messages/modules/orchestrator/outputs/Model INTO BrokeredEndpoint(\"/modules/anomalydetection/inputs/Model\")",
-          "route6": "FROM /messages/modules/anomalydetection/outputs/Anomaly INTO $upstream"
+          "route0": "FROM /messages/modules/temperaturesensor/outputs/Temperature INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 20
