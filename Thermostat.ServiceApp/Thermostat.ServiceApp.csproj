@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <OutputType>Exe</OutputType>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TypeEdge.Proxy" Version="0.3.1" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\TypeEdge.Proxy\TypeEdge.Proxy.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
+    <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

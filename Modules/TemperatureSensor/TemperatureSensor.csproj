@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TypeEdge" Version="0.3.1" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+    <PackageReference Include="WaveGenerator" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\TypeEdge\TypeEdge.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
+    <ProjectReference Include="..\..\Thermostat.Shared\Thermostat.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
