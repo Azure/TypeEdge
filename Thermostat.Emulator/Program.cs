@@ -30,7 +30,12 @@ namespace ThermostatApplication
 
             host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
-            var manifest = host.Build(); 
+            var manifest = host.GenerateDeviceManifest((e) =>
+            {
+                return "1.0";
+            });
+            var sasToken = host.ProvisionDevice(manifest);
+            host.BuildEmulatedDevice(sasToken);
 
             File.WriteAllText("../../../manifest.json", manifest);
 
