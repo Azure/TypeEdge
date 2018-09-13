@@ -2,7 +2,7 @@
 
 namespace ThermostatApplication.Twins
 {
-    public class TemperatureTwin : TypeModuleTwin
+    public class TemperatureTwin : TypeTwin
     {
         public double SamplingHz { get; set; }
         public double Frequency { get; set; }

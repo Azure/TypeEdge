@@ -14,7 +14,7 @@ namespace ThermostatApplication.Twins
         VisualizeFeature = 1 << 5,
     }
 
-    public class OrchestratorTwin : TypeModuleTwin
+    public class OrchestratorTwin : TypeTwin
     {
         public TemperatureScale Scale { get; set; }
 

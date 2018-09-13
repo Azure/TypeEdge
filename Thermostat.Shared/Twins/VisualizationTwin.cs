@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ThermostatApplication.Twins
 {
-    public class VisualizationTwin : TypeModuleTwin
+    public class VisualizationTwin : TypeTwin
     {
         public string ChartName {get; set;}
         public string XAxisLabel {get; set;}

@@ -3,7 +3,7 @@
 
 namespace ThermostatApplication.Twins
 {
-    public class ModelTrainingTwin : TypeModuleTwin
+    public class ModelTrainingTwin : TypeTwin
     {
        public int TumblingWindowPercentage { get; set; }
        public int AggregationSize { get; set; }

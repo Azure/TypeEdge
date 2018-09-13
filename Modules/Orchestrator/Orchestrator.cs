@@ -18,6 +18,9 @@ namespace Modules
 {
     public class Orchestrator : EdgeModule, IOrchestrator
     {
+        readonly object _twinLock = new object();
+        OrchestratorTwin _lastTwin;
+
         public Output<Temperature> Training { get; set; }
         public Output<Temperature> Detection { get; set; }
         public Output<GraphData> Visualization { get; set; }
@@ -31,7 +34,11 @@ namespace Modules
         {
             temperatureProxy.Temperature.Subscribe(this, async signal =>
             {
-                var twin = Twin.LastKnownTwin;
+                OrchestratorTwin twin;
+
+                lock (_twinLock)
+                    twin = _lastTwin;
+
                 if (twin != null)
                 {
                     if (twin.Scale == TemperatureScale.Celsius)
@@ -51,6 +58,9 @@ namespace Modules
 
             Twin.Subscribe(async twin =>
             {
+                lock (_twinLock)
+                    _lastTwin = twin;
+
                 Console.WriteLine($"{typeof(OrchestratorTwin).Name}::Twin update. Routing  = { twin.RoutingMode.ToString()}");
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;

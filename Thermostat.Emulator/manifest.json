@@ -37,7 +37,7 @@
             "status": "running",
             "restartPolicy": "on-failure",
             "settings": {
-              "image": "typeedge.azurecr.io/temperaturesensor",
+              "image": "typeedge.azurecr.io/temperaturesensor:1.0",
               "createOptions": "{\n  \"Env\":[\n     \"moduleName=temperaturesensor\"\n  ]\n  }"
             }
           },
@@ -47,7 +47,7 @@
             "status": "running",
             "restartPolicy": "on-failure",
             "settings": {
-              "image": "typeedge.azurecr.io/orchestrator",
+              "image": "typeedge.azurecr.io/orchestrator:1.0",
               "createOptions": "{\n  \"Env\":[\n     \"moduleName=orchestrator\"\n  ]\n  }"
             }
           },
@@ -57,7 +57,7 @@
             "status": "running",
             "restartPolicy": "on-failure",
             "settings": {
-              "image": "typeedge.azurecr.io/modeltraining",
+              "image": "typeedge.azurecr.io/modeltraining:1.0",
               "createOptions": "{\n  \"Env\":[\n     \"moduleName=modeltraining\"\n  ]\n  }"
             }
           },
@@ -67,7 +67,7 @@
             "status": "running",
             "restartPolicy": "on-failure",
             "settings": {
-              "image": "typeedge.azurecr.io/visualization",
+              "image": "typeedge.azurecr.io/visualization:1.0",
               "createOptions": "{\n  \"Env\":[\n     \"moduleName=visualization\"\n  ]\n  }"
             }
           },
@@ -77,7 +77,7 @@
             "status": "running",
             "restartPolicy": "on-failure",
             "settings": {
-              "image": "typeedge.azurecr.io/anomalydetection",
+              "image": "typeedge.azurecr.io/anomalydetection:1.0",
               "createOptions": "{\n  \"Env\":[\n     \"moduleName=anomalydetection\"\n  ]\n  }"
             }
           }
