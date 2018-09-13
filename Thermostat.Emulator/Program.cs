@@ -10,12 +10,12 @@ using System.IO;
 namespace ThermostatApplication
 {
     internal class Program
-    {
+    { 
         private static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
-                .AddEnvironmentVariables()
+                .AddEnvironmentVariables() 
                 .AddDotenvFile()
                 .AddCommandLine(args)
                 .Build();
