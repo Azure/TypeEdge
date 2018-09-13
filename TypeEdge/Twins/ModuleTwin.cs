@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Azure.Devices.Shared;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using TypeEdge.Modules;
 using TypeEdge.Modules.Enums;
@@ -6,13 +10,8 @@ using TypeEdge.Modules.Enums;
 namespace TypeEdge.Twins
 {
     public class ModuleTwin<T> : TypeProperty
-        where T : TypeModuleTwin, new()
+        where T : TypeTwin, new()
     {
-        private object _twinLock = new object();
-        T _lastTwin;
-
-        public T LastKnownTwin { get { lock (_twinLock) return _lastTwin; } set { lock (_twinLock) _lastTwin = value; } }
-
         public ModuleTwin(string name, EdgeModule module)
            : base(name, module)
         {
@@ -26,21 +25,16 @@ namespace TypeEdge.Twins
         public async Task ReportAsync(T twin)
         {
             await Module.ReportTwinAsync(Name, twin);
-            LastKnownTwin = twin;
         }
 
         public async Task<T> PublishAsync(T twin)
         {
-            var t = await Module.PublishTwinAsync(Name, twin);
-            LastKnownTwin = t;
-            return t;
+            return await Module.PublishTwinAsync(Name, twin);
         }
 
         public async Task<T> GetAsync()
         {
-            var t = await Module.GetTwinAsync<T>(Name);
-            LastKnownTwin = t;
-            return t;
+            return await Module.GetTwinAsync<T>(Name);
         }
     }
 }

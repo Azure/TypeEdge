@@ -67,7 +67,7 @@ namespace TypeEdge.Proxy
                 methodInvocation.SetPayloadJson(paramData);
 
                 // Invoke the direct method asynchronously and get the response from the simulated device.
-                var response = _serviceClient.InvokeDeviceMethodAsync(_deviceId,  Name, methodInvocation).Result;
+                var response = _serviceClient.InvokeDeviceMethodAsync(_deviceId, Name, methodInvocation).Result;
 
                 if (response.Status == 200)
                 {
@@ -85,17 +85,15 @@ namespace TypeEdge.Proxy
         internal override async Task<TT> GetTwinAsync<TT>(string name)
         {
             var twin = await _registryManager.GetTwinAsync(_deviceId, Name);
-            var typeTwin = Activator.CreateInstance<TT>();
-            typeTwin.SetTwin(name, twin);
+            var typeTwin = TypeTwin.CreateTwin<TT>(name, twin);
             return typeTwin;
         }
 
         internal override async Task<TT> PublishTwinAsync<TT>(string name, TT typeTwin)
         {
-            var twin = typeTwin.GetDesiredTwin(name);
-            var res = await _registryManager.UpdateTwinAsync(_deviceId, Name, twin, twin.ETag);
-            typeTwin.SetTwin(name, res);
-            return typeTwin;
+            var twin = typeTwin.GetTwin();
+            var newTwin = await _registryManager.UpdateTwinAsync(_deviceId, Name, twin, twin.ETag);
+            return TypeTwin.CreateTwin<TT>(name, newTwin);
         }
     }
 }

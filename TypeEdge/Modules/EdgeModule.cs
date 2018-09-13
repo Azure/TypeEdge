@@ -71,19 +71,18 @@ namespace TypeEdge.Modules
 
         #region virtual methods
 
-        internal virtual Task<T> PublishTwinAsync<T>(string name, T twin)
-            where T : IModuleTwin, new()
+        internal virtual async Task<T> PublishTwinAsync<T>(string name, T twin)
+            where T : TypeTwin, new()
         {
-            _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
-            throw new NotImplementedException();
+            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedProperties());
+            return twin;
         }
 
         internal virtual async Task<T> GetTwinAsync<T>(string name)
-            where T : IModuleTwin, new()
+            where T : TypeTwin, new()
         {
-            var typeTwin = Activator.CreateInstance<T>();
-            typeTwin.SetTwin(name, await _ioTHubModuleClient.GetTwinAsync());
-            return typeTwin;
+            var twin = await _ioTHubModuleClient.GetTwinAsync();
+            return TypeTwin.CreateTwin<T>(name, twin);
         }
 
         public virtual Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
@@ -207,7 +206,7 @@ namespace TypeEdge.Modules
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
         }
 
-        internal void SubscribeTwin<T>(string name, Func<T, Task<TwinResult>> handler) where T : IModuleTwin
+        internal void SubscribeTwin<T>(string name, Func<T, Task<TwinResult>> handler) where T : TypeTwin
         {
             //Console.WriteLine($"{Name}:SubscribeTwin called");
 
@@ -215,10 +214,10 @@ namespace TypeEdge.Modules
         }
 
         internal async Task ReportTwinAsync<T>(string name, T twin)
-            where T : IModuleTwin
+            where T : TypeTwin
         {
             //Console.WriteLine($"{Name}:ReportTwinAsync called");
-            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedTwin(name).Properties.Reported);
+            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedProperties());
         }
 
         internal void RegisterVolume(string volumeName)
@@ -379,9 +378,7 @@ namespace TypeEdge.Modules
             foreach (var callback in callbacks)
                 if (desiredProperties.Contains($"___{callback.Key}"))
                 {
-                    if (!(Activator.CreateInstance(callback.Value.Type) is IModuleTwin input))
-                        continue;
-                    input.SetTwin(callback.Key, new Twin(new TwinProperties { Desired = desiredProperties }));
+                    var input = TypeTwin.CreateTwin(callback.Value.Type, callback.Key, desiredProperties);
 
                     var invocationResult = callback.Value.Handler.DynamicInvoke(input);
                     await (Task<TwinResult>)invocationResult;
