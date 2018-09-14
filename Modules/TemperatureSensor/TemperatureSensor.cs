@@ -18,7 +18,17 @@ namespace Modules
     {
         readonly object _sync = new object();
         readonly DateTime _startTimeStamp;
+
         //default values
+        static readonly TemperatureTwin _defaultTwin = new TemperatureTwin()
+        {
+            SamplingHz = 10,
+            Amplitude = 10,
+            Frequency = 2,
+            WaveType = WaveformType.Sine,
+            Offset = 60
+        };
+
         double _anomalyOffset = 0.0;
         double _samplingRateHz = 1.0;
 
@@ -27,9 +37,11 @@ namespace Modules
         public Output<Temperature> Temperature { get; set; }
         public ModuleTwin<TemperatureTwin> Twin { get; set; }
 
-        public TemperatureSensor()
+        public TemperatureSensor(TemperatureTwin defaultTwin = null)
         {
             _startTimeStamp = DateTime.Now;
+
+            Twin.SetDefault(defaultTwin ?? _defaultTwin);
 
             Twin.Subscribe(async twin =>
             {
@@ -93,10 +105,10 @@ namespace Modules
                     var message = new Temperature()
                     {
                         Value = newValue + offset,
-                        TimeStamp = DateTime.Now.Subtract(_startTimeStamp).TotalMilliseconds/1000
+                        TimeStamp = DateTime.Now.Subtract(_startTimeStamp).TotalMilliseconds / 1000
                     };
 
-                    await Temperature.PublishAsync(message);                    
+                    await Temperature.PublishAsync(message);
                 }
                 await Task.Delay((int)sleepTimeMs);
             }

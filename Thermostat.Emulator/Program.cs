@@ -23,6 +23,15 @@ namespace ThermostatApplication
             var host = new TypeEdgeHost(configuration);
 
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
+            host.RegisterInstance(new Twins.TemperatureTwin()
+            {
+                SamplingHz = 11,
+                Amplitude = 11,
+                Frequency = 3,
+                WaveType = Twins.WaveformType.Sine,
+                Offset = 61
+            });
+
             host.Upstream.Subscribe(host.GetProxy<ITemperatureSensor>().Temperature);
 
             var manifest = host.GenerateDeviceManifest((e) =>
