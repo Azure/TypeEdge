@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>TypeEdge</PackageId>
-    <Version>0.3.3</Version>
+    <Version>0.3.5</Version>
     <Authors>paloukari</Authors>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

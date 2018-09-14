@@ -14,20 +14,20 @@ namespace TypeEdge.Twins
         Twin _twin;
         string _name;
 
-        internal TwinCollection GetReportedProperties()
+        internal TwinCollection GetReportedProperties(string twinName = null)
         {
             if (_twin == null)
                 _twin = new Twin(new TwinProperties() { Desired = new TwinCollection(), Reported = new TwinCollection() });
-            UpdateProperties(_twin.Properties.Reported);
+            UpdateProperties(_twin.Properties.Reported, twinName != null ? twinName : _name);
             return _twin.Properties.Reported;
         }
-    
+
         internal Twin GetTwin()
         {
             //only the proxy is calling this
             if (_twin == null)
                 _twin = new Twin(new TwinProperties() { Desired = new TwinCollection(), Reported = new TwinCollection() });
-            UpdateProperties(_twin.Properties.Desired);
+            UpdateProperties(_twin.Properties.Desired, _name);
             return _twin;
         }
 
@@ -45,7 +45,7 @@ namespace TypeEdge.Twins
                 {
                     Desired = desiredProperties,
                     Reported = new TwinCollection()
-                }), 
+                }),
                 instance);
         }
         private static T SetupInstance<T>(string name, Twin twin, T instance) where T : TypeTwin
@@ -71,7 +71,7 @@ namespace TypeEdge.Twins
 
             JsonConvert.PopulateObject(props.ToJson(), this, settings);
         }
-        private void UpdateProperties(TwinCollection properties)
+        private void UpdateProperties(TwinCollection properties, string name)
         {
             //arrays are not supported!!
             foreach (var prop in GetType()
@@ -79,7 +79,7 @@ namespace TypeEdge.Twins
                 if (prop.GetValue(this) != null)
                     properties[prop.Name] = Convert.ChangeType(prop.GetValue(this), typeof(string));
 
-            properties[$"___{_name}"] = true;
+            properties[$"___{name}"] = true;
         }
         private bool IsValid(TwinCollection props)
         {

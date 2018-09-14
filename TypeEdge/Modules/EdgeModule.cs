@@ -23,6 +23,7 @@ using Newtonsoft.Json;
 using Autofac;
 using Castle.DynamicProxy;
 using TypeEdge.Proxy;
+using Newtonsoft.Json.Linq;
 
 [assembly: InternalsVisibleTo("TypeEdge.Host")]
 [assembly: InternalsVisibleTo("TypeEdge.Proxy")]
@@ -38,15 +39,18 @@ namespace TypeEdge.Modules
         private string _connectionString;
         private ModuleClient _ioTHubModuleClient;
         private ITransportSettings[] _transportSettings;
+        
         #endregion
 
         protected EdgeModule()
         {
             _routeSubscriptions = new Dictionary<string, SubscriptionCallback>();
             _twinSubscriptions = new Dictionary<string, SubscriptionCallback>();
+
             _methodSubscriptions = new Dictionary<string, MethodCallback>();
             Volumes = new Dictionary<string, string>();
 
+            DefaultTwin = new TwinCollection();
             Routes = new List<string>();
 
             InstantiateProperties();
@@ -67,6 +71,8 @@ namespace TypeEdge.Modules
         }
         public Dictionary<string, string> Volumes { get; }
         internal List<string> Routes { get; set; }
+
+        internal TwinCollection DefaultTwin { get; set; }
         #endregion
 
         #region virtual methods
@@ -83,6 +89,23 @@ namespace TypeEdge.Modules
         {
             var twin = await _ioTHubModuleClient.GetTwinAsync();
             return TypeTwin.CreateTwin<T>(name, twin);
+        }
+
+        internal virtual void SetTwinDefault<T>(string name, T twin)
+          where T : TypeTwin, new()
+        {
+            var partialTwin = twin.GetReportedProperties(name);
+
+            var mergeSettings = new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Union
+            };
+
+            var union = JObject.Parse(DefaultTwin.ToJson());
+
+            union.Merge(JObject.Parse(partialTwin.ToJson()), mergeSettings);
+
+            DefaultTwin = new TwinCollection(union.ToString(Formatting.None));
         }
 
         public virtual Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)

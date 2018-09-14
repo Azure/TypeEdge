@@ -17,7 +17,7 @@ namespace TypeEdge.Twins
         {
         }
 
-        public virtual void Subscribe(Func<T, Task<TwinResult>> handler)
+        public void Subscribe(Func<T, Task<TwinResult>> handler)
         {
             Module.SubscribeTwin(Name, handler);
         }
@@ -35,6 +35,11 @@ namespace TypeEdge.Twins
         public async Task<T> GetAsync()
         {
             return await Module.GetTwinAsync<T>(Name);
+        }
+
+        public void SetDefault(T twin)
+        {
+            Module.SetTwinDefault(Name, twin);
         }
     }
 }
