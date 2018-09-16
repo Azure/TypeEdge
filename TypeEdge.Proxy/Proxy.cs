@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace TypeEdge.Proxy
 {
-    internal class Proxy<T> : EdgeModule, IInterceptor
+    internal class Proxy<T> : TypeModule, IInterceptor
         where T : class
     {
         private readonly ServiceClient _serviceClient;
@@ -29,7 +29,7 @@ namespace TypeEdge.Proxy
             _serviceClient = ServiceClient.CreateFromConnectionString(iotHubConnectionString);
         }
 
-        internal override string Name
+        public override string Name
         {
             get
             {

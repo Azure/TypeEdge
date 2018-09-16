@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IoT.Edge\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Core\Microsoft.Azure.Devices.Edge.Agent.Core.csproj" />
+    <ProjectReference Include="..\IoT.Edge\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Docker\Microsoft.Azure.Devices.Edge.Agent.Docker.csproj" />
     <ProjectReference Include="..\IoT.Edge\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Service\Microsoft.Azure.Devices.Edge.Hub.Service.csproj" />
     <ProjectReference Include="..\TypeEdge\TypeEdge.csproj" />
   </ItemGroup>
@@ -33,5 +34,9 @@
 
   <ItemGroup>
     <EmbeddedResource Include="deviceconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Docker.DotNet" Version="3.125.2" />
   </ItemGroup>
 </Project>

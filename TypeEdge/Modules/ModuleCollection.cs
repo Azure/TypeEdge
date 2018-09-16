@@ -2,7 +2,7 @@
 
 namespace TypeEdge.Modules
 {
-    public class ModuleCollection : List<EdgeModule>
+    public class ModuleCollection : List<TypeModule>
     {
     }
 }

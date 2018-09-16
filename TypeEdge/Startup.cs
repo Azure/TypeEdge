@@ -21,7 +21,7 @@ namespace TypeEdge
 {
     public static class Startup
     {
-        public static EdgeModule Module { get; set; }
+        public static TypeModule Module { get; set; }
 
         public static async Task DockerEntryPoint(string[] args)
         {
@@ -121,7 +121,7 @@ namespace TypeEdge
 
             var container = containerBuilder.Build();
 
-            Module = container.Resolve(moduleType) as EdgeModule;
+            Module = container.Resolve(moduleType) as TypeModule;
             if (Module != null)
             {
                 Module._Init(configuration, container);

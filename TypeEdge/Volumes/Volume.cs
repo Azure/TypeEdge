@@ -9,7 +9,7 @@ namespace TypeEdge.Volumes
     public class Volume<T> : TypeProperty
        where T : class, IEdgeMessage, new()
     {
-        public Volume(string name, EdgeModule module)
+        public Volume(string name, TypeModule module)
              : base(name, module)
         {
             Module.RegisterVolume(Name);

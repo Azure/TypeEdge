@@ -2,7 +2,7 @@
 {
     public abstract class Endpoint : TypeProperty
     {
-        protected Endpoint(string name, EdgeModule module)
+        protected Endpoint(string name, TypeModule module)
             :base(name, module)
         {
         }

@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
-using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Microsoft.Azure.Devices.Shared;
 using TypeEdge.Enums;
 using TypeEdge.Modules.Endpoints;
@@ -30,19 +29,19 @@ using Newtonsoft.Json.Linq;
 
 namespace TypeEdge.Modules
 {
-    public abstract class EdgeModule : IDisposable
+    public abstract class TypeModule : IDisposable
     {
         #region members
         private readonly Dictionary<string, MethodCallback> _methodSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> _routeSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
+
         private string _connectionString;
         private ModuleClient _ioTHubModuleClient;
         private ITransportSettings[] _transportSettings;
-        
         #endregion
 
-        protected EdgeModule()
+        protected TypeModule()
         {
             _routeSubscriptions = new Dictionary<string, SubscriptionCallback>();
             _twinSubscriptions = new Dictionary<string, SubscriptionCallback>();
@@ -56,8 +55,8 @@ namespace TypeEdge.Modules
             InstantiateProperties();
         }
 
-        #region properties
-        internal virtual string Name
+        #region Properties
+        public virtual string Name
         {
             get
             {
@@ -69,10 +68,14 @@ namespace TypeEdge.Modules
                 return proxyInterface.Name.Substring(1).ToLower(CultureInfo.CurrentCulture);
             }
         }
-        public Dictionary<string, string> Volumes { get; }
-        internal List<string> Routes { get; set; }
+        internal virtual HostingSettings HostingSettings => GenerateHostingSettings();
 
-        internal TwinCollection DefaultTwin { get; set; }
+        #endregion
+
+        #region properties
+        internal Dictionary<string, string> Volumes { get; }
+        internal virtual List<string> Routes { get; private set; }
+        internal virtual TwinCollection DefaultTwin { get; private set; }
         #endregion
 
         #region virtual methods
@@ -133,7 +136,22 @@ namespace TypeEdge.Modules
             return cb.Build().Resolve<T>();
         }
 
-        internal async Task<ExecutionResult> _RunAsync(CancellationToken cancellationToken)
+        protected HostingSettings GenerateHostingSettings()
+        {
+            //todo: add attributes for static env configuration
+            var createOptions = new Dictionary<string, object>();
+            List<string> env = new List<string>();
+
+            env.Add(Constants.ModuleNameConfigName + "=" + Name);
+
+            if (Volumes.Count > 0)
+                env.Add($", \"Volumes\": {{ {String.Join(',', Volumes.Select(e => $"\"{$"/env/{e.Key.ToLower()}"}\": {{}}"))} }}");
+
+            createOptions.Add("Env", env);
+            return new HostingSettings(Name, createOptions);
+        }
+
+        internal virtual async Task<ExecutionResult> _RunAsync(CancellationToken cancellationToken)
         {
             RegisterMethods();
 
@@ -165,7 +183,7 @@ namespace TypeEdge.Modules
             return await RunAsync(cancellationToken);
         }
 
-        internal InitializationResult _Init(IConfigurationRoot configuration, IContainer container)
+        internal virtual InitializationResult _Init(IConfigurationRoot configuration, IContainer container)
         {
             //Console.WriteLine($"{Name}:InternalConfigure called");
 

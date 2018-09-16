@@ -7,13 +7,13 @@ namespace TypeEdge
 {
     public abstract class TypeProperty
     {
-        protected TypeProperty(string name, EdgeModule module)
+        protected TypeProperty(string name, TypeModule module)
         {
             Name = name;
             Module = module;
         }
 
         public string Name { get; set; }
-        internal EdgeModule Module { get; set; }
+        internal TypeModule Module { get; set; }
     }
 }

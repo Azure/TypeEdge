@@ -12,7 +12,7 @@ namespace TypeEdge.Twins
     public class ModuleTwin<T> : TypeProperty
         where T : TypeTwin, new()
     {
-        public ModuleTwin(string name, EdgeModule module)
+        public ModuleTwin(string name, TypeModule module)
            : base(name, module)
         {
         }

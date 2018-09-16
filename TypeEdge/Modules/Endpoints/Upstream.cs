@@ -6,7 +6,7 @@ namespace TypeEdge.Modules.Endpoints
         where T : class, IEdgeMessage, new()
 
     {
-        public Upstream(EdgeModule module) :
+        public Upstream(TypeModule module) :
             base("$upstream", module)
         {
         }

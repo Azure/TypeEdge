@@ -9,7 +9,7 @@ using TypeEdge.Volumes;
 
 namespace TypeEdge.Proxy
 {
-    internal class ModuleProxyBase : EdgeModule, IInterceptor
+    internal class ModuleProxyBase : TypeModule, IInterceptor
     {
         private readonly Type _type;
 
@@ -18,7 +18,7 @@ namespace TypeEdge.Proxy
             _type = type;
         }
 
-        internal override string Name
+        public override string Name
         {
             get
             {

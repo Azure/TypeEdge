@@ -25,12 +25,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using HubService = Microsoft.Azure.Devices.Edge.Hub.Service;
-using Module = Microsoft.Azure.Devices.Module;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using System.Globalization;
 using System.Runtime.Loader;
 using TypeEdge.Twins;
+using TypeEdge.Host.Docker;
 
 namespace TypeEdge.Host
 {
@@ -43,8 +43,8 @@ namespace TypeEdge.Host
         private readonly bool _inContainer;
         private string _manifest;
         private IContainer _container;
+        private readonly ModuleCollection _externalModules;
         private ModuleCollection _modules;
-
         const string DisableServerCertificateValidationKeyName =
             "Microsoft.Azure.Devices.DisableServerCertificateValidation";
 
@@ -67,6 +67,8 @@ namespace TypeEdge.Host
             Upstream = new Upstream<JsonMessage>(_hub);
 
             _inContainer = File.Exists(@"/.dockerenv");
+
+            _externalModules = new ModuleCollection();
         }
 
         public Upstream<JsonMessage> Upstream { get; set; }
@@ -90,6 +92,11 @@ namespace TypeEdge.Host
         }
 
 
+        public void RegisterExternalModule(ExternalModule externalModule)
+        {
+            _externalModules.Add(externalModule);
+        }
+
         public void RegisterModule<TTModule>()
             where TTModule : class
         {
@@ -104,12 +111,12 @@ namespace TypeEdge.Host
 
             _modules = CreateModules();
         }
-        public string GenerateDeviceManifest(Func<string, string> moduleImageVersionCallback)
+        public string GenerateDeviceManifest(Func<string, DockerHostingSettings, DockerHostingSettings> hostingSettings = null)
         {
             if (_modules == null)
                 Init();
 
-            return _GenerateManifest(moduleImageVersionCallback);
+            return _GenerateManifest(hostingSettings);
         }
         public string ProvisionDevice(string manifest)
         {
@@ -331,18 +338,20 @@ namespace TypeEdge.Host
             using (var scope = _container.BeginLifetimeScope())
             {
                 foreach (var moduleType in _container.ComponentRegistry.Registrations
-                    .Where(r => typeof(EdgeModule).IsAssignableFrom(r.Activator.LimitType))
+                    .Where(r => typeof(TypeModule).IsAssignableFrom(r.Activator.LimitType))
                     .Select(r => r.Activator.LimitType).Distinct())
-                    if ((scope.Resolve(moduleType) is EdgeModule module))
+                    if ((scope.Resolve(moduleType) is TypeModule module))
                         modules.Add(module);
             }
+            modules.AddRange(_externalModules);
 
             return modules;
         }
 
-        private string _GenerateManifest(Func<string, string> moduleImageVersion)
+        private string _GenerateManifest(Func<string, DockerHostingSettings, DockerHostingSettings> hostOverride)
         {
             ConfigurationContent configurationContent;
+
             using (var stream = Assembly.GetExecutingAssembly()
                 .GetManifestResourceStream("TypeEdge.Host.deviceconfig.json"))
             using (var reader = new StreamReader(stream))
@@ -355,38 +364,16 @@ namespace TypeEdge.Host
             if (!agentDesired.TryGetValue("modules", out JToken modules))
                 throw new Exception("Cannot read modules config from $edgeAgent");
             var modulesConfig = modules as JObject;
-            var dockerRegistry = _configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
 
             foreach (var module in _modules)
             {
-                var volumes = "";
-                if (module.Volumes.Count > 0)
-                {
-                    var v = String.Join(',', module.Volumes.Select(e => $"\"{$"/env/{e.Key.ToLower()}"}\": {{}}"));
-                    volumes = $", \"Volumes\": {{ {v} }}";
-                }
-                var imageVersion = moduleImageVersion != null ? ":" + moduleImageVersion(module.Name.ToLower()) : "";
-
-                var moduleManifest = JObject.FromObject(new
-                {
-                    version = "1.0",
-                    type = "docker",
-                    status = "running",
-                    restartPolicy = "on-failure",
-                    settings = new
-                    {
-                        image = dockerRegistry + module.Name.ToLower() + imageVersion,
-                        createOptions = "{\n  \"Env\":[\n     \"" + TypeEdge.Constants.ModuleNameConfigName + "=" +
-                                             module.Name.ToLower() + $"\"\n  ]\n {volumes} }}"
-                    }
-                });
-
-
-                modulesConfig?.Add(module.Name.ToLower(), moduleManifest);
+                var dockerHostingSettings = new DockerHostingSettings(module.HostingSettings);
+                var settings = hostOverride != null ? hostOverride(module.Name, dockerHostingSettings) : dockerHostingSettings;
+                modulesConfig?.Add(module.Name, JObject.FromObject(settings));
             }
 
             foreach (var module in _modules)
-                if (module.DefaultTwin.Count > 0)
+                if (module.DefaultTwin?.Count > 0)
                 {
                     if (!configurationContent.ModulesContent.ContainsKey(module.Name))
                         configurationContent.ModulesContent.Add(module.Name, new Dictionary<string, object>());
@@ -399,8 +386,9 @@ namespace TypeEdge.Host
             var routes = new Dictionary<string, string>();
 
             foreach (var module in _modules)
-                foreach (var route in module.Routes)
-                    routes[$"route{routes.Count}"] = route;
+                if (module.Routes != null)
+                    foreach (var route in module.Routes)
+                        routes[$"route{routes.Count}"] = route;
 
             foreach (var route in _hub.Routes) routes[$"route{routes.Count}"] = route;
 
@@ -453,7 +441,7 @@ namespace TypeEdge.Host
             {
                 try
                 {
-                    await registryManager.AddModuleAsync(new Module(_options.DeviceId, module.Name));
+                    await registryManager.AddModuleAsync(new Microsoft.Azure.Devices.Module(_options.DeviceId, module.Name));
                 }
                 catch (ModuleAlreadyExistsException)
                 {

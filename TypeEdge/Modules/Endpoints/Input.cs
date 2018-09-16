@@ -9,7 +9,7 @@ namespace TypeEdge.Modules.Endpoints
     {
         private Volumes.Volume<T> _volume;
 
-        public Input(string name, EdgeModule module) :
+        public Input(string name, TypeModule module) :
             base(name, module)
         {
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Reference<>))

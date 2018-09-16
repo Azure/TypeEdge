@@ -10,7 +10,7 @@ namespace TypeEdge.Modules.Endpoints
     {
         private Volumes.Volume<T> _volume;
 
-        public Output(string name, EdgeModule module) :
+        public Output(string name, TypeModule module) :
             base(name, module)
         {
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Reference<>))
@@ -38,7 +38,7 @@ namespace TypeEdge.Modules.Endpoints
             return await Module.PublishMessageAsync(Name, message);
         }
 
-        public virtual void Subscribe(EdgeModule input, Func<T, Task<MessageResult>> handler)
+        public virtual void Subscribe(TypeModule input, Func<T, Task<MessageResult>> handler)
         {
             var dereference = new Func<T, Task<MessageResult>>((t) =>
             {

@@ -9,9 +9,9 @@ using System.Threading;
 
 namespace TypeEdge.Host.Hub
 {
-    public class EdgeHub : EdgeModule
+    internal class EdgeHub : TypeModule
     {
-        internal override string Name => Agent.Constants.EdgeHubModuleIdentityName;
+        public override string Name => Agent.Constants.EdgeHubModuleIdentityName;
         private IConfigurationRoot HubServiceConfiguration { get; set; }
 
         public override InitializationResult Init()
