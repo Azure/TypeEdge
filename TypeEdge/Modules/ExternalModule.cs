@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace TypeEdge.Modules
 {
-    public class ExternalModule : TypeModule 
+    public abstract class ExternalModule : TypeModule 
     {
         private readonly string _name;
         HostingSettings _settings;

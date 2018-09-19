@@ -36,7 +36,7 @@ namespace TypeEdge.Host.Docker
             Type = hostingSettings.Type;
             DesiredStatus = Enum.Parse<ModuleStatus>(hostingSettings.DesiredStatus.ToString());
             RestartPolicy = Enum.Parse<Microsoft.Azure.Devices.Edge.Agent.Core.RestartPolicy>(hostingSettings.RestartPolicy.ToString());
-            Settings = new DockerConfig(hostingSettings.ImageName, ProcessCreateOptions(hostingSettings.Options));
+            Config = new DockerConfig(hostingSettings.ImageName, ProcessCreateOptions(hostingSettings.Options));
         }
 
         [JsonIgnore]
@@ -55,6 +55,6 @@ namespace TypeEdge.Host.Docker
         public Microsoft.Azure.Devices.Edge.Agent.Core.RestartPolicy RestartPolicy { get; private set; }
 
         [JsonProperty(Required = Required.Always, PropertyName = "settings")]
-        public DockerConfig Settings { get; set; }
+        public DockerConfig Config { get; set; }
     }
 }
