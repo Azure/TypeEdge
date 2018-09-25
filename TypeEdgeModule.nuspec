@@ -4,12 +4,12 @@
         <id>TypeEdge.Module</id>
         <version>0.1.2</version>
         <description>Creates a new Azure IoT Edge Module project for TypeEdge, a strongly typed Azure IoT Edge framework</description>
-        <authors>paloukari</authors>
-    	<owners>paloukari</owners>
+        <authors>Microsoft</authors>
+    	<owners>Microsoft</owners>
     	<requireLicenseAcceptance>false</requireLicenseAcceptance>
     	<language>en-US</language>
-        <projectUrl>https://github.com/paloukari/TypeEdge</projectUrl>
-        <licenseUrl>https://github.com/paloukari/TypeEdge/blob/master/LICENSE</licenseUrl>
+        <projectUrl>https://github.com/Azure/TypeEdge</projectUrl>
+        <licenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</licenseUrl>
         <packageTypes>
             <packageType name="Template" />
         </packageTypes>

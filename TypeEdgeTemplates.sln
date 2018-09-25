@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeEdgeModule2", "TypeEdge
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeEdgeServiceProxy", "TypeEdgeServiceProxy\TypeEdgeServiceProxy.csproj", "{A12248A2-C567-4236-84A9-54364A6F0FFA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeEdgeModuleVsCode", "TypeEdgeModuleVsCode\TypeEdgeModuleVsCode.csproj", "{CD8D8642-5093-4434-953C-4EFD56CC521B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,12 @@ Global
 		{A12248A2-C567-4236-84A9-54364A6F0FFA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A12248A2-C567-4236-84A9-54364A6F0FFA}.TemplateDevelopment|Any CPU.ActiveCfg = Debug|Any CPU
 		{A12248A2-C567-4236-84A9-54364A6F0FFA}.TemplateDevelopment|Any CPU.Build.0 = Debug|Any CPU
+		{CD8D8642-5093-4434-953C-4EFD56CC521B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD8D8642-5093-4434-953C-4EFD56CC521B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD8D8642-5093-4434-953C-4EFD56CC521B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD8D8642-5093-4434-953C-4EFD56CC521B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD8D8642-5093-4434-953C-4EFD56CC521B}.TemplateDevelopment|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD8D8642-5093-4434-953C-4EFD56CC521B}.TemplateDevelopment|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

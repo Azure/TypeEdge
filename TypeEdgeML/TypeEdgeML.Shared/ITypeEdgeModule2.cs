@@ -1,6 +1,6 @@
-﻿using TypeEdge.Attributes;
-using TypeEdge.Modules.Endpoints;
-using TypeEdge.Twins;
+﻿using Microsoft.Azure.TypeEdge.Attributes;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Twins;
 using TypeEdgeML.Shared.Messages;
 using TypeEdgeML.Shared.Twins;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TypeEdge.Proxy;
+using Microsoft.Azure.TypeEdge.Proxy;
 using Microsoft.Extensions.Configuration;
 using TypeEdgeML.Shared;
 

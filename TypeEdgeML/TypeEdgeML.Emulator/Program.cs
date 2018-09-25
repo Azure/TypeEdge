@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TypeEdge.DovEnv;
-using TypeEdge.Host;
+using Microsoft.Azure.TypeEdge.DovEnv;
+using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using TypeEdgeML.Shared;
+using System.IO;
+using Microsoft.Azure.Devices.Edge.Agent.Docker;
+using Microsoft.Azure.TypeEdge;
 
 namespace TypeEdgeML
 {
@@ -17,7 +20,7 @@ namespace TypeEdgeML
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
-                .AddDotenvFile()
+                .AddDotenv()
                 .AddCommandLine(args)
                 .Build();
 
@@ -31,7 +34,25 @@ namespace TypeEdgeML
             //TODO: Define all cross-module subscriptions 
             host.Upstream.Subscribe(host.GetProxy<ITypeEdgeModule3>().Output);
 
-            host.Build();
+            //customize the runtime configuration
+            var dockerRegistry = configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
+            var manifest = host.GenerateDeviceManifest((e, settings) =>
+            {
+                //this is the opportunity for the host to change the hosting settings of the module e
+                if (!settings.IsExternalModule)
+                    settings.Config = new DockerConfig($"{dockerRegistry}{e}:1.0", settings.Config.CreateOptions);
+                return settings;
+            });
+            File.WriteAllText("../../../manifest.json", manifest);
+
+            //provision a new device with the new manifest
+            var sasToken = host.ProvisionDevice(manifest);
+
+            //build an emulated device in memory
+            host.BuildEmulatedDevice(sasToken);
+
+            //run the emulated device
+            await host.RunAsync();
 
             await host.RunAsync();
 

@@ -1,15 +1,16 @@
-﻿using System;
-using TypeEdge.Modules;
-using TypeEdge.Modules.Endpoints;
-using TypeEdge.Modules.Messages;
-using TypeEdge.Twins;
+﻿using Microsoft.Extensions.Logging;
+using System;
+using Microsoft.Azure.TypeEdge.Modules;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Twins;
 using TypeEdgeApplication.Shared;
 using TypeEdgeApplication.Shared.Messages;
 using TypeEdgeApplication.Shared.Twins;
 
 namespace Modules
 {
-    public class TypeEdgeModule2 : EdgeModule, ITypeEdgeModule2
+    public class TypeEdgeModule2 : TypeModule, ITypeEdgeModule2
     {
         public TypeEdgeModule2(ITypeEdgeModule1 proxy)
         {
@@ -20,7 +21,7 @@ namespace Modules
                     Data = msg.Data,
                     Metadata = DateTime.UtcNow.ToShortTimeString()
                 });
-                Console.WriteLine("TypeEdgeModule2: Generated Message");
+                Logger.LogInformation($"Generated Message");
                 return MessageResult.Ok;
             });
         }

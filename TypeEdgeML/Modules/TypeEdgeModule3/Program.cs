@@ -1,5 +1,5 @@
-﻿using TypeEdge;
-using TypeEdge.Attributes;
+﻿using Microsoft.Azure.TypeEdge;
+using Microsoft.Azure.TypeEdge.Attributes;
 using System;
 using System.Linq;
 using System.Reflection;

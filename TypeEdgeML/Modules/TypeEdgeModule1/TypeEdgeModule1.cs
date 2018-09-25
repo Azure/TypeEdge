@@ -2,24 +2,25 @@
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using TypeEdge.Enums;
-using TypeEdge.Modules;
-using TypeEdge.Modules.Endpoints;
-using TypeEdge.Twins;
+using Microsoft.Azure.TypeEdge.Enums;
+using Microsoft.Azure.TypeEdge.Modules;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Twins;
 using TypeEdgeML.Shared;
 using TypeEdgeML.Shared.Messages;
 using TypeEdgeML.Shared.Twins;
+using Microsoft.Extensions.Logging;
 
 namespace Modules
 {
-    public class TypeEdgeModule1 : EdgeModule, ITypeEdgeModule1
+    public class TypeEdgeModule1 : TypeModule, ITypeEdgeModule1
     {
         public Output<TypeEdgeModule1Output> Output { get; set; }
         public ModuleTwin<TypeEdgeModule1Twin> Twin { get; set; }
 
         public bool ResetModule(int sensorThreshold)
         {
-            Console.WriteLine($"New sensor threshold:{sensorThreshold}");
+            Logger.LogInformation($"New sensor threshold:{sensorThreshold}");
             return true;
         }
 
@@ -28,7 +29,7 @@ namespace Modules
             while (!cancellationToken.IsCancellationRequested)
             {
                 await Output.PublishAsync(new TypeEdgeModule1Output {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)});
-                Console.WriteLine("TypeEdgeModule1: Generated Message");
+                Logger.LogInformation($"Generated Message");
                 await Task.Delay(1000);
             }
             return ExecutionResult.Ok;

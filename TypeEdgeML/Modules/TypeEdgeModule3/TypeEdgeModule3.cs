@@ -4,21 +4,22 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using TypeEdge.Modules;
-using TypeEdge.Modules.Endpoints;
-using TypeEdge.Modules.Enums;
-using TypeEdge.Modules.Messages;
-using TypeEdge.Twins;
+using Microsoft.Azure.TypeEdge.Modules;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Modules.Enums;
+using Microsoft.Azure.TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Twins;
 using Microsoft.Extensions.Configuration;
 using Python.Runtime;
 using TypeEdgeML.Shared;
 using TypeEdgeML.Shared.Messages;
 using TypeEdgeML.Shared.Twins;
 using TypeEdgeModule3;
+using Microsoft.Extensions.Logging;
 
 namespace Modules
 {
-    public class TypeEdgeModule3 : EdgeModule, ITypeEdgeModule3, IDisposable
+    public class TypeEdgeModule3 : TypeModule, ITypeEdgeModule3, IDisposable
     {
         private Py.GILState _state;
         private dynamic _sys;
@@ -42,7 +43,7 @@ namespace Modules
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToString());
+                    Logger.LogError(ex, "");
                 }
             });
             _pythonTaskScheduler.Start();
@@ -56,7 +57,7 @@ namespace Modules
         {
             proxy.Output.Subscribe(this, async msg =>
             {
-                Console.WriteLine("Processing new message in TypeEdgeModule3");
+                Logger.LogInformation($"Processing new message");
 
                 await _pythonTaskScheduler.Schedule(() =>
                 {
@@ -76,7 +77,7 @@ namespace Modules
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.ToString());
+                        Logger.LogError(ex, "");
                     }
                 });
 
@@ -86,7 +87,7 @@ namespace Modules
                     Data = msg.Data,
                     Metadata = DateTime.UtcNow.ToShortTimeString()
                 });
-                Console.WriteLine("TypeEdgeModule3: Generated Message");
+                Logger.LogInformation($"Generated Message");
 
                 return MessageResult.Ok;
             });
