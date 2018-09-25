@@ -36,7 +36,7 @@
             "restartPolicy": "on-failure",
             "settings": {
               "image": "typeedge.azurecr.io/temperaturesensor:1.0",
-              "createOptions": "{\n  \"Env\":[\n     \"moduleName=temperaturesensor\"\n  ]\n  }"
+              "createOptions": "{\"Env\":[\"moduleName=temperaturesensor\"]}"
             }
           }
         }
@@ -55,11 +55,11 @@
     },
     "temperaturesensor": {
       "properties.desired": {
-        "SamplingHz": "11",
-        "Frequency": "3",
-        "Amplitude": "11",
+        "SamplingHz": "10",
+        "Frequency": "2",
+        "Amplitude": "10",
         "WaveType": "Sine",
-        "Offset": "61",
+        "Offset": "60",
         "___Twin": true
       }
     }
