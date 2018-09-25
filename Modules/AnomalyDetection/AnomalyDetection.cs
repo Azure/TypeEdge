@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using AnomalyDetectionAlgorithms;
-using TypeEdge.Modules;
-using TypeEdge.Modules.Endpoints;
-using TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Modules;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Modules.Messages;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using System;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Modules
 {
-    public class AnomalyDetection : EdgeModule, IAnomalyDetection
+    public class AnomalyDetection : TypeModule, IAnomalyDetection
     {
         readonly object _syncSample = new object();
         object _syncClustering = new object();
@@ -41,7 +41,7 @@ namespace Modules
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    Logger.LogError(ex, $"Error processing {signal.ToString()}");
                 }
                 return MessageResult.Ok;
             });
@@ -71,7 +71,7 @@ namespace Modules
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    Logger.LogError(ex, $"Error processing {model.ToString()}");
                 }
 
                 return Task.FromResult(MessageResult.Ok);

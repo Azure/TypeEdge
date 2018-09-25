@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using TypeEdge;
+using Microsoft.Azure.TypeEdge;
 
 namespace Modules
 {

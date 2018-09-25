@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,16 +12,16 @@ using ThermostatApplication.Messages;
 using ThermostatApplication.Messages.Visualization;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
-using TypeEdge.Enums;
-using TypeEdge.Modules;
-using TypeEdge.Modules.Enums;
-using TypeEdge.Modules.Messages;
-using TypeEdge.Twins;
+using Microsoft.Azure.TypeEdge.Enums;
+using Microsoft.Azure.TypeEdge.Modules;
+using Microsoft.Azure.TypeEdge.Modules.Enums;
+using Microsoft.Azure.TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Twins;
 using VisualizationWeb;
 
 namespace Modules
 {
-    public class Visualization : EdgeModule, IVisualization
+    public class Visualization : TypeModule, IVisualization
     {
         readonly object _sync = new object();
         readonly IConfigurationRoot _configuration;
@@ -59,7 +60,7 @@ namespace Modules
 
             Twin.Subscribe(twin =>
             {
-                Console.WriteLine($"{typeof(Visualization).Name}::Twin update");
+                Logger.LogInformation($"Twin update");
 
                 ConfigureCharts(twin);
                 return Task.FromResult(TwinResult.Ok);

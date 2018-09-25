@@ -15,11 +15,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="1.0.2" />
-    <PackageReference Include="TypeEdge" Version="0.3.5" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.1" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\TypeEdge\TypeEdge.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
+    <ProjectReference Include="..\..\..\..\Microsoft.Azure.TypeEdge\Microsoft.Azure.TypeEdge.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
     <ProjectReference Include="..\..\Thermostat.Shared\Thermostat.Shared.csproj" />
     <ProjectReference Include="..\VisualizationWeb\VisualizationWeb.csproj" />
   </ItemGroup>

@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TypeEdge.Enums;
-using TypeEdge.Modules;
-using TypeEdge.Modules.Endpoints;
-using TypeEdge.Modules.Enums;
-using TypeEdge.Modules.Messages;
-using TypeEdge.Twins;
+using Microsoft.Azure.TypeEdge.Enums;
+using Microsoft.Azure.TypeEdge.Modules;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Modules.Enums;
+using Microsoft.Azure.TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Twins;
 using ThermostatApplication;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using Newtonsoft.Json;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Modules
 {
-    public class Orchestrator : EdgeModule, IOrchestrator
+    public class Orchestrator : TypeModule, IOrchestrator
     {
         readonly object _twinLock = new object();
         OrchestratorTwin _lastTwin;
@@ -51,7 +52,7 @@ namespace Modules
 
             trainerProxy.Model.Subscribe(this, async model =>
             {
-                Console.WriteLine($"{typeof(OrchestratorTwin).Name}::New Trained Model for {model.Algorithm}. Updating the model in {model.Algorithm}");
+                Logger.LogInformation($"New Trained Model for {model.Algorithm}. Updating the model in {model.Algorithm}");
                 await Model.PublishAsync(model);
                 return MessageResult.Ok;
             });
@@ -61,7 +62,7 @@ namespace Modules
                 lock (_twinLock)
                     _lastTwin = twin;
 
-                Console.WriteLine($"{typeof(OrchestratorTwin).Name}::Twin update. Routing  = { twin.RoutingMode.ToString()}");
+                Logger.LogInformation($"Twin update. Routing  = { twin.RoutingMode.ToString()}");
                 await Twin.ReportAsync(twin);
                 return TwinResult.Ok;
             });
@@ -102,7 +103,7 @@ namespace Modules
 
         private async Task BroadcastMessage(Temperature signal, OrchestratorTwin twin)
         {
-            Console.WriteLine($"Orchestrator.BroadcastMessage : {JsonConvert.SerializeObject(signal)}");
+            Logger.LogInformation($"BroadcastMessage : {JsonConvert.SerializeObject(signal)}");
 
             List<Task> messages = new List<Task>();
             foreach (Routing item in Enum.GetValues(typeof(Routing)))

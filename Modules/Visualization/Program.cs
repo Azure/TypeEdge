@@ -1,4 +1,4 @@
-﻿using TypeEdge;
+﻿using Microsoft.Azure.TypeEdge;
 using System;
 using System.Threading.Tasks;
 

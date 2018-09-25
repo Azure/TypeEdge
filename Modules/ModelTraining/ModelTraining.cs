@@ -1,19 +1,20 @@
 ﻿using System.Linq;
-using TypeEdge.Modules;
-using TypeEdge.Modules.Endpoints;
-using TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Modules;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Modules.Messages;
 using System.Collections.Generic;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
-using TypeEdge.Twins;
-using TypeEdge.Modules.Enums;
+using Microsoft.Azure.TypeEdge.Twins;
+using Microsoft.Azure.TypeEdge.Modules.Enums;
 using System;
 using AnomalyDetectionAlgorithms;
+using Microsoft.Extensions.Logging;
 
 namespace Modules
 {
-    public class ModelTraining : EdgeModule, IModelTraining
+    public class ModelTraining : TypeModule, IModelTraining
     {
         object _sync = new object();
 
@@ -36,7 +37,8 @@ namespace Modules
 
             Twin.Subscribe(async twin =>
             {
-                Console.WriteLine($"{typeof(ModelTraining).Name}::Twin update");
+
+                Logger.LogInformation("Twin update");
 
                 lock (_sync)
                 {

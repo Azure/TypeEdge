@@ -1,5 +1,5 @@
 ﻿
-using TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Modules.Messages;
 using ThermostatApplication.Messages.Visualization;
 
 namespace ThermostatApplication.Messages

@@ -1,4 +1,4 @@
-﻿using TypeEdge.Twins;
+﻿using Microsoft.Azure.TypeEdge.Twins;
 
 
 namespace ThermostatApplication.Twins

@@ -1,4 +1,4 @@
-﻿using TypeEdge.Volumes;
+﻿using Microsoft.Azure.TypeEdge.Volumes;
 using ThermostatApplication.Messages;
 
 namespace ThermostatApplication.Modules

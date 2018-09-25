@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using ThermostatApplication;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
-using TypeEdge.Proxy;
+using Microsoft.Azure.TypeEdge.Proxy;
 
 namespace Thermostat.ServiceApp
 {

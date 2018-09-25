@@ -1,5 +1,5 @@
 ﻿
-using TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Modules.Messages;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Text;

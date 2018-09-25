@@ -1,38 +1,42 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TypeEdge.Host;
+using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using Modules;
 using ThermostatApplication.Modules;
-using TypeEdge.DovEnv;
+using Microsoft.Azure.TypeEdge;
 using System.IO;
+using Microsoft.Azure.Devices.Edge.Agent.Docker;
 
 namespace ThermostatApplication
 {
-    internal class Program 
+    internal class Program
     {
-        private static async Task Main(string[] args) 
+        private static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
-                .AddDotenvFile()
+                .AddDotenv()
                 .AddCommandLine(args)
                 .Build();
 
             var host = new TypeEdgeHost(configuration);
 
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
-            host.RegisterModule<IOrchestrator, Orchestrator>(); 
+            host.RegisterModule<IOrchestrator, Orchestrator>();
             host.RegisterModule<IModelTraining, ModelTraining>();
             host.RegisterModule<IVisualization, Visualization>();
             host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
 
             host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
-            var manifest = host.GenerateDeviceManifest((e) =>
+            var dockerRegistry = configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
+            var manifest = host.GenerateDeviceManifest((e, settings) =>
             {
-                return "1.0";
+                //this is the opportunity of the host to change the hosting settings of the module e
+                settings.Config = new DockerConfig($"{dockerRegistry}{e}:1.0", settings.Config.CreateOptions);
+                return settings;
             });
             var sasToken = host.ProvisionDevice(manifest);
             host.BuildEmulatedDevice(sasToken);

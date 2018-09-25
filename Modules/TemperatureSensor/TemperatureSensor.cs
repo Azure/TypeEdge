@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TypeEdge.Enums;
-using TypeEdge.Modules;
-using TypeEdge.Modules.Endpoints;
-using TypeEdge.Modules.Enums;
-using TypeEdge.Twins;
+using Microsoft.Azure.TypeEdge.Enums;
+using Microsoft.Azure.TypeEdge.Modules;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Modules.Enums;
+using Microsoft.Azure.TypeEdge.Twins;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
 using WaveGenerator;
 using Newtonsoft.Json;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Modules
 {
-    public class TemperatureSensor : EdgeModule, ITemperatureSensor
+    public class TemperatureSensor : TypeModule, ITemperatureSensor
     {
         readonly object _sync = new object();
         readonly DateTime _startTimeStamp;
@@ -33,7 +34,7 @@ namespace Modules
 
             Twin.Subscribe(async twin =>
             {
-                Console.WriteLine($"{typeof(TemperatureSensor).Name}::Twin update");
+                Logger.LogInformation($"Twin update");
 
                 ConfigureGenerator(twin);
                 await Twin.ReportAsync(twin);
@@ -65,7 +66,7 @@ namespace Modules
         }
         public void GenerateAnomaly(int value)
         {
-            Console.WriteLine($"TemperatureSensor::GenerateAnomaly called with value:{value}");
+            Logger.LogInformation($"GenerateAnomaly called with value:{value}");            
 
             lock (_sync)
                 _anomalyOffset = value;
@@ -93,10 +94,10 @@ namespace Modules
                     var message = new Temperature()
                     {
                         Value = newValue + offset,
-                        TimeStamp = DateTime.Now.Subtract(_startTimeStamp).TotalMilliseconds/1000
+                        TimeStamp = DateTime.Now.Subtract(_startTimeStamp).TotalMilliseconds / 1000
                     };
 
-                    await Temperature.PublishAsync(message);                    
+                    await Temperature.PublishAsync(message);
                 }
                 await Task.Delay((int)sleepTimeMs);
             }
