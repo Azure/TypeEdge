@@ -3,7 +3,6 @@ using Docker.DotNet;
 using Docker.DotNet.Models;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Edge.Agent.Core;
-using Microsoft.Azure.Devices.Edge.Agent.Core.Commands;
 using Microsoft.Azure.Devices.Edge.Agent.Docker;
 using Microsoft.Azure.Devices.Edge.Agent.Docker.Commands;
 using Microsoft.Azure.Devices.Edge.Util;
@@ -11,9 +10,7 @@ using Microsoft.Azure.Devices.Shared;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TypeEdge.Enums;
@@ -78,7 +75,7 @@ namespace TypeEdge.Host.Docker
                 loggingConfig,
                 configSource,
                 combinedDockerConfigProvider),
-                Logger.Factory) as ICommandFactory;
+                Microsoft.Azure.Devices.Edge.Util.Logger.Factory) as ICommandFactory;
 
             //var updateCommand = new GroupCommand(
             //      new RemoveCommand(_dockerClient, dockerModule),
