@@ -116,7 +116,7 @@ namespace TypeEdge.Host.Docker
                     await (await _dockerFactory.RemoveAsync(_moduleWithIdentity.Module)).ExecuteAsync(cancellationToken);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine($"{_moduleWithIdentity.Module.Name} not found");
             }

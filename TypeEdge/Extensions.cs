@@ -1,16 +1,98 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TypeEdge.DovEnv;
 
 namespace TypeEdge
 {
     public static class Extensions
     {
+        public static IConfigurationBuilder AddDotenv(this IConfigurationBuilder builder)
+        {
+            return AddDotenv(builder, null, string.Empty, false, false);
+        }
+
+        public static IConfigurationBuilder AddDotenv(this IConfigurationBuilder builder, string path)
+        {
+            return AddDotenv(builder, null, path, false, false);
+        }
+
+        public static IConfigurationBuilder AddDotenvFile(this IConfigurationBuilder builder, string path, bool optional)
+        {
+            return AddDotenv(builder, null, path, optional, false);
+        }
+
+        public static IConfigurationBuilder AddDotenvFile(this IConfigurationBuilder builder, string path, bool optional, bool reloadOnChange)
+        {
+            return AddDotenv(builder, null, path, optional, reloadOnChange);
+        }
+
+        public static IConfigurationBuilder AddDotenv(this IConfigurationBuilder configurationBuilder, IFileProvider provider, string filePath, bool optional, bool reloadOnChange)
+        {
+            if (configurationBuilder == null)
+                throw new ArgumentNullException(nameof(configurationBuilder));
+
+            if (string.IsNullOrEmpty(filePath))
+                filePath = Dotenv.DefaultPath;
+
+            var lookUpPaths = new List<string>() { AppContext.BaseDirectory, "" };
+
+            if (provider == null)
+            {
+                bool exists = false;
+                foreach (var lookUpPath in lookUpPaths)
+                {
+                    var fullPath = Path.Join(lookUpPath, filePath);
+                    if (File.Exists(fullPath))
+                    {
+                        exists = true;
+                        filePath = fullPath;
+                        break;
+                    }
+                }
+                if (!exists && !optional)
+                    throw new Exception($"Could not locate {filePath}");
+            }
+            else
+                if (!provider.GetFileInfo(filePath).Exists)
+                throw new Exception($"Could not locate {filePath}");
+
+            if (Path.IsPathRooted(filePath))
+            {                
+                provider = new PhysicalFileProvider(Path.GetDirectoryName(filePath), Microsoft.Extensions.FileProviders.Physical.ExclusionFilters.None);
+                filePath = Path.GetFileName(filePath);
+            }
+
+            var source = new DotenvConfigurationSource
+            {
+                Path = filePath,
+                Optional = optional,
+                FileProvider = provider,
+                ReloadOnChange = reloadOnChange
+            };
+            configurationBuilder.Add(source);
+            return configurationBuilder;
+
+        }
+        public static Dictionary<TKey, TValue> DeepClone<TKey, TValue>
+            (this Dictionary<TKey, TValue> original) where TValue : ICloneable
+        {
+            Dictionary<TKey, TValue> ret = new Dictionary<TKey, TValue>(original.Count,
+                                                                    original.Comparer);
+            foreach (KeyValuePair<TKey, TValue> entry in original)
+            {
+                ret.Add(entry.Key, (TValue)entry.Value.Clone());
+            }
+            return ret;
+        }
+
         public static Task WhenCanceled(this CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<bool>();

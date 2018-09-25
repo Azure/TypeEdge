@@ -23,6 +23,7 @@ using Autofac;
 using Castle.DynamicProxy;
 using TypeEdge.Proxy;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
 
 [assembly: InternalsVisibleTo("TypeEdge.Host")]
 [assembly: InternalsVisibleTo("TypeEdge.Proxy")]
@@ -35,10 +36,11 @@ namespace TypeEdge.Modules
         private readonly Dictionary<string, MethodCallback> _methodSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> _routeSubscriptions;
         private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
-
-        private string _connectionString;
+        private readonly ILogger _logger;
         private ModuleClient _ioTHubModuleClient;
         private ITransportSettings[] _transportSettings;
+
+        
         #endregion
 
         protected TypeModule()
@@ -51,6 +53,8 @@ namespace TypeEdge.Modules
 
             DefaultTwin = new TwinCollection();
             Routes = new List<string>();
+
+            _logger = Logger.Factory.CreateLogger(GetType());
 
             InstantiateProperties();
         }
@@ -156,10 +160,10 @@ namespace TypeEdge.Modules
             RegisterMethods();
 
             // Open a connection to the Edge runtime
-            _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, _transportSettings);
+            _ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(_transportSettings);
 
             await _ioTHubModuleClient.OpenAsync();
-            //Console.WriteLine($"{Name}:IoT Hub module client initialized.");
+            _logger?.LogInformation($"IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
             foreach (var subscription in _routeSubscriptions)
@@ -167,7 +171,7 @@ namespace TypeEdge.Modules
                 await _ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, MessageHandler,
                     subscription.Value);
 
-                //Console.WriteLine($"{Name}:MessageHandler set for {subscription.Key}");
+                _logger?.LogInformation($"MessageHandler set for {subscription.Key}");
             }
 
             // Register callback to be called when a twin update is received by the module
@@ -176,25 +180,25 @@ namespace TypeEdge.Modules
             foreach (var subscription in _methodSubscriptions)
             {
                 await _ioTHubModuleClient.SetMethodHandlerAsync(subscription.Key, MethodCallback, subscription.Value);
-                //Console.WriteLine($"{Name}:MethodCallback set for{subscription.Key}");
+                _logger?.LogInformation($"MethodCallback set for{subscription.Key}");
             }
 
-            //Console.WriteLine($"{Name}:Running RunAsync..");
+            _logger?.LogInformation($"Running RunAsync..");
             return await RunAsync(cancellationToken);
         }
 
         internal virtual InitializationResult _Init(IConfigurationRoot configuration, IContainer container)
         {
-            //Console.WriteLine($"{Name}:InternalConfigure called");
-
-            _connectionString = configuration.GetValue<string>($"{Constants.EdgeHubConnectionStringKey}");
-            if (string.IsNullOrEmpty(_connectionString))
-                throw new ArgumentException($"Missing {Constants.EdgeHubConnectionStringKey} in configuration for {Name}");
+            _logger?.LogInformation($"InternalConfigure called");
+            
+             var connectionString = configuration.GetValue<string>($"{Constants.EdgeHubConnectionStringKey}");
+            if (string.IsNullOrEmpty(connectionString))
+                _logger?.LogWarning($"Missing {Constants.EdgeHubConnectionStringKey} variable.");
 
             // Cert verification is not yet fully functional when using Windows OS for the container
-            var bypassCertVerification = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            if (!bypassCertVerification)
-                InstallCert();
+            //var bypassCertVerification = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            //if (!bypassCertVerification)
+            //    InstallCert();
 
             var settings = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
             if (true) //bypassCertVerification)
@@ -208,7 +212,7 @@ namespace TypeEdge.Modules
         internal async Task<PublishResult> PublishMessageAsync<T>(string outputName, T message)
             where T : IEdgeMessage
         {
-            //Console.WriteLine($"{Name}:PublishMessageAsync called");
+            _logger?.LogInformation($"PublishMessageAsync called");
             var edgeMessage = new Message(message.GetBytes());
 
 
@@ -219,7 +223,7 @@ namespace TypeEdge.Modules
             await _ioTHubModuleClient.SendEventAsync(outputName, edgeMessage);
 
             var messageString = Encoding.UTF8.GetString(message.GetBytes());
-            //Console.WriteLine($">>>>>>{Name}: message: Body: [{messageString}]");
+            _logger?.LogInformation($"Message: Body: [{messageString}]");
 
             return PublishResult.Ok;
         }
@@ -228,7 +232,7 @@ namespace TypeEdge.Modules
             Func<T, Task<MessageResult>> handler)
             where T : IEdgeMessage
         {
-            //Console.WriteLine($"{Name}:SubscribeRoute called");
+            _logger?.LogInformation($"SubscribeRoute called");
 
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
@@ -241,7 +245,7 @@ namespace TypeEdge.Modules
 
         internal void SubscribeRoute(string outName, string outRoute, string inName, string inRoute)
         {
-            //Console.WriteLine($"{Name}:SubscribeRoute called");
+            _logger?.LogInformation($"SubscribeRoute called");
 
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
@@ -249,7 +253,7 @@ namespace TypeEdge.Modules
 
         internal void SubscribeTwin<T>(string name, Func<T, Task<TwinResult>> handler) where T : TypeTwin
         {
-            //Console.WriteLine($"{Name}:SubscribeTwin called");
+            _logger?.LogInformation($"SubscribeTwin called");
 
             _twinSubscriptions[name] = new SubscriptionCallback(name, handler, typeof(T));
         }
@@ -257,7 +261,7 @@ namespace TypeEdge.Modules
         internal async Task ReportTwinAsync<T>(string name, T twin)
             where T : TypeTwin
         {
-            //Console.WriteLine($"{Name}:ReportTwinAsync called");
+            _logger?.LogInformation($"ReportTwinAsync called");
             await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedProperties());
         }
 
@@ -292,7 +296,7 @@ namespace TypeEdge.Modules
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{Name}:ERROR:{ex}");
+                _logger?.LogError(ex, "Error in GetReferenceData.");
             }
             return null;
         }
@@ -311,7 +315,7 @@ namespace TypeEdge.Modules
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{Name}:ERROR:{ex}");
+                _logger?.LogError(ex, "Error in SetReferenceData.");
             }
             return false;
         }
@@ -327,7 +331,7 @@ namespace TypeEdge.Modules
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{Name}:ERROR:{ex}");
+                _logger?.LogError(ex, "Error in DeleteReferenceData.");
             }
             return false;
         }
@@ -354,7 +358,7 @@ namespace TypeEdge.Modules
 
         private Task<MethodResponse> MethodCallback(MethodRequest methodRequest, object userContext)
         {
-            //Console.WriteLine($"{Name}:MethodCallback called");
+            _logger?.LogInformation($"MethodCallback called");
             if (!(userContext is MethodCallback callback))
                 throw new InvalidOperationException($"{Name}:UserContext doesn't contain a valid SubscriptionCallback");
 
@@ -373,8 +377,7 @@ namespace TypeEdge.Modules
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"{Name}:ERROR:{ex}");
-
+                _logger?.LogError(ex, "Error in MethodCallback.");
                 // Acknowlege the direct method call with a 400 error message
                 var result = "{\"result\":\"" + ex.Message + "\"}";
                 return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 400));
@@ -383,18 +386,17 @@ namespace TypeEdge.Modules
 
         private async Task<MessageResponse> MessageHandler(Message message, object userContext)
         {
-            //Console.WriteLine($"{Name}:MessageHandler called");
+            _logger?.LogInformation($"MessageHandler called");
 
             if (!(userContext is SubscriptionCallback callback))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
             var messageBytes = message.GetBytes();
             var messageString = Encoding.UTF8.GetString(messageBytes);
-            //Console.WriteLine($"<<<<<<{Name}:message: Body: [{messageString}]");
 
             if (!(Activator.CreateInstance(callback.Type) is IEdgeMessage input))
             {
-                Console.WriteLine($"{Name}:Abandoned Message");
+                _logger?.LogWarning("Abandoned Message");
                 return MessageResponse.Abandoned;
             }
 
@@ -408,13 +410,13 @@ namespace TypeEdge.Modules
 
         private async Task PropertyHandler(TwinCollection desiredProperties, object userContext)
         {
-            //Console.WriteLine($"{Name}:PropertyHandler called");
+            _logger?.LogInformation($"PropertyHandler called");
 
             if (!(userContext is Dictionary<string, SubscriptionCallback> callbacks))
                 throw new InvalidOperationException("UserContext doesn't contain a valid SubscriptionCallback");
 
-            //Console.WriteLine($"{Name}:Desired property change:");
-            //Console.WriteLine(JsonConvert.SerializeObject(desiredProperties));
+            _logger?.LogInformation($"Desired property change:");
+            _logger?.LogInformation(JsonConvert.SerializeObject(desiredProperties));
 
             foreach (var callback in callbacks)
                 if (desiredProperties.Contains($"___{callback.Key}"))
@@ -432,21 +434,21 @@ namespace TypeEdge.Modules
             if (string.IsNullOrWhiteSpace(certPath))
             {
                 // We cannot proceed further without a proper cert file
-                Console.WriteLine($"Missing path to certificate collection file: {certPath}");
+                _logger?.LogWarning($"Missing path to certificate collection file: {certPath}");
                 throw new InvalidOperationException("Missing path to certificate file.");
             }
 
             if (!File.Exists(certPath))
             {
                 // We cannot proceed further without a proper cert file
-                Console.WriteLine($"Missing path to certificate collection file: {certPath}");
+                _logger?.LogWarning($"Missing path to certificate collection file: {certPath}");
                 throw new InvalidOperationException("Missing certificate file.");
             }
 
             var store = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadWrite);
             store.Add(new X509Certificate2(X509Certificate.CreateFromCertFile(certPath)));
-            //Console.WriteLine($"{Name}:Added Cert: " + certPath);
+            _logger?.LogInformation($"Added Cert: " + certPath);
             store.Close();
         }
 
@@ -480,7 +482,7 @@ namespace TypeEdge.Modules
 
         private void RegisterMethods()
         {
-            //Console.WriteLine($"{Name}:RegisterMethods called");
+            _logger?.LogInformation($"RegisterMethods called");
             var interfaceType = GetType().GetProxyInterface();
 
             if (interfaceType == null)

@@ -3,57 +3,30 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
+
+//copied from https://github.com/frozzare/dotnet-dotenv
+
 namespace TypeEdge.DovEnv
 {
     public class Dotenv
     {
-        public static readonly string DefaultPath = "./.env";
+        public static readonly string DefaultPath = ".env";
 
         private readonly Dictionary<string, string> _variables = new Dictionary<string, string>();
 
-        public static Dotenv Load(string path)
+        public static Dotenv Read(Stream input)
         {
-            if (String.IsNullOrEmpty(path))
-            {
-                path = DefaultPath;
-            }
-
-            if (!File.Exists(path))
-            {
-                throw new Exception("The .env file don't exists in the current directory");
-            }
-
-            var content = File.ReadAllText(path);
-
-            return new Dotenv(content);
-        }
-
-        public static Dotenv Load(Stream input)
-        {
-            string dotEnvContent;
-            // Ensure resources are cleaned up after the read...
             using (var reader = new StreamReader(input))
             {
-                dotEnvContent = reader.ReadToEnd();
+                return new Dotenv(reader.ReadToEnd());
             }
-            return new Dotenv(dotEnvContent);
         }
 
-        public Dictionary<string, string> GetVariables()
+        public Dictionary<string, string> GetData()
         {
-            // Return a copy so caller cannot modify internal state.
-            return CloneVariables();
+            return _variables.DeepClone();
         }
 
-        private Dictionary<string, string> CloneVariables()
-        {
-            var clone = new Dictionary<string, string>(_variables.Count, _variables.Comparer);
-            foreach (var item in _variables)
-            {
-                clone.Add(item.Key, item.Value);
-            }
-            return clone;
-        }
 
         protected Dotenv(string content)
         {

@@ -84,7 +84,7 @@ namespace TypeEdge
                             .AddJsonFile($"{moduleName}Settings.json", true)
                             .AddEnvironmentVariables()
                             .AddCommandLine(args)
-                            .AddDotenvFile(fileName)
+                            .AddDotenv(fileName)
                             .Build();
                         File.Delete(fileName);
                         break;

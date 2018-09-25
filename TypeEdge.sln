@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edg
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Storage", "IoT.Edge\edge-util\src\Microsoft.Azure.Devices.Edge.Storage\Microsoft.Azure.Devices.Edge.Storage.csproj", "{101A6115-688F-474A-AC5F-051FA6232349}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Agent.Docker", "IoT.Edge\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Docker\Microsoft.Azure.Devices.Edge.Agent.Docker.csproj", "{05407166-867F-4321-A3B2-0E5D56726C2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CodeCoverage|Any CPU = CodeCoverage|Any CPU
@@ -153,6 +155,14 @@ Global
 		{101A6115-688F-474A-AC5F-051FA6232349}.Release|Any CPU.Build.0 = Release|Any CPU
 		{101A6115-688F-474A-AC5F-051FA6232349}.TemplateDevelopment|Any CPU.ActiveCfg = CodeCoverage|Any CPU
 		{101A6115-688F-474A-AC5F-051FA6232349}.TemplateDevelopment|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{05407166-867F-4321-A3B2-0E5D56726C2B}.CodeCoverage|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{05407166-867F-4321-A3B2-0E5D56726C2B}.CodeCoverage|Any CPU.Build.0 = CodeCoverage|Any CPU
+		{05407166-867F-4321-A3B2-0E5D56726C2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05407166-867F-4321-A3B2-0E5D56726C2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05407166-867F-4321-A3B2-0E5D56726C2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05407166-867F-4321-A3B2-0E5D56726C2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05407166-867F-4321-A3B2-0E5D56726C2B}.TemplateDevelopment|Any CPU.ActiveCfg = CodeCoverage|Any CPU
+		{05407166-867F-4321-A3B2-0E5D56726C2B}.TemplateDevelopment|Any CPU.Build.0 = CodeCoverage|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -169,6 +179,7 @@ Global
 		{A7DEAB53-6DCB-4287-8DED-C0358BCB4EBB} = {ABC622C1-4D24-48CF-8B0D-CA63C27CB444}
 		{ED0444A3-03A3-4B84-854F-CC6BC53DEBB8} = {ABC622C1-4D24-48CF-8B0D-CA63C27CB444}
 		{101A6115-688F-474A-AC5F-051FA6232349} = {ABC622C1-4D24-48CF-8B0D-CA63C27CB444}
+		{05407166-867F-4321-A3B2-0E5D56726C2B} = {ABC622C1-4D24-48CF-8B0D-CA63C27CB444}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {114E5850-267D-4B44-ACD5-91ACA382DDBC}
