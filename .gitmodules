@@ -1,12 +1,6 @@
 [submodule "IoT.Edge"]
 	path = IoT.Edge
 	url = https://github.com/Azure/iotedge
-[submodule "Examples/AnomalyDetection"]
-	path = Examples/AnomalyDetection
-	url = https://github.com/paloukari/TypeEdge.AnomalyDetection.git
-[submodule "Examples/QuickStart"]
-	path = Examples/QuickStart
-	url = https://github.com/paloukari/TypeEdge.QuickStart.git
 [submodule "Templates"]
 	path = Templates
 	url = https://github.com/paloukari/TypeEdge.Templates.git
