@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\.env" Link=".env" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
+    <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Host" Version="0.4.4" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
+    <ProjectReference Include="..\Modules\TemperatureSensor\TemperatureSensor.csproj" />
+    <ProjectReference Include="..\Thermostat.Shared\Thermostat.Shared.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Certificates\**\*.*" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'">
+      <Link>Certificates\%(RecursiveDir)%(FileName)%(Extension)</Link>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\Microsoft.Azure.TypeEdge.Host\appsettings_hub.json" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'">
+      <Link>appsettings_hub.json</Link>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

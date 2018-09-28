@@ -1,0 +1,20 @@
+version: '3.4'
+volumes:
+  env:
+
+services:
+  thermostat.emulator:
+    image: ${DOCKER_REGISTRY}thermostatemulator
+    build:
+      context: .
+      dockerfile: Thermostat.Emulator/Dockerfile
+    volumes:
+    - env:/app/env
+
+  temperaturesensor:
+    image: ${DOCKER_REGISTRY}temperaturesensor
+    build:
+      context: .
+      dockerfile: Modules/TemperatureSensor/Dockerfile
+    volumes:
+    - env:/app/env
