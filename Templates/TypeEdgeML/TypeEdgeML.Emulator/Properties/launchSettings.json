@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TypeEdgeML.Emulator": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "__PY_VERSION": "3.6"
+      }
+    }
+  }
+}

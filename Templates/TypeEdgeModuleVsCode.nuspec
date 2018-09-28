@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>TypeEdge.Module.VsCode</id>
+        <version>0.1.2</version>
+        <description>A TypeEdge Module project template for VsCode Azure IoT Edge extension</description>
+        <authors>Microsoft</authors>
+    	<owners>Microsoft</owners>
+    	<requireLicenseAcceptance>false</requireLicenseAcceptance>
+    	<language>en-US</language>
+        <projectUrl>https://github.com/Azure/TypeEdge</projectUrl>
+        <licenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</licenseUrl>
+        <packageTypes>
+            <packageType name="Template" />
+        </packageTypes>
+    </metadata>
+</package>
