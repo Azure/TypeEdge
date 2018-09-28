@@ -4,7 +4,7 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.TypeEdge</PackageId>
     <Version>0.4.4</Version>
-    <Authors>paloukari</Authors>
+    <Authors>Microsoft</Authors>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
