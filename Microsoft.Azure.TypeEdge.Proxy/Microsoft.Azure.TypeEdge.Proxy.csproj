@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.TypeEdge.Proxy</PackageId>
-    <Version>0.4.1</Version>
+    <Version>0.4.3</Version>
     <Authors>paloukari</Authors>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

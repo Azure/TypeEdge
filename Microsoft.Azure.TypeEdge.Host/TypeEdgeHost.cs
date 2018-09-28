@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
@@ -15,6 +15,7 @@ using Microsoft.Azure.Devices.Common.Exceptions;
 using Microsoft.Azure.Devices.Edge.Agent.Core;
 using Microsoft.Azure.Devices.Edge.Storage;
 using Microsoft.Azure.Devices.Shared;
+using Microsoft.Azure.TypeEdge.Host.Docker;
 using Microsoft.Azure.TypeEdge.Host.Hub;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Endpoints;
@@ -22,47 +23,41 @@ using Microsoft.Azure.TypeEdge.Modules.Messages;
 using Microsoft.Azure.TypeEdge.Proxy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using HubService = Microsoft.Azure.Devices.Edge.Hub.Service;
-using Microsoft.Extensions.Logging;
 using Serilog;
-using System.Globalization;
-using System.Runtime.Loader;
-using Microsoft.Azure.TypeEdge.Twins;
-using Microsoft.Azure.TypeEdge.Host.Docker;
+using HubService = Microsoft.Azure.Devices.Edge.Hub.Service;
+using IotHubConnectionStringBuilder = Microsoft.Azure.Devices.IotHubConnectionStringBuilder;
+using Module = Microsoft.Azure.Devices.Module;
+using TransportType = Microsoft.Azure.Devices.Client.TransportType;
 
 namespace Microsoft.Azure.TypeEdge.Host
 {
     public class TypeEdgeHost
     {
-        private readonly IConfigurationRoot _configuration;
         private readonly ContainerBuilder _containerBuilder;
+
+        private readonly string _deviceId;
+        private readonly ModuleCollection _externalModules;
         private readonly EdgeHub _hub;
         private readonly bool _inContainer;
-        private string _manifest;
+        private readonly string _iotHubConnectionString;
         private IContainer _container;
-        private readonly ModuleCollection _externalModules;
+        private string _manifest;
         private ModuleCollection _modules;
-        const string DisableServerCertificateValidationKeyName =
-            "Microsoft.Azure.Devices.DisableServerCertificateValidation";
-
-        string _deviceId;
-        string _iotHubConnectionString;
 
 
         public TypeEdgeHost(IConfigurationRoot configuration)
         {
-            _configuration = configuration;
-
-            _deviceId = _configuration.GetValue<string>("DeviceId");
-            _iotHubConnectionString = _configuration.GetValue<string>("IotHubConnectionString");
+            _deviceId = configuration.GetValue<string>("DeviceId");
+            _iotHubConnectionString = configuration.GetValue<string>("IotHubConnectionString");
 
             if (string.IsNullOrEmpty(_iotHubConnectionString))
-                throw new Exception($"Missing \"IotHubConnectionString\" value in configuration");
+                throw new Exception("Missing \"IotHubConnectionString\" value in configuration");
 
             if (string.IsNullOrEmpty(_deviceId))
-                throw new Exception($"Missing \"DeviceId\"value in configuration");
+                throw new Exception("Missing \"DeviceId\"value in configuration");
 
             _containerBuilder = new ContainerBuilder();
             _hub = new EdgeHub();
@@ -85,10 +80,10 @@ namespace Microsoft.Azure.TypeEdge.Host
             _containerBuilder.RegisterType<TTModule>().WithParameter(
                 (pi, ctx) => pi.ParameterType == typeof(IConfigurationRoot),
                 (pi, ctx) => new ConfigurationBuilder()
-                        .AddJsonFile($"{moduleName}Settings.json", true)
-                        .AddJsonFile("appsettings.json", true)
-                        .AddEnvironmentVariables()
-                        .Build());
+                    .AddJsonFile($"{moduleName}Settings.json", true)
+                    .AddJsonFile("appSettings.json", true)
+                    .AddEnvironmentVariables()
+                    .Build());
 
             _containerBuilder.RegisterInstance(new ProxyGenerator()
                 .CreateInterfaceProxyWithoutTarget<TIModule>(new ModuleProxy<TIModule>()));
@@ -110,17 +105,20 @@ namespace Microsoft.Azure.TypeEdge.Host
         {
             CleanUp();
 
-            BuildDIContainer();
+            BuildDiContainer();
 
             _modules = CreateModules();
         }
-        public string GenerateDeviceManifest(Func<string, DockerHostingSettings, DockerHostingSettings> hostingSettings = null)
+
+        public string GenerateDeviceManifest(
+            Func<string, DockerHostingSettings, DockerHostingSettings> hostingSettings = null)
         {
             if (_modules == null)
                 Init();
 
             return _GenerateManifest(hostingSettings);
         }
+
         public string ProvisionDevice(string manifest)
         {
             if (_modules == null)
@@ -145,20 +143,21 @@ namespace Microsoft.Azure.TypeEdge.Host
 
         private void CleanUp()
         {
-            if (!_inContainer || !Directory.Exists(TypeEdge.Constants.ComposeConfigurationPath))
+            if (!_inContainer || !Directory.Exists(Volumes.Constants.ComposeConfigurationPath))
                 return;
-            foreach (var file in Directory.EnumerateFiles(TypeEdge.Constants.ComposeConfigurationPath))
+            foreach (var file in Directory.EnumerateFiles(Volumes.Constants.ComposeConfigurationPath))
                 File.Delete(file);
         }
 
         public async Task RunAsync()
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            AssemblyLoadContext.Default.Unloading += (ctx) => cancellationTokenSource.Cancel();
+            AssemblyLoadContext.Default.Unloading += ctx => cancellationTokenSource.Cancel();
             Console.CancelKeyPress += (sender, cpe) => cancellationTokenSource.Cancel();
 
             await RunAsync(cancellationTokenSource.Token);
         }
+
         public async Task RunAsync(CancellationToken cancellationToken)
         {
             var tasks = new List<Task>
@@ -180,25 +179,28 @@ namespace Microsoft.Azure.TypeEdge.Host
         private async Task CreateTemporaryConnection()
         {
             var moduleConnectionString =
-                  GetModuleConnectionStringAsync(_iotHubConnectionString, _deviceId, _modules[0].Name)
-                      .Result;
+                GetModuleConnectionStringAsync(_iotHubConnectionString, _deviceId, _modules[0].Name)
+                    .Result;
 
             var tmpClient = ModuleClient.CreateFromConnectionString(moduleConnectionString,
-                            new ITransportSettings[]
-                            {
-                                new AmqpTransportSettings(Microsoft.Azure.Devices.Client.TransportType.Amqp_Tcp_Only)
-                                {
-                                    RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
-                                    OpenTimeout = new TimeSpan(1)
-                                }
-                            }
-                        );
+                new ITransportSettings[]
+                {
+                    new AmqpTransportSettings(TransportType.Amqp_Tcp_Only)
+                    {
+                        RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
+                        OpenTimeout = new TimeSpan(1)
+                    }
+                }
+            );
 
             try
             {
                 await tmpClient.OpenAsync();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
 
         public T GetProxy<T>()
@@ -213,7 +215,7 @@ namespace Microsoft.Azure.TypeEdge.Host
 
         #region Build
 
-        private void BuildDIContainer()
+        private void BuildDiContainer()
         {
             var services = new ServiceCollection().AddSingleton(new LoggerFactory()
                 .AddConsole()
@@ -222,28 +224,24 @@ namespace Microsoft.Azure.TypeEdge.Host
             services.AddLogging();
 
             Log.Logger = new LoggerConfiguration()
-                 .MinimumLevel.Debug()
-                 .Enrich.FromLogContext()
-                 .CreateLogger();
+                .MinimumLevel.Debug()
+                .Enrich.FromLogContext()
+                .CreateLogger();
 
             _containerBuilder.Populate(services);
             _containerBuilder.RegisterBuildCallback(c => { });
 
-            _containerBuilder.Register((ss, p) =>
-            {
-                return new ConfigurationBuilder()
-                            .AddJsonFile($"Settings.json", true)
-                            .AddJsonFile("appsettings.json", true)
-                            .AddEnvironmentVariables()
-                            .Build();
-            });
+            _containerBuilder.Register((ss, p) => new ConfigurationBuilder()
+                .AddJsonFile("Settings.json", true)
+                .AddJsonFile("appSettings.json", true)
+                .AddEnvironmentVariables()
+                .Build());
 
             _container = _containerBuilder.Build();
         }
 
         private void BuildHub(string deviceSasKey)
         {
-            //Calculate the Hub Enviroment Varialbes
             var currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             Environment.SetEnvironmentVariable(HubService.Constants.EdgeHubServerCertificateFileKey,
@@ -267,21 +265,21 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             Environment.SetEnvironmentVariable("storageFolder", storageFolder);
 
-            var csBuilder = Microsoft.Azure.Devices.IotHubConnectionStringBuilder.Create(_iotHubConnectionString);
+            var csBuilder = IotHubConnectionStringBuilder.Create(_iotHubConnectionString);
 
             var edgeConnectionString =
                 new ModuleConnectionStringBuilder(csBuilder.HostName, _deviceId)
-                    .Create(Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
+                    .Create(Devices.Edge.Agent.Core.Constants.EdgeHubModuleIdentityName)
                     .WithSharedAccessKey(deviceSasKey)
                     .Build();
-            Environment.SetEnvironmentVariable(Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
+            Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
                 edgeConnectionString);
-            
-            Environment.SetEnvironmentVariable(variable: Microsoft.Azure.Devices.Edge.Agent.Core.Constants.IotHubConnectionStringKey,
-                value: edgeConnectionString);
+
+            Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.IotHubConnectionStringKey,
+                edgeConnectionString);
 
             var edgeHubConfiguration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", true)
+                .AddJsonFile("appSettings.json", true)
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -294,17 +292,16 @@ namespace Microsoft.Azure.TypeEdge.Host
             var currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
 
-
             foreach (var module in _modules)
             {
                 if (module.HostingSettings.IsExternalModule)
 
-                    Environment.SetEnvironmentVariable(Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey,
-                    Path.Combine(currentLocation,
-                        certificatePath));
+                    Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey,
+                        Path.Combine(currentLocation,
+                            certificatePath));
                 else
-                    Environment.SetEnvironmentVariable(Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey,
-                    "/azure-edge/vol1/edge-device-ca-root.cert.pem");
+                    Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey,
+                        "/azure-edge/vol1/edge-device-ca-root.cert.pem");
 
                 var moduleConnectionString =
                     GetModuleConnectionStringAsync(_iotHubConnectionString, _deviceId, module.Name)
@@ -312,15 +309,17 @@ namespace Microsoft.Azure.TypeEdge.Host
 
                 if (_inContainer)
                 {
-                    System.Console.WriteLine("Emulator running in docker-compose mode.");
+                    Console.WriteLine("Emulator running in docker-compose mode.");
 
-                    const string envPath = TypeEdge.Constants.ComposeConfigurationPath;
+                    const string envPath = Volumes.Constants.ComposeConfigurationPath;
                     var path = Path.Combine(envPath, $"{module.Name}.env");
                     var certPath = Path.Combine(envPath, certificatePath);
 
-                    var dotenvData = $"{Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey}={moduleConnectionString}";
-                    dotenvData += $"{Environment.NewLine}{Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey}={certPath}";
-                    dotenvData += $"{Environment.NewLine}{TypeEdge.Constants.DisableSSLCertificateVlaidationKey}=true";
+                    var dotEnvData =
+                        $"{Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey}={moduleConnectionString}";
+                    dotEnvData +=
+                        $"{Environment.NewLine}{Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey}={certPath}";
+                    dotEnvData += $"{Environment.NewLine}{Volumes.Constants.DisableSslCertificateValidationKey}=true";
 
                     if (!Directory.Exists(Path.GetDirectoryName(certPath)))
                         Directory.CreateDirectory(Path.GetDirectoryName(certPath));
@@ -328,26 +327,27 @@ namespace Microsoft.Azure.TypeEdge.Host
                     if (!File.Exists(certPath))
                         File.Copy(Path.Combine(currentLocation, certificatePath), certPath);
 
-                    File.WriteAllText(path, dotenvData);
+                    File.WriteAllText(path, dotEnvData);
                 }
                 else
                 {
                     Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
                         moduleConnectionString);
 
-                    Environment.SetEnvironmentVariable(TypeEdge.Constants.DisableSSLCertificateVlaidationKey,
+                    Environment.SetEnvironmentVariable(Volumes.Constants.DisableSslCertificateValidationKey,
                         "true");
 
                     var moduleConfiguration = new ConfigurationBuilder()
-                        .AddInMemoryCollection(new Dictionary<string, string>() { { Constants.ManifestEnvironmentName, _manifest } })
+                        .AddInMemoryCollection(new Dictionary<string, string>
+                            {{Constants.ManifestEnvironmentName, _manifest}})
                         .AddJsonFile($"{module.Name}Settings.json", true)
-                        .AddJsonFile("appsettings.json", true)
+                        .AddJsonFile("appSettings.json", true)
                         .AddEnvironmentVariables()
                         .AddInMemoryCollection(
                             new Dictionary<string, string>
                             {
-                                { Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeModuleVolumeNameKey, currentLocation },
-                                { Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeModuleVolumePathKey, "/azure-edge/vol1" }
+                                {Devices.Edge.Agent.Core.Constants.EdgeModuleVolumeNameKey, currentLocation},
+                                {Devices.Edge.Agent.Core.Constants.EdgeModuleVolumePathKey, "/azure-edge/vol1"}
                             })
                         .Build();
 
@@ -364,9 +364,10 @@ namespace Microsoft.Azure.TypeEdge.Host
                 foreach (var moduleType in _container.ComponentRegistry.Registrations
                     .Where(r => typeof(TypeModule).IsAssignableFrom(r.Activator.LimitType))
                     .Select(r => r.Activator.LimitType).Distinct())
-                    if ((scope.Resolve(moduleType) is TypeModule module))
+                    if (scope.Resolve(moduleType) is TypeModule module)
                         modules.Add(module);
             }
+
             modules.AddRange(_externalModules);
 
             return modules;
@@ -380,19 +381,23 @@ namespace Microsoft.Azure.TypeEdge.Host
                 .GetManifestResourceStream("Microsoft.Azure.TypeEdge.Host.deviceconfig.json"))
             using (var reader = new StreamReader(stream))
             {
-                var deviceconfig = reader.ReadToEnd();
-                configurationContent = JsonConvert.DeserializeObject<ConfigurationContent>(deviceconfig);
+                var deviceConfig = reader.ReadToEnd();
+                configurationContent = JsonConvert.DeserializeObject<ConfigurationContent>(deviceConfig);
             }
-            var agentDesired = JObject.FromObject(configurationContent.ModulesContent["$edgeAgent"]["properties.desired"]);
 
-            if (!agentDesired.TryGetValue("modules", out JToken modules))
+            var agentDesired =
+                JObject.FromObject(configurationContent.ModulesContent["$edgeAgent"]["properties.desired"]);
+
+            if (!agentDesired.TryGetValue("modules", out var modules))
                 throw new Exception("Cannot read modules config from $edgeAgent");
             var modulesConfig = modules as JObject;
 
             foreach (var module in _modules)
             {
                 var dockerHostingSettings = new DockerHostingSettings(module.HostingSettings);
-                var settings = hostOverride != null ? hostOverride(module.Name, dockerHostingSettings) : dockerHostingSettings;
+                var settings = hostOverride != null
+                    ? hostOverride(module.Name, dockerHostingSettings)
+                    : dockerHostingSettings;
                 modulesConfig?.Add(module.Name, JObject.FromObject(settings));
                 if (settings.IsExternalModule && module is DockerModule dockerModule)
                     dockerModule.DockerHostingSettings = settings;
@@ -404,8 +409,10 @@ namespace Microsoft.Azure.TypeEdge.Host
                     if (!configurationContent.ModulesContent.ContainsKey(module.Name))
                         configurationContent.ModulesContent.Add(module.Name, new Dictionary<string, object>());
 
-                    configurationContent.ModulesContent[module.Name]["properties.desired"] = JObject.Parse(module.DefaultTwin.ToJson());
+                    configurationContent.ModulesContent[module.Name]["properties.desired"] =
+                        JObject.Parse(module.DefaultTwin.ToJson());
                 }
+
             agentDesired["modules"] = modulesConfig;
             configurationContent.ModulesContent["$edgeAgent"]["properties.desired"] = agentDesired;
 
@@ -435,19 +442,15 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             return _manifest;
         }
+
         private async Task<string> ProvisionDeviceAsync(string manifest)
         {
-            Microsoft.Azure.Devices.IotHubConnectionStringBuilder.Create(_iotHubConnectionString);
+            IotHubConnectionStringBuilder.Create(_iotHubConnectionString);
 
             var registryManager = RegistryManager.CreateFromConnectionString(_iotHubConnectionString);
-            string sasKey;
-            var device = await registryManager.GetDeviceAsync(_deviceId);
-            if (device == null)
-            {
-                device = await registryManager.AddDeviceAsync(
-                new Device(_deviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
-            }
-            sasKey = device.Authentication.SymmetricKey.PrimaryKey;
+            var device = await registryManager.GetDeviceAsync(_deviceId) ?? await registryManager.AddDeviceAsync(
+                             new Device(_deviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
+            var sasKey = device.Authentication.SymmetricKey.PrimaryKey;
 
             try
             {
@@ -458,18 +461,17 @@ namespace Microsoft.Azure.TypeEdge.Host
             }
             catch
             {
+                // ignored
             }
 
             foreach (var module in _modules)
-            {
                 try
                 {
-                    await registryManager.AddModuleAsync(new Microsoft.Azure.Devices.Module(_deviceId, module.Name));
+                    await registryManager.AddModuleAsync(new Module(_deviceId, module.Name));
                 }
                 catch (ModuleAlreadyExistsException)
                 {
                 }
-            }
 
             await registryManager.ApplyConfigurationContentOnDeviceAsync(_deviceId,
                 manifest.FromJson<ConfigurationContent>());
@@ -480,7 +482,7 @@ namespace Microsoft.Azure.TypeEdge.Host
         private async Task<string> GetModuleConnectionStringAsync(string iotHubConnectionString, string deviceId,
             string moduleName)
         {
-            var csBuilder = Microsoft.Azure.Devices.IotHubConnectionStringBuilder.Create(iotHubConnectionString);
+            var csBuilder = IotHubConnectionStringBuilder.Create(iotHubConnectionString);
             var registryManager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
             var module = await registryManager.GetModuleAsync(deviceId, moduleName);
             var sasKey = module.Authentication.SymmetricKey.PrimaryKey;

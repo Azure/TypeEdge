@@ -15,11 +15,10 @@ namespace Microsoft.Azure.TypeEdge.Proxy
     internal class Proxy<T> : TypeModule, IInterceptor
         where T : class
     {
-        private readonly ServiceClient _serviceClient;
-
         private readonly string _deviceId;
         private readonly string _iotHubConnectionString;
         private readonly RegistryManager _registryManager;
+        private readonly ServiceClient _serviceClient;
 
         public Proxy(string iotHubConnectionString, string deviceId)
         {
@@ -62,7 +61,7 @@ namespace Microsoft.Azure.TypeEdge.Proxy
             {
                 //direct methods
                 var methodInvocation =
-                    new CloudToDeviceMethod(invocation.Method.Name) { ResponseTimeout = TimeSpan.FromSeconds(30) };
+                    new CloudToDeviceMethod(invocation.Method.Name) {ResponseTimeout = TimeSpan.FromSeconds(30)};
                 var paramData = JsonConvert.SerializeObject(invocation.Arguments);
                 methodInvocation.SetPayloadJson(paramData);
 
@@ -77,8 +76,10 @@ namespace Microsoft.Azure.TypeEdge.Proxy
                                 invocation.Method.ReturnType);
                 }
                 else
+                {
                     throw new Exception(
                         $"Direct method result Status:{response.Status}, {response.GetPayloadAsJson()}");
+                }
             }
         }
 

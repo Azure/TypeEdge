@@ -1,35 +1,36 @@
-﻿using Microsoft.Azure.Devices;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Edge.Agent.Core;
 using Microsoft.Azure.Devices.Edge.Agent.Docker;
+using Microsoft.Azure.Devices.Edge.Storage;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Azure.Devices.Edge.Storage;
 
 namespace Microsoft.Azure.TypeEdge.Host
 {
     public class EmulatorConfigSource : IConfigSource
     {
-        readonly IConfiguration _configuration;
         public EmulatorConfigSource(IConfiguration configuration)
         {
-            _configuration = configuration;
+            Configuration = configuration;
         }
-        public IConfiguration Configuration => _configuration;
+
+        public IConfiguration Configuration { get; }
 
         public void Dispose()
         {
         }
 
+#pragma warning disable 1998
         public async Task<DeploymentConfigInfo> GetDeploymentConfigInfoAsync()
+#pragma warning restore 1998
         {
-            var manifest = _configuration.GetValue<string>(Constants.ManifestEnvironmentName);
-            var edgeAgentDesired = JsonConvert.DeserializeObject<ConfigurationContent>(manifest).ModulesContent["$edgeAgent"]["properties.desired"];
+            var manifest = Configuration.GetValue<string>(Constants.ManifestEnvironmentName);
+            var edgeAgentDesired =
+                JsonConvert.DeserializeObject<ConfigurationContent>(manifest).ModulesContent["$edgeAgent"][
+                    "properties.desired"];
             dynamic element = JObject.FromObject(edgeAgentDesired);
             //var deploymentConfigInfo  = JsonConvert.SerializeObject(element);
 
@@ -40,16 +41,16 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             var modulesDictionary = new Dictionary<string, IModule>();
 
-            foreach (var module in (modules as JObject) )
+            foreach (var module in (JObject) modules)
                 modulesDictionary[module.Key] = JsonConvert.DeserializeObject<DockerModule>(module.Value.ToJson());
 
             var deploymentConfig = new DeploymentConfig(
-                    schemaVersion.ToString(),
-                    JsonConvert.DeserializeObject<DockerRuntimeInfo>(runtime.ToJson()),
-                    new SystemModules(
-                        JsonConvert.DeserializeObject<EdgeAgentDockerModule>(systemModules["edgeAgent"].ToJson()),
-                        JsonConvert.DeserializeObject<EdgeHubDockerModule>(systemModules["edgeHub"].ToJson())),
-                    modulesDictionary);
+                schemaVersion.ToString(),
+                JsonConvert.DeserializeObject<DockerRuntimeInfo>(runtime.ToJson()),
+                new SystemModules(
+                    JsonConvert.DeserializeObject<EdgeAgentDockerModule>(systemModules["edgeAgent"].ToJson()),
+                    JsonConvert.DeserializeObject<EdgeHubDockerModule>(systemModules["edgeHub"].ToJson())),
+                modulesDictionary);
 
             //EdgeAgentDockerModule EdgeHubDockerModule
             var deploymentConfigInfo = new DeploymentConfigInfo(
@@ -59,7 +60,8 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             //var deploymentConfig = new DeploymentConfig(schemaVersion.ToString(), runtime, new SystemModules(null, null), modules);
             //return new DeploymentConfigInfo(0, JsonConvert.DeserializeObject<DeploymentConfig>(deploymentConfigInfo));
-            return deploymentConfigInfo;//new DeploymentConfigInfo(0, Microsoft.Azure.Devices.Edge.Agent.Core.DeploymentConfig.Empty);
+            return
+                deploymentConfigInfo; //new DeploymentConfigInfo(0, Microsoft.Azure.Devices.Edge.Agent.Core.DeploymentConfig.Empty);
         }
     }
 }

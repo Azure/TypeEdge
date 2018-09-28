@@ -2,9 +2,7 @@
 
 namespace Microsoft.Azure.TypeEdge.Attributes
 {
-    [AttributeUsage(AttributeTargets.All,
-                   AllowMultiple = false,
-                   Inherited = true)]
+    [AttributeUsage(AttributeTargets.All)]
     public class TypeModuleAttribute : Attribute
     {
     }

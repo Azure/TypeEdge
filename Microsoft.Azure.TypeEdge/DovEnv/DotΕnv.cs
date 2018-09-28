@@ -8,27 +8,14 @@ using System.Text.RegularExpressions;
 
 namespace Microsoft.Azure.TypeEdge.DovEnv
 {
-    public class Dotenv
+    public class DotΕnv
     {
         public static readonly string DefaultPath = ".env";
 
         private readonly Dictionary<string, string> _variables = new Dictionary<string, string>();
 
-        public static Dotenv Read(Stream input)
-        {
-            using (var reader = new StreamReader(input))
-            {
-                return new Dotenv(reader.ReadToEnd());
-            }
-        }
 
-        public Dictionary<string, string> GetData()
-        {
-            return _variables.DeepClone();
-        }
-
-
-        protected Dotenv(string content)
+        protected DotΕnv(string content)
         {
             var parsedVars = ParseContent(content);
 
@@ -40,13 +27,26 @@ namespace Microsoft.Azure.TypeEdge.DovEnv
                 foreach (var var in ParseValue(value))
                 {
                     // When variable is not defined the result should be "{}".
-                    var replace = String.IsNullOrEmpty(parsedVars[var]) ? "{}" : parsedVars[var];
+                    var replace = string.IsNullOrEmpty(parsedVars[var]) ? "{}" : parsedVars[var];
                     value = value.Replace("${" + var + "}", replace, StringComparison.OrdinalIgnoreCase);
                 }
 
                 Environment.SetEnvironmentVariable(key, value);
                 _variables[key] = value;
             }
+        }
+
+        public static DotΕnv Read(Stream input)
+        {
+            using (var reader = new StreamReader(input))
+            {
+                return new DotΕnv(reader.ReadToEnd());
+            }
+        }
+
+        public Dictionary<string, string> GetData()
+        {
+            return _variables.DeepClone();
         }
 
         protected IList<string> ParseValue(string value)
@@ -56,10 +56,7 @@ namespace Microsoft.Azure.TypeEdge.DovEnv
 
             foreach (Match match in regex.Matches(value))
             {
-                if (!match.Success)
-                {
-                    continue;
-                }
+                if (!match.Success) continue;
 
                 vars.Add(match.Groups[1].Value);
             }
@@ -76,25 +73,17 @@ namespace Microsoft.Azure.TypeEdge.DovEnv
             {
                 var matches = regex.Match(t);
                 var key = matches.Groups[1].Value;
-                var value = String.Empty;
+                var value = string.Empty;
 
                 // Bail if empty key.
-                if (string.IsNullOrEmpty(key))
-                {
-                    continue;
-                }
+                if (string.IsNullOrEmpty(key)) continue;
 
                 // Replace empty value with real value if any.
-                if (!string.IsNullOrEmpty(matches.Groups[2].Value))
-                {
-                    value = matches.Groups[2].Value;
-                }
+                if (!string.IsNullOrEmpty(matches.Groups[2].Value)) value = matches.Groups[2].Value;
 
                 // Split string that don't starts with a quote.
-                if (!value.StartsWith("\"", StringComparison.OrdinalIgnoreCase) && !value.StartsWith("\'", StringComparison.OrdinalIgnoreCase))
-                {
-                    value = value.Split(' ')[0];
-                }
+                if (!value.StartsWith("\"", StringComparison.OrdinalIgnoreCase) &&
+                    !value.StartsWith("\'", StringComparison.OrdinalIgnoreCase)) value = value.Split(' ')[0];
 
                 // Remove quotes in the beging and the end of a string.
                 value = Regex.Replace(value, "^(?:\"|\')|(?:\"|\')$", string.Empty);

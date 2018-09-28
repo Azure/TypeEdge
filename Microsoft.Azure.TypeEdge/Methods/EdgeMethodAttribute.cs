@@ -2,9 +2,7 @@
 
 namespace Microsoft.Azure.TypeEdge.Methods
 {
-    [AttributeUsage(AttributeTargets.All,
-                  AllowMultiple = false,
-                  Inherited = true)]
+    [AttributeUsage(AttributeTargets.All)]
     public class EdgeMethodAttribute : Attribute
     {
     }

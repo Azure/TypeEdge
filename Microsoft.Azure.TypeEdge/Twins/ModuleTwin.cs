@@ -1,8 +1,4 @@
-﻿using Microsoft.Azure.Devices.Shared;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System;
-using System.Reflection;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Enums;
@@ -13,7 +9,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
         where T : TypeTwin, new()
     {
         public ModuleTwin(string name, TypeModule module)
-           : base(name, module)
+            : base(name, module)
         {
         }
 

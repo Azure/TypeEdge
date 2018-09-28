@@ -1,32 +1,30 @@
-﻿using Microsoft.Azure.Devices.Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using Microsoft.Azure.Devices.Shared;
 
 namespace Microsoft.Azure.TypeEdge.Modules
 {
-    public abstract class ExternalModule : TypeModule 
+    public abstract class ExternalModule : TypeModule
     {
-        private readonly string _name;
-        HostingSettings _settings;
-        TwinCollection _defaultTwin;
-        List<string> _routes;
+        private readonly TwinCollection _defaultTwin;
+        private readonly HostingSettings _settings;
 
-        public ExternalModule(string name,
+        protected ExternalModule(string name,
             HostingSettings settings,
             TwinCollection defaultTwin,
             List<string> routes)
         {
-            _name = name;
+            Name = name;
             _settings = settings;
             _defaultTwin = defaultTwin;
-            _routes = routes;
+            Routes = routes;
             _settings.IsExternalModule = true;
         }
 
-        public override string Name => _name;
+        public override string Name { get; }
+
         internal override TwinCollection DefaultTwin => _defaultTwin;
-        internal override List<string> Routes => _routes;
+        internal override List<string> Routes { get; }
+
         internal override HostingSettings HostingSettings => _settings;
     }
 }

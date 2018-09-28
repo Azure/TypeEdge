@@ -2,23 +2,21 @@
 using System.Reflection;
 using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json;
-using System.Linq;
-using Newtonsoft.Json.Serialization;
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.Azure.TypeEdge.Twins
 {
     public abstract class TypeTwin
     {
-        Twin _twin;
-        string _name;
+        private string _name;
+        private Twin _twin;
 
         internal TwinCollection GetReportedProperties(string twinName = null)
         {
             if (_twin == null)
-                _twin = new Twin(new TwinProperties() { Desired = new TwinCollection(), Reported = new TwinCollection() });
-            UpdateProperties(_twin.Properties.Reported, twinName != null ? twinName : _name);
+                _twin = new Twin(new TwinProperties {Desired = new TwinCollection(), Reported = new TwinCollection()});
+            UpdateProperties(_twin.Properties.Reported, twinName ?? _name);
             return _twin.Properties.Reported;
         }
 
@@ -26,7 +24,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
         {
             //only the proxy is calling this
             if (_twin == null)
-                _twin = new Twin(new TwinProperties() { Desired = new TwinCollection(), Reported = new TwinCollection() });
+                _twin = new Twin(new TwinProperties {Desired = new TwinCollection(), Reported = new TwinCollection()});
             UpdateProperties(_twin.Properties.Desired, _name);
             return _twin;
         }
@@ -37,17 +35,19 @@ namespace Microsoft.Azure.TypeEdge.Twins
             var instance = Activator.CreateInstance<T>();
             return SetupInstance(name, twin, instance);
         }
+
         public static TypeTwin CreateTwin(Type type, string name, TwinCollection desiredProperties)
         {
-            var instance = (TypeTwin)Activator.CreateInstance(type);
+            var instance = (TypeTwin) Activator.CreateInstance(type);
             return SetupInstance(name,
-                new Twin(new TwinProperties()
+                new Twin(new TwinProperties
                 {
                     Desired = desiredProperties,
                     Reported = new TwinCollection()
                 }),
                 instance);
         }
+
         private static T SetupInstance<T>(string name, Twin twin, T instance) where T : TypeTwin
         {
             instance._twin = twin;
@@ -55,6 +55,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
             instance.PopulateProperties();
             return instance;
         }
+
         private void PopulateProperties()
         {
             var props = _twin.Properties.Desired;
@@ -66,11 +67,12 @@ namespace Microsoft.Azure.TypeEdge.Twins
             var settings = new JsonSerializerSettings
             {
                 ContractResolver = resolver,
-                Converters = new JsonConverter[] { new JsonFlatteningConverter(resolver) }
+                Converters = new JsonConverter[] {new JsonFlatteningConverter(resolver)}
             };
 
             JsonConvert.PopulateObject(props.ToJson(), this, settings);
         }
+
         private void UpdateProperties(TwinCollection properties, string name)
         {
             //arrays are not supported!!
@@ -81,6 +83,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
 
             properties[$"___{name}"] = true;
         }
+
         private bool IsValid(TwinCollection props)
         {
             var nameToken = $"___{_name}";
@@ -88,10 +91,9 @@ namespace Microsoft.Azure.TypeEdge.Twins
             if (!props.Contains(nameToken) ||
                 !(props[nameToken] is JValue nameValue) ||
                 nameValue.Type != JTokenType.Boolean ||
-                !((bool)nameValue.Value))
+                !(bool) nameValue.Value)
                 return false;
             return true;
         }
-
     }
 }

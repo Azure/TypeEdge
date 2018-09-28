@@ -1,24 +1,21 @@
 ﻿using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Messages;
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Microsoft.Azure.TypeEdge.Volumes
 {
     public class Volume<T> : TypeProperty
-       where T : class, IEdgeMessage, new()
+        where T : class, IEdgeMessage, new()
     {
         public Volume(string name, TypeModule module)
-             : base(name, module)
+            : base(name, module)
         {
             Module.RegisterVolume(Name);
         }
 
         public bool TryWrite(T data, string fileName)
-        {            
-            if (Module.SetReferenceData(Name, fileName, data))            
-                return true;                        
+        {
+            if (Module.SetReferenceData(Name, fileName, data))
+                return true;
             return false;
         }
 

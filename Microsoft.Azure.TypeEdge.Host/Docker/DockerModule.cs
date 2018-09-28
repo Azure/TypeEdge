@@ -1,34 +1,36 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Autofac;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Edge.Agent.Core;
 using Microsoft.Azure.Devices.Edge.Agent.Docker;
-using Microsoft.Azure.Devices.Edge.Agent.Docker.Commands;
-using Microsoft.Azure.Devices.Edge.Util;
 using Microsoft.Azure.Devices.Shared;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Azure.TypeEdge.Enums;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Enums;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Azure.TypeEdge.Host.Docker
 {
     public class DockerModule : ExternalModule
     {
-        DockerClient _dockerClient;
+        private DockerClient _dockerClient;
+
         //ICommand _createCommand;
         //ICommand _startCommand;
-        ICommandFactory _dockerFactory;
-        IModuleWithIdentity _moduleWithIdentity;
-        public DockerModule(string name, HostingSettings settings, TwinCollection defaultTwin, List<string> routes) : base(name, settings, defaultTwin, routes)
+        private ICommandFactory _dockerFactory;
+        private IModuleWithIdentity _moduleWithIdentity;
+
+        public DockerModule(string name, HostingSettings settings, TwinCollection defaultTwin, List<string> routes) :
+            base(name, settings, defaultTwin, routes)
         {
         }
+
         public DockerHostingSettings DockerHostingSettings { get; set; }
 
         internal override InitializationResult _Init(IConfigurationRoot configuration, IContainer container)
@@ -39,27 +41,29 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
             var configSource = new EmulatorConfigSource(configuration);
 
             var dockerLoggingOptions = new Dictionary<string, string>
-                {
-                    {"max-size", "1m"},
-                    {"max-file", "1" }
-                };
+            {
+                {"max-size", "1m"},
+                {"max-file", "1"}
+            };
             var loggingConfig = new DockerLoggingConfig("json-file", dockerLoggingOptions);
 
-            var dockerAuthConfig = configuration.GetSection("DockerRegistryAuth").Get<List<AuthConfig>>() ?? new List<AuthConfig>();
+            var dockerAuthConfig = configuration.GetSection("DockerRegistryAuth").Get<List<AuthConfig>>() ??
+                                   new List<AuthConfig>();
             var combinedDockerConfigProvider = new CombinedDockerConfigProvider(dockerAuthConfig);
             //var runtimeInfoProvider = RuntimeInfoProvider.CreateAsync(_dockerClient);
 
-            var dockerModule = new Microsoft.Azure.Devices.Edge.Agent.Docker.DockerModule(
-                   Name,
-                   DockerHostingSettings.Version,
-                   DockerHostingSettings.DesiredStatus,
-                   DockerHostingSettings.RestartPolicy,
-                   DockerHostingSettings.Config,
-                   null,
-                   null
-               );
+            var dockerModule = new Devices.Edge.Agent.Docker.DockerModule(
+                Name,
+                DockerHostingSettings.Version,
+                DockerHostingSettings.DesiredStatus,
+                DockerHostingSettings.RestartPolicy,
+                DockerHostingSettings.Config,
+                null,
+                null
+            );
 
-            var connectionString = configuration.GetValue<string>(Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey);
+            var connectionString =
+                configuration.GetValue<string>(Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey);
             var connectionStringBuilder = IotHubConnectionStringBuilder.Create(connectionString);
 
             var moduleIdentity = new ModuleIdentity(connectionStringBuilder.IotHubName,
@@ -72,10 +76,10 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
             //var combinedDockerConfig = combinedDockerConfigProvider.GetCombinedConfig(dockerModule, runtimeInfo);
 
             _dockerFactory = new LoggingCommandFactory(new DockerCommandFactory(_dockerClient,
-                loggingConfig,
-                configSource,
-                combinedDockerConfigProvider),
-                Microsoft.Azure.Devices.Edge.Util.Logger.Factory) as ICommandFactory;
+                    loggingConfig,
+                    configSource,
+                    combinedDockerConfigProvider),
+                Devices.Edge.Util.Logger.Factory);
 
             //var updateCommand = new GroupCommand(
             //      new RemoveCommand(_dockerClient, dockerModule),
@@ -106,11 +110,15 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
         {
             try
             {
-                var containers = await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters() { All = true });
-                if (containers.Where(e => e.Image == (_moduleWithIdentity.Module as Microsoft.Azure.Devices.Edge.Agent.Docker.DockerModule).Config.Image).SingleOrDefault() != null)
+                var containers =
+                    await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters {All = true}, cancellationToken);
+                if (containers
+                        .SingleOrDefault(e => e.Image == (_moduleWithIdentity.Module as Devices.Edge.Agent.Docker.DockerModule)?.Config
+                                              .Image) != null)
                 {
                     Console.WriteLine($"Removing {_moduleWithIdentity.Module.Name}...");
-                    await (await _dockerFactory.RemoveAsync(_moduleWithIdentity.Module)).ExecuteAsync(cancellationToken);
+                    await (await _dockerFactory.RemoveAsync(_moduleWithIdentity.Module))
+                        .ExecuteAsync(cancellationToken);
                 }
             }
             catch (Exception)
@@ -124,7 +132,8 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
                 var runtimeInfo = new DockerRuntimeInfo("docker", runtimeConfig);
                 Console.WriteLine($"Creating {_moduleWithIdentity.Module.Name}...");
                 //_dockerClient.Volumes.CreateAsync(new VolumesCreateParameters() { Name = "vol1", Driver = "local",  })
-                await (await _dockerFactory.CreateAsync(_moduleWithIdentity, runtimeInfo)).ExecuteAsync(cancellationToken);
+                await (await _dockerFactory.CreateAsync(_moduleWithIdentity, runtimeInfo)).ExecuteAsync(
+                    cancellationToken);
             }
             catch (Exception ex)
             {
@@ -152,8 +161,9 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
                 Console.WriteLine($"Removing {_moduleWithIdentity.Module.Name}...");
                 _dockerFactory.RemoveAsync(_moduleWithIdentity.Module).Result.ExecuteAsync(new CancellationToken());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
+                // ignored
             }
 
             base.Dispose(disposing);

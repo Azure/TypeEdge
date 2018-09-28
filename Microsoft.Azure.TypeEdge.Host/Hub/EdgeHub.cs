@@ -1,11 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Edge.Hub.Service;
 using Microsoft.Azure.TypeEdge.Enums;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Enums;
 using Microsoft.Extensions.Configuration;
 using Agent = Microsoft.Azure.Devices.Edge.Agent.Core;
-using System.Threading;
 
 namespace Microsoft.Azure.TypeEdge.Host.Hub
 {

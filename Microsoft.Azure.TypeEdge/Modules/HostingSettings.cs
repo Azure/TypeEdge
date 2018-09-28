@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Azure.TypeEdge.Modules.Enums;
 
 namespace Microsoft.Azure.TypeEdge.Modules

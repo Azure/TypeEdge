@@ -2,20 +2,21 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.TypeEdge.Enums;
 using Microsoft.Azure.TypeEdge.Modules.Messages;
+using Microsoft.Azure.TypeEdge.Volumes;
 
 namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
 {
     public class Output<T> : Endpoint
         where T : class, IEdgeMessage, new()
     {
-        private Volumes.Volume<T> _volume;
+        private readonly Volume<T> _volume;
 
         public Output(string name, TypeModule module) :
             base(name, module)
         {
             if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Reference<>))
             {
-                _volume = new Volumes.Volume<T>(Name, Module);
+                _volume = new Volume<T>(Name, Module);
                 Module.RegisterVolume(name);
             }
         }
@@ -24,29 +25,26 @@ namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
 
         public async Task<PublishResult> PublishAsync(T message)
         {
-            if (_volume != null)
-            {
-                string fileName = $@"{DateTime.Now.Ticks}"; ;
-                if (_volume.TryWrite(message, fileName))
-                {
-                    typeof(T).GetProperty("FileName").SetValue(message, fileName);
-                    typeof(T).GetProperty("Message").SetValue(message, null);
-                    var referenceCount = (int)typeof(T).GetProperty("ReferenceCount").GetValue(message);
-                    typeof(T).GetProperty("ReferenceCount").SetValue(message, ++referenceCount);
-                }
-            }
+            if (_volume == null) return await Module.PublishMessageAsync(Name, message);
+            var fileName = $@"{DateTime.Now.Ticks}";
+            if (!_volume.TryWrite(message, fileName)) return await Module.PublishMessageAsync(Name, message);
+            typeof(T).GetProperty("FileName").SetValue(message, fileName);
+            typeof(T).GetProperty("Message").SetValue(message, null);
+            var referenceCount = (int) typeof(T).GetProperty("ReferenceCount").GetValue(message);
+            typeof(T).GetProperty("ReferenceCount").SetValue(message, ++referenceCount);
+
             return await Module.PublishMessageAsync(Name, message);
         }
 
         public virtual void Subscribe(TypeModule input, Func<T, Task<MessageResult>> handler)
         {
-            var dereference = new Func<T, Task<MessageResult>>((t) =>
+            var dereference = new Func<T, Task<MessageResult>>(t =>
             {
                 if (_volume != null)
                 {
                     //todo: find a typed way to do this
                     var fileName = typeof(T).GetProperty("FileName").GetValue(t) as string;
-                    var referenceCount = (int)typeof(T).GetProperty("ReferenceCount").GetValue(t);
+                    var referenceCount = (int) typeof(T).GetProperty("ReferenceCount").GetValue(t);
                     var message = _volume.Read(fileName);
 
                     var res = handler(message);
@@ -56,8 +54,8 @@ namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
 
                     return res;
                 }
-                else
-                    return handler(t);
+
+                return handler(t);
             });
 
             var inRouteName = $"BrokeredEndpoint(\"/modules/{input.Name}/inputs/{Name}\")";
@@ -71,6 +69,5 @@ namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
                 inRouteName,
                 dereference);
         }
-
     }
 }

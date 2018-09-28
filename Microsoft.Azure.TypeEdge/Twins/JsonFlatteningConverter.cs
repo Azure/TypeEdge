@@ -56,8 +56,8 @@ namespace Microsoft.Azure.TypeEdge.Twins
                     if (jsonProperty == null || !jsonProperty.Writable)
                         continue;
                     {
-                        var subObj = new JObject(@group.Select(p =>
-                            new JProperty(p.Name.Substring(@group.Key.Length + 1), p.Value)));
+                        var subObj = new JObject(group.Select(p =>
+                            new JProperty(p.Name.Substring(group.Key.Length + 1), p.Value)));
                         using (var subReader = subObj.CreateReader())
                         {
                             var propertyValue = serializer.Deserialize(subReader, jsonProperty.PropertyType);

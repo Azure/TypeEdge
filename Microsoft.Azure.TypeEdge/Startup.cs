@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
@@ -10,9 +9,9 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Castle.DynamicProxy;
 using Microsoft.Azure.TypeEdge.Attributes;
-using Microsoft.Azure.TypeEdge.DovEnv;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Proxy;
+using Microsoft.Azure.TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using static System.String;
@@ -26,16 +25,16 @@ namespace Microsoft.Azure.TypeEdge
         public static async Task DockerEntryPoint(string[] args)
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            AssemblyLoadContext.Default.Unloading += (ctx) => cancellationTokenSource.Cancel();
+            AssemblyLoadContext.Default.Unloading += ctx => cancellationTokenSource.Cancel();
             Console.CancelKeyPress += (sender, cpe) => cancellationTokenSource.Cancel();
-            
+
             var services = new ServiceCollection().AddLogging();
             var containerBuilder = new ContainerBuilder();
             containerBuilder.Populate(services);
             containerBuilder.RegisterBuildCallback(c => { });
 
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", true)
+                .AddJsonFile("appSettings.json", true)
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();
@@ -56,11 +55,11 @@ namespace Microsoft.Azure.TypeEdge
             }
 
             configuration = new ConfigurationBuilder()
-             .AddJsonFile("appsettings.json", true)
-             .AddJsonFile($"{moduleName}Settings.json", true)
-             .AddEnvironmentVariables()
-             .AddCommandLine(args)
-             .Build();
+                .AddJsonFile("appSettings.json", true)
+                .AddJsonFile($"{moduleName}Settings.json", true)
+                .AddEnvironmentVariables()
+                .AddCommandLine(args)
+                .Build();
 
             var (moduleType, _) = GetModuleTypes(moduleName);
 
@@ -71,7 +70,6 @@ namespace Microsoft.Azure.TypeEdge
 
             if (IsNullOrEmpty(connectionString))
             {
-
                 //check the file system, we are in docker-compose mode
                 var fileName = Path.Combine(Constants.ComposeConfigurationPath, $"{moduleName}.env");
                 var remainingSeconds = 100;
@@ -80,11 +78,11 @@ namespace Microsoft.Azure.TypeEdge
                     if (File.Exists(fileName))
                     {
                         configuration = new ConfigurationBuilder()
-                            .AddJsonFile("appsettings.json", true)
+                            .AddJsonFile("appSettings.json", true)
                             .AddJsonFile($"{moduleName}Settings.json", true)
                             .AddEnvironmentVariables()
                             .AddCommandLine(args)
-                            .AddDotenv(fileName)
+                            .AddDotΕnv(fileName)
                             .Build();
                         File.Delete(fileName);
                         break;
@@ -105,19 +103,17 @@ namespace Microsoft.Azure.TypeEdge
             containerBuilder.RegisterType(moduleType);
             containerBuilder.RegisterInstance(configuration);
 
-            var moduleDepedencies = moduleType.GetConstructors().First().GetParameters();
-            var moduleDepedencyTypes = moduleDepedencies.Where(i => i.ParameterType.IsInterface &&
+            var moduleDependencies = moduleType.GetConstructors().First().GetParameters();
+            var moduleDependencyTypes = moduleDependencies.Where(i => i.ParameterType.IsInterface &&
                                                                     i.ParameterType.GetCustomAttribute(
                                                                         typeof(TypeModuleAttribute),
                                                                         true) != null).Select(e => e.ParameterType);
 
             var proxyGenerator = new ProxyGenerator();
-            foreach (var depedency in moduleDepedencyTypes)
-            {
+            foreach (var dependency in moduleDependencyTypes)
                 containerBuilder.RegisterInstance(
-                    proxyGenerator.CreateInterfaceProxyWithoutTarget(depedency, new ModuleProxyBase(depedency)))
-                    .As(depedency);
-            }
+                        proxyGenerator.CreateInterfaceProxyWithoutTarget(dependency, new ModuleProxyBase(dependency)))
+                    .As(dependency);
 
             var container = containerBuilder.Build();
 
@@ -127,6 +123,7 @@ namespace Microsoft.Azure.TypeEdge
                 Module._Init(configuration, container);
                 await Module._RunAsync(cancellationTokenSource.Token);
             }
+
             await cancellationTokenSource.Token.WhenCanceled();
         }
 
@@ -137,28 +134,25 @@ namespace Microsoft.Azure.TypeEdge
                 t.GetInterfaces().SingleOrDefault(i =>
                     i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null) != null);
 
-            if (moduleType == null)
-                return null;
-
-            return moduleType.GetProxyInterface().GetModuleName();
+            return moduleType?.GetProxyInterface().GetModuleName();
         }
 
         public static Task WhenCancelled(CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<bool>();
-            cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).SetResult(true), tcs);
+            cancellationToken.Register(s => ((TaskCompletionSource<bool>) s).SetResult(true), tcs);
             return tcs.Task;
         }
 
         private static (Type moduleType, Type moduleInterfaceType)
             GetModuleTypes(string moduleName)
         {
-
-            if (GetModule(moduleName, Assembly.GetEntryAssembly(), out var moduleTypes))
-                return moduleTypes;
-
-            //try all assemblies now
-            return AppDomain.CurrentDomain.GetAssemblies().Any(assembly => GetModule(moduleName, assembly, out moduleTypes)) ? moduleTypes : (null, null);
+            return GetModule(moduleName, Assembly.GetEntryAssembly(), out var moduleTypes)
+                ? moduleTypes
+                : AppDomain.CurrentDomain.GetAssemblies()
+                    .Any(assembly => GetModule(moduleName, assembly, out moduleTypes))
+                    ? moduleTypes
+                    : (null, null);
         }
 
         private static bool GetModule(string moduleName, Assembly assembly,
@@ -167,7 +161,7 @@ namespace Microsoft.Azure.TypeEdge
             var moduleType = assembly.GetTypes().SingleOrDefault(t =>
                 t.GetInterfaces().SingleOrDefault(i =>
                     i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null &&
-                    String.Equals(i.GetModuleName(), moduleName, StringComparison.InvariantCultureIgnoreCase)) != null);
+                    string.Equals(i.GetModuleName(), moduleName, StringComparison.InvariantCultureIgnoreCase)) != null);
 
             if (moduleType == null)
             {
