@@ -1,12 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Azure.TypeEdge.DovEnv;
+using Microsoft.Azure.Devices.Edge.Agent.Docker;
+using Microsoft.Azure.TypeEdge;
 using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using TypeEdgeML.Shared;
-using System.IO;
-using Microsoft.Azure.Devices.Edge.Agent.Docker;
-using Microsoft.Azure.TypeEdge;
+using TypeEdgeModule1 = Modules.TypeEdgeModule1;
+using TypeEdgeModule2 = Modules.TypeEdgeModule2;
 
 namespace TypeEdgeML
 {
@@ -18,9 +19,9 @@ namespace TypeEdgeML
 
             //TODO: Set your IoT Hub iothubowner connection string in appsettings.json
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appSettings.json")
                 .AddEnvironmentVariables()
-                .AddDotenv()
+                .AddDotΕnv()
                 .AddCommandLine(args)
                 .Build();
 

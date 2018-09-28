@@ -21,7 +21,7 @@ namespace Modules
                     Data = msg.Data,
                     Metadata = DateTime.UtcNow.ToShortTimeString()
                 });
-                Logger.LogInformation($"Generated Message");
+                Logger.LogInformation("Generated Message");
 
                 return MessageResult.Ok;
             });

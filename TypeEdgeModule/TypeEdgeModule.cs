@@ -20,8 +20,9 @@ namespace Modules
             while (!cancellationToken.IsCancellationRequested)
             {
                 await Output.PublishAsync(new TypeEdgeModuleOutput());
-                await Task.Delay(1000);
-            }    
+                await Task.Delay(1000, cancellationToken);
+            }
+
             return ExecutionResult.Ok;
         }
     }

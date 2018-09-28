@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.TypeEdge.Modules.Messages;
 using Microsoft.Azure.TypeEdge.Twins;
+using Microsoft.Extensions.Logging;
 using TypeEdgeApplication.Shared;
 using TypeEdgeApplication.Shared.Messages;
 using TypeEdgeApplication.Shared.Twins;
@@ -21,7 +21,7 @@ namespace Modules
                     Data = msg.Data,
                     Metadata = DateTime.UtcNow.ToShortTimeString()
                 });
-                Logger.LogInformation($"Generated Message");
+                Logger.LogInformation("Generated Message");
                 return MessageResult.Ok;
             });
         }

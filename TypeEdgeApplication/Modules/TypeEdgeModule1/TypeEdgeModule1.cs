@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Microsoft.Azure.TypeEdge.Enums;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.TypeEdge.Twins;
+using Microsoft.Extensions.Logging;
 using TypeEdgeApplication.Shared;
 using TypeEdgeApplication.Shared.Messages;
 using TypeEdgeApplication.Shared.Twins;
@@ -28,11 +28,13 @@ namespace Modules
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Output.PublishAsync(new TypeEdgeModule1Output {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)});
-                Logger.LogInformation($"Generated Message");
+                await Output.PublishAsync(new TypeEdgeModule1Output
+                    {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)});
+                Logger.LogInformation("Generated Message");
 
-                await Task.Delay(1000);
+                await Task.Delay(1000, cancellationToken);
             }
+
             return ExecutionResult.Ok;
         }
     }

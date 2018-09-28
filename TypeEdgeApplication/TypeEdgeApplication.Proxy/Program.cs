@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.Azure.TypeEdge.Proxy;
 using Microsoft.Extensions.Configuration;
 using TypeEdgeApplication.Shared;
@@ -14,7 +13,7 @@ namespace TypeEdgeApplication.Proxy
             Console.ReadLine();
 
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appSettings.json")
                 .AddEnvironmentVariables()
                 .Build();
 

@@ -1,13 +1,9 @@
-﻿using Microsoft.Azure.TypeEdge;
-using Microsoft.Azure.TypeEdge.Attributes;
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.Azure.TypeEdge;
 
 namespace TypeEdgeModule3
 {
-    class Program
+    internal class Program
     {
         public static async Task Main(string[] args)
         {

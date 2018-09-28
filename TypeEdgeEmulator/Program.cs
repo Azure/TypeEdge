@@ -1,9 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Edge.Agent.Docker;
 using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
-using System.IO;
-using Microsoft.Azure.Devices.Edge.Agent.Docker;
 
 namespace TypeEdgeEmulator
 {
@@ -13,7 +13,7 @@ namespace TypeEdgeEmulator
         {
             //TODO: Set your IoT Hub iothubowner connection string in appsettings.json
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appSettings.json")
                 .AddEnvironmentVariables()
                 .AddCommandLine(args)
                 .Build();

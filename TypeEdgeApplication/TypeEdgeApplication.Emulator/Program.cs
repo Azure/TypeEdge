@@ -1,12 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Azure.TypeEdge.DovEnv;
+using Microsoft.Azure.Devices.Edge.Agent.Docker;
+using Microsoft.Azure.TypeEdge;
 using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using TypeEdgeApplication.Shared;
-using System.IO;
-using Microsoft.Azure.Devices.Edge.Agent.Docker;
-using Microsoft.Azure.TypeEdge;
+using TypeEdgeModule1 = Modules.TypeEdgeModule1;
+using TypeEdgeModule2 = Modules.TypeEdgeModule2;
 
 namespace TypeEdgeApplication
 {
@@ -16,17 +17,17 @@ namespace TypeEdgeApplication
         {
             //TODO: Set your IoT Hub iothubowner connection string in appsettings.json
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appSettings.json")
                 .AddEnvironmentVariables()
-                .AddDotenv()
+                .AddDotΕnv()
                 .AddCommandLine(args)
                 .Build();
 
             var host = new TypeEdgeHost(configuration);
 
             //TODO: Register your TypeEdge Modules here
-            host.RegisterModule<ITypeEdgeModule1, Modules.TypeEdgeModule1>();
-            host.RegisterModule<ITypeEdgeModule2, Modules.TypeEdgeModule2>();
+            host.RegisterModule<ITypeEdgeModule1, TypeEdgeModule1>();
+            host.RegisterModule<ITypeEdgeModule2, TypeEdgeModule2>();
 
             //TODO: Define all cross-module subscriptions 
             host.Upstream.Subscribe(host.GetProxy<ITypeEdgeModule2>().Output);

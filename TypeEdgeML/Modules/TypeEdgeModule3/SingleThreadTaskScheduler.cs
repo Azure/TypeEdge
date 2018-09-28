@@ -44,10 +44,7 @@ namespace TypeEdgeModule3
 
             try
             {
-                foreach (var task in _taskQueue.GetConsumingEnumerable(_cancellationToken))
-                {
-                    TryExecuteTask(task);
-                }
+                foreach (var task in _taskQueue.GetConsumingEnumerable(_cancellationToken)) TryExecuteTask(task);
             }
             catch (OperationCanceledException)
             {

@@ -6,10 +6,10 @@ using Microsoft.Azure.TypeEdge.Enums;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.TypeEdge.Twins;
+using Microsoft.Extensions.Logging;
 using TypeEdgeML.Shared;
 using TypeEdgeML.Shared.Messages;
 using TypeEdgeML.Shared.Twins;
-using Microsoft.Extensions.Logging;
 
 namespace Modules
 {
@@ -28,10 +28,12 @@ namespace Modules
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                await Output.PublishAsync(new TypeEdgeModule1Output {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)});
-                Logger.LogInformation($"Generated Message");
-                await Task.Delay(1000);
+                await Output.PublishAsync(new TypeEdgeModule1Output
+                    {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)});
+                Logger.LogInformation("Generated Message");
+                await Task.Delay(1000, cancellationToken);
             }
+
             return ExecutionResult.Ok;
         }
     }
