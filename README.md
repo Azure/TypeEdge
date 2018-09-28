@@ -1,6 +1,11 @@
-# Azure IoT TypeEdge
+# Microsoft Azure TypeEdge
 
-The **Azure IoT TypeEdge** introduces a strongly-typed flavor of the inherently loosely coupled vanilla [Azure IoT Edge](https:/azure.microsoft.com/en-us/services/iot-edge/).
+**TypeEdge** introduces a strongly-typed flavor of the inherently loosely coupled vanilla [Azure IoT Edge](https:/azure.microsoft.com/en-us/services/iot-edge/).
+
+>Note: 
+
+Note: **TypeEdge** is an **experiment** created by a customer facing team at Microsoft called, Commercial Software Engineering. We work with customers on a daily basis and as a result of that work we created **TypeEdge**. It is being used by partners today across the globe. We believe that **TypeEdge** has huge potential and will have great impact. Please help us improve by trying it out and providing us feedback.
+
 
 Specifically, **TypeEdge**:
 
@@ -16,7 +21,7 @@ Here is a quick video that demonstrates the value of **TypeEdge**
 ## Prerequisites
 
 The minimum requirements to get started with **TypeEdge** are:
- - The latest [.NET Core SDK](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.302) (version 2.1.302). To find your current version, run 
+ - The latest [.NET Core SDK](https://www.microsoft.com/net/download/dotnet-core/sdk-2.1.302) (>= 2.1.302). To find your current version, run 
 `dotnet --version`
  -  An [Azure IoT Hub](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal) 
 
@@ -116,26 +121,13 @@ You just created your first **TypeEdge** application. Continue reading to learn 
     >Note: The registry is configured in the .env file inside the root folder. **If you edit the .env file, make sure you run the the emulator afterwards** to update the cloud IoT Edge Device deployment configuration.
 
 ## Device Deployment
-1. **Get the device connection string from Azure portal**, and on the device host run:
 
-        iotedgectl setup --connection-string "THE_DEVICE_CONNECTION_STRING" --auto-cert-gen-force-no-passwords
-
-    >Note: The device name is configured in the appsettings.json of the emulator project. **Make sure you run the emulator and rebuilt the containers if you change that name**. The emulator will provision a new device if the device does not exist.
-
-1. If your registry requires authentication, you need to run 
-    
-        iotedgectl login --address YOUR_REGISTRY_ADDRESS --username YOUR_REGISTRY_USERNAME --password YOUR_REGISTRY_PASSWORD
-
-1. Finally, start the runtime:
-    
-        iotedgectl start
-
-Read more [here](https://docs.microsoft.com/en-us/azure/iot-edge/quickstart#configure-the-iot-edge-runtime) about the IoT Edge device deployment.
+Read [here](https://docs.microsoft.com/en-us/azure/iot-edge/quickstart-linux) about the IoT Edge device deployment.
 
 ## <a name="how">How it works</a>
 
 
-**TypeEdge** uses C# code to define the behavior and structure of a module. A **TypeEdge** application is a collection of **TypeEdge Modules**.
+**TypeEdge** uses code to define the behavior and structure of a module. A **TypeEdge** application is a collection of **TypeEdge Modules**.
 
 ### Module interface
 
@@ -154,7 +146,7 @@ public interface ISensorModule
 This module has a strongly typed output called ***Output*** and the messages type is ***SensorModuleOutput***. Similarly, it has a module twin called ***Twin*** with type ***SensorModuleTwin***
 > Note: **TypeEdge** allows you to define multiple twin properties in the same module to enable partial twin updates
 
-Finally, this module has a method that can be invoked directly with the following method signature:
+Finally, this module has a method that can be invoked (direct method) with the following method signature:
 
 ```cs
 bool ResetModule(int sensorThreshold);
@@ -162,76 +154,82 @@ bool ResetModule(int sensorThreshold);
 
 ### Module implementation
 
-After describing the module behavior and structure with an interface, the next step is to implement the module interface. This is effectively the code that will run in the **TypeEdge** module. Here is an implementation example of the above interface:
+After describing the module behavior and structure with an interface, the next step is to implement this interface. This is effectively the code that will run in the **TypeEdge** module. Here is an implementation example of the above interface:
 
 <details>
   <summary>Click to see the full <b>SensorModule</b> implementation code</summary>
 
 ```cs
-public class SensorModule : EdgeModule, ISensorModule
+public class SensorModule : TypeModule, ISensorModule
 {
     public Output<SensorModuleOutput> Output { get; set; }
     public ModuleTwin<SensorModuleTwin> Twin { get; set; }
 
     public bool ResetModule(int sensorThreshold)
     {
-        System.Console.WriteLine($"New sensor threshold:{sensorThreshold}");
+        Logger.LogInformation($"New sensor threshold:{sensorThreshold}");
         return true;
     }
 
-    public override async Task<ExecutionResult> RunAsync()
+    public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
     {
-        while (true)
+        while (!cancellationToken.IsCancellationRequested)
         {
-            await Output.PublishAsync(
-                new SensorModuleOutput() {
-                    Data = new System.Random().NextDouble().ToString() });
-            
-            System.Threading.Thread.Sleep(1000);
+            var message  = new SensorModuleOutput {Data = new Random().NextDouble().ToString(CultureInfo.InvariantCulture)};
+            await Output.PublishAsync(message);
+            Logger.LogInformation($"Generated Message");
+
+            await Task.Delay(1000);
         }
-        return await base.RunAsync();
+        return ExecutionResult.Ok;
     }
-} 
+}
 ```
 </details>
 <br>
-A <b>TypeEdge</b> module can override any of the virtual methods of the base class ``EdgeModule``. As demonstrated in the above example, the ``RunAsync`` method is used for defining long running loops, typically useful for modules that read sensor values. Another virtual method is ``Configure``, which can be used to read custom module configuration during startup.
+A <b>TypeEdge</b> module can override any of the virtual methods of the base class ``TypeModule``. As demonstrated in the above example, the ``RunAsync`` method is used for defining long running loops, typically useful for modules that read sensor values. Another virtual method is ``Configure``, which can be used to read custom module configuration during startup.
 
-The complete ``EdgeModule`` definition is:
+The complete ``TypeModule`` definition is:
 
 ```cs
-public abstract class EdgeModule
+public abstract class TypeModule : IDisposable
 {
-    public virtual CreationResult Configure(IConfigurationRoot configuration);
-    public virtual Task<ExecutionResult> RunAsync();
+    protected TypeModule();
+
+    public virtual string Name { get; }
+    protected ILogger Logger { get; }
+
+    public virtual InitializationResult Init();
+    public virtual Task<ExecutionResult> RunAsync(CancellationToken cancellationToken);
+
+    public void Dispose();
+    protected T GetProxy<T>() where T : class;
+    protected virtual void Dispose(bool disposing);
 }
 ```
 
 ### Module Subscriptions
-**TypeEdge** uses the pub/sub pattern for all module I/O, except for the direct methods. This means that a module can subscribe to other module outputs, and publish messages to their inputs. To do this, a reference to the module interface definition is required. **TypeEdge** uses dependency injection to determine the referenced modules. 
+**TypeEdge** uses the pub/sub pattern for all module I/O, except for the direct methods. This means that a module can subscribe to other module outputs, and publish messages to their inputs. To do this, a reference to the module interface definition is required. **TypeEdge** uses dependency injection to determine the referenced modules.
 
-Below, is the constructor of the second module included in the application template called ``PreprocessorModule``, that references the ``SensorModule`` via its interface.
+Below is the constructor of the second module included in the application template called ``PreprocessorModule``, that references the ``SensorModule`` via its interface. Using this proxy, the ``PreprocessorModule`` module can subscribe to the ``SensorModule``:
 
 ```cs
 public PreprocessorModule(ISensorModule proxy)
 {
-    this.proxy = proxy;
+    proxy.Output.Subscribe(this, async msg =>
+    {
+        await Output.PublishAsync(new PreprocessorModuleOutput
+        {
+            Data = msg.Data,
+            Metadata = DateTime.UtcNow.ToShortTimeString()
+        });
+        Logger.LogInformation($"Generated Message");
+        return MessageResult.Ok;
+    });
 }
 ```
 
-Using this proxy, the ``PreprocessorModule`` module can interact with the ``SensorModule``:
-```cs
-proxy.Output.Subscribe(this, async (msg) =>
-{
-    await Output.PublishAsync(new PreprocessorModuleOutput()
-    {
-        Data = msg.Data,
-        Metadata = System.DateTime.UtcNow.ToShortTimeString()
-    });
-    return MessageResult.OK;
-});
-```
-In this example, the ``PreprocessorModule`` subscribes to ``SensorModule's`` output, called ``Output``, and defines a subscription handler, a delegate in other words  that will be called every time the ``SensorModule`` sends a messages through its ``Output ``.
+In this example, the ``PreprocessorModule`` subscribes to ``SensorModule's`` output, called ``Output``, and defines a subscription callback, a delegate in other words that will be called every time the ``SensorModule`` sends a messages through its ``Output ``.
 
 The complete code of the template's ``PreprocessorModule`` is:
 
@@ -239,32 +237,33 @@ The complete code of the template's ``PreprocessorModule`` is:
   <summary>Click to see the full <b>PreprocessorModule</b> implementation code</summary>
 
 ```cs
-public class PreprocessorModule : EdgeModule, IPreprocessorModule
+public class PreprocessorModule : TypeModule, IPreprocessorModule
 {
-    public Output<PreprocessorModuleOutput> Output { get; set; }
-    public ModuleTwin<PreprocessorModuleTwin> Twin { get; set; }
-
     public PreprocessorModule(ISensorModule proxy)
     {
-        proxy.Output.Subscribe(this, async (msg) =>
+        proxy.Output.Subscribe(this, async msg =>
         {
-            await Output.PublishAsync(new PreprocessorModuleOutput()
+            await Output.PublishAsync(new PreprocessorModuleOutput
             {
                 Data = msg.Data,
-                Metadata = System.DateTime.UtcNow.ToShortTimeString()
+                Metadata = DateTime.UtcNow.ToShortTimeString()
             });
-            return MessageResult.OK;
+            Logger.LogInformation($"Generated Message");
+            return MessageResult.Ok;
         });
     }
+
+    public Output<PreprocessorModuleOutput> Output { get; set; }
+    public ModuleTwin<PreprocessorModuleTwin> Twin { get; set; }
 }
 ```
 </details>
 
 
 ### Emulator
-The emulator references the Runtime bits to achieve the emulation. Under the hood, the emulator starts a console application that hosts the Edge Hub and all referenced modules. It will also provision a new Edge device to your designated IoT Hub. This device will contain the complete deployment manifest, ready to be used to an actual device deployment.
+The emulator references the Runtime bits to achieve the emulation. Under the hood, the emulator starts a console application that hosts the Edge Hub and all referenced modules. It will also provision a new Edge device to your designated IoT Hub. This device will contain the complete deployment manifest, ready to be used to an actual device deployment. The emulator uses the same Azure IoT Edge Runtime bits that run on the edge devices, without any containers involved.
 
-To reference modules in an emulator application, both the interface and the implementation class of the module are required:
+To reference modules in an emulator application, you need to register a module definition (interface) with the implementation:
 
 ```cs
 host.RegisterModule<ISensorModule, Modules.SensorModule>();
@@ -288,7 +287,7 @@ public static async Task Main(string[] args)
     var configuration = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
         .AddEnvironmentVariables()
-        .AddDotenvFile()
+        .AddDotenv()
         .AddCommandLine(args)
         .Build();
 
@@ -301,8 +300,24 @@ public static async Task Main(string[] args)
     //TODO: Define all cross-module subscriptions 
     host.Upstream.Subscribe(host.GetProxy<IPreprocessorModule>().Output);
 
-    host.Build();
+    //customize the runtime configuration
+    var dockerRegistry = configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
+    var manifest = host.GenerateDeviceManifest((e, settings) =>
+    {
+        //this is the opportunity for the host to change the hosting settings of the module e
+        if (!settings.IsExternalModule)
+            settings.Config = new DockerConfig($"{dockerRegistry}{e}:1.0", settings.Config.CreateOptions);
+        return settings;
+    });
+    File.WriteAllText("../../../manifest.json", manifest);
 
+    //provision a new device with the new manifest
+    var sasToken = host.ProvisionDevice(manifest);
+
+    //build an emulated device in memory
+    host.BuildEmulatedDevice(sasToken);
+
+    //run the emulated device
     await host.RunAsync();
 
     Console.WriteLine("Press <ENTER> to exit..");
@@ -321,4 +336,8 @@ ProxyFactory.GetModuleProxy<ISensorModule>().ResetModule(4);
 
 ### Solution structure
 Apparently, to reference the module definition interfaces and to avoid coupling the module implementation code together, these interfaces need to be defined in a separate project that will be commonly shared across the solution, containing only the definition interfaces and the referenced types.
+
+This images shows the assembly dependencies of the above example
+
 ![](images/solution.png)
+

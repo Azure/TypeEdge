@@ -276,6 +276,7 @@ namespace Microsoft.Azure.TypeEdge.Host
                     .Build();
             Environment.SetEnvironmentVariable(Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
                 edgeConnectionString);
+            
             Environment.SetEnvironmentVariable(variable: Microsoft.Azure.Devices.Edge.Agent.Core.Constants.IotHubConnectionStringKey,
                 value: edgeConnectionString);
 
@@ -319,6 +320,7 @@ namespace Microsoft.Azure.TypeEdge.Host
 
                     var dotenvData = $"{Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey}={moduleConnectionString}";
                     dotenvData += $"{Environment.NewLine}{Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeModuleCaCertificateFileKey}={certPath}";
+                    dotenvData += $"{Environment.NewLine}{TypeEdge.Constants.DisableSSLCertificateVlaidationKey}=true";
 
                     if (!Directory.Exists(Path.GetDirectoryName(certPath)))
                         Directory.CreateDirectory(Path.GetDirectoryName(certPath));
@@ -330,8 +332,11 @@ namespace Microsoft.Azure.TypeEdge.Host
                 }
                 else
                 {
-                    Environment.SetEnvironmentVariable(Microsoft.Azure.Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
+                    Environment.SetEnvironmentVariable(Devices.Edge.Agent.Core.Constants.EdgeHubConnectionStringKey,
                         moduleConnectionString);
+
+                    Environment.SetEnvironmentVariable(TypeEdge.Constants.DisableSSLCertificateVlaidationKey,
+                        "true");
 
                     var moduleConfiguration = new ConfigurationBuilder()
                         .AddInMemoryCollection(new Dictionary<string, string>() { { Constants.ManifestEnvironmentName, _manifest } })
@@ -372,7 +377,7 @@ namespace Microsoft.Azure.TypeEdge.Host
             ConfigurationContent configurationContent;
 
             using (var stream = Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream("TypeEdge.Host.deviceconfig.json"))
+                .GetManifestResourceStream("Microsoft.Azure.TypeEdge.Host.deviceconfig.json"))
             using (var reader = new StreamReader(stream))
             {
                 var deviceconfig = reader.ReadToEnd();

@@ -200,13 +200,10 @@ namespace Microsoft.Azure.TypeEdge.Modules
             if (string.IsNullOrEmpty(_connectionString))
                 Logger.LogWarning($"Missing {Constants.EdgeHubConnectionStringKey} variable.");
 
-            // Cert verification is not yet fully functional when using Windows OS for the container
-            //var bypassCertVerification = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            //if (!bypassCertVerification)
-            //    InstallCert();
-
             var settings = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
-            if (true) //bypassCertVerification)
+            var disableSSLCertificateVlaidationKey = configuration.GetValue<bool>($"{Constants.DisableSSLCertificateVlaidationKey}", false);
+
+            if (disableSSLCertificateVlaidationKey)
                 settings.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
                 true;
             _transportSettings = new ITransportSettings[] { settings };
