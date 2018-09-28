@@ -2,11 +2,6 @@
 
 **TypeEdge** introduces a strongly-typed flavor of the inherently loosely coupled vanilla [Azure IoT Edge](https:/azure.microsoft.com/en-us/services/iot-edge/).
 
->Note: 
-
-Note: **TypeEdge** is an **experiment** created by a customer facing team at Microsoft called, Commercial Software Engineering. We work with customers on a daily basis and as a result of that work we created **TypeEdge**. It is being used by partners today across the globe. We believe that **TypeEdge** has huge potential and will have great impact. Please help us improve by trying it out and providing us feedback.
-
-
 Specifically, **TypeEdge**:
 
 - Removes all configuration burden from an IoT Edge application, because configuration can be now automatically generated.
@@ -17,6 +12,8 @@ Specifically, **TypeEdge**:
 Here is a quick video that demonstrates the value of **TypeEdge**
 
 [![TypeEdge: Into](images/image.png)](https://youtu.be/_vWcpEjjtI0)
+
+>Note: **TypeEdge** is an **experiment** created by a customer facing team at Microsoft called, Commercial Software Engineering. We work with customers on a daily basis and as a result of that work we created **TypeEdge**. It is being used by partners today across the globe. Please help us improve it by trying it out and providing us feedback.
 
 ## Prerequisites
 
