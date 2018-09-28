@@ -1,0 +1,11 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  },
+  "Urls": "",
+  "AllowedHosts": "*",
+  "ASPNETCORE_ENVIRONMENT": "Development",
+  "server.urls": "http://localhost:5000;http://localhost:5001"
+}

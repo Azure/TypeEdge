@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="1.0.2" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4" Condition="'$(Configuration)|$(Platform)'!='TemplateDevelopment|AnyCPU'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Microsoft.Azure.TypeEdge\Microsoft.Azure.TypeEdge.csproj" Condition="'$(Configuration)|$(Platform)'=='TemplateDevelopment|AnyCPU'" />
+    <ProjectReference Include="..\..\Thermostat.Shared\Thermostat.Shared.csproj" />
+    <ProjectReference Include="..\VisualizationWeb\VisualizationWeb.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\VisualizationWeb\wwwroot\**\*.*" CopyToOutputDirectory="PreserveNewest">
+      <Link>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="visualizationsettings.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="visualizationSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  
+</Project>
