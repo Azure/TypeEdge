@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 using ThermostatApplication.ML;
 
 namespace AnomalyDetectionAlgorithms
 {
     public class KMeansScoring : IScorer
     {
-        int _numClusters;
-        readonly object sync = new object();
-        double[] _sampleMeans;
-        double[] _sampleStandardDeviations;
-        double[] _clustersRadius;
-        double[][] _means;
+        private readonly object _sync = new object();
+        private double[] _clustersRadius;
+        private double[][] _means;
+        private int _numClusters;
+        private double[] _sampleMeans;
+        private double[] _sampleStandardDeviations;
 
         public KMeansScoring(int numClusters)
         {
@@ -22,7 +22,7 @@ namespace AnomalyDetectionAlgorithms
         {
             dynamic model = JsonConvert.DeserializeObject(data);
 
-            lock (sync)
+            lock (_sync)
             {
                 _means = model.Means.ToObject<double[][]>();
                 _sampleMeans = model.SampleMeans.ToObject<double[]>();
@@ -31,38 +31,41 @@ namespace AnomalyDetectionAlgorithms
                 _numClusters = model.NumberOfClusters;
             }
         }
+
         public int Score(double[] point)
         {
-            lock (sync)
+            lock (_sync)
             {
                 //normalize
-                for (int j = 0; j < point.Length; ++j) // each col
+                for (var j = 0; j < point.Length; ++j) // each col
                     point[j] = (point[j] - _sampleMeans[j]) / _sampleStandardDeviations[j];
 
-                double[] distances = new double[_numClusters]; // distances from curr tuple to each mean
+                var distances = new double[_numClusters]; // distances from curr tuple to each mean
 
-                for (int k = 0; k < _numClusters; ++k)
+                for (var k = 0; k < _numClusters; ++k)
                     distances[k] = Distance(point, _means[k]); // compute distances from curr tuple to all k means
 
-                int clusterID = MinIndex(distances);
+                var clusterId = MinIndex(distances);
 
                 //is it inside the cluster?
-                if (distances[clusterID] > 1.2 * _clustersRadius[clusterID])
+                if (distances[clusterId] > 1.2 * _clustersRadius[clusterId])
                     return -1;
-                return clusterID;
+                return clusterId;
             }
         }
+
         private double Distance(double[] tuple, double[] mean)
         {
             // Euclidean distance between two vectors for UpdateClustering()
             // consider alternatives such as Manhattan distance
-            double sumSquaredDiffs = 0.0;
-            for (int j = 0; j < tuple.Length; ++j)
+            var sumSquaredDiffs = 0.0;
+            for (var j = 0; j < tuple.Length; ++j)
             {
                 if (double.IsNaN(tuple[j]))
                     continue;
-                sumSquaredDiffs += Math.Pow((tuple[j] - mean[j]), 2);
+                sumSquaredDiffs += Math.Pow(tuple[j] - mean[j], 2);
             }
+
             return Math.Sqrt(sumSquaredDiffs);
         }
 
@@ -70,19 +73,16 @@ namespace AnomalyDetectionAlgorithms
         {
             // index of smallest value in array
             // helper for UpdateClustering()
-            int indexOfMin = 0;
-            double smallDist = distances[0];
-            for (int k = 0; k < distances.Length; ++k)
-            {
+            var indexOfMin = 0;
+            var smallDist = distances[0];
+            for (var k = 0; k < distances.Length; ++k)
                 if (distances[k] < smallDist)
                 {
                     smallDist = distances[k];
                     indexOfMin = k;
                 }
-            }
+
             return indexOfMin;
         }
-
-
     }
 }

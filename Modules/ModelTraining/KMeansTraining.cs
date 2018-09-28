@@ -1,25 +1,25 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 using ThermostatApplication.ML;
 
 namespace AnomalyDetectionAlgorithms
 {
     public class KMeansTraining : ITrainer
     {
-        int _numClusters;
+        private readonly int _numClusters;
+        private int[] _clustering;
 
-        double[][] _rawData;
-        double[][] _normalizedData;
+        private double[] _clustersRadius;
 
-        double[] _sampleMeans;
-        double[] _sampleStandardDeviations;
+        private double[][] _means;
+        private double[][] _normalizedData;
 
-        double[][] _means;
-        int[] _clustering;
+        private double[][] _rawData;
 
-        double[] _clustersRadius;
+        private double[] _sampleMeans;
+        private double[] _sampleStandardDeviations;
 
-        public KMeansTraining( int numClusters)
+        public KMeansTraining(int numClusters)
         {
             _numClusters = numClusters;
         }
@@ -30,65 +30,11 @@ namespace AnomalyDetectionAlgorithms
 
             ProcessData();
         }
-        private void ProcessData()
-        {
-            _normalizedData = NormalizeData();
-
-
-            bool changed = true;
-            bool success = true;
-
-            _clustering = InitializeClusters();
-            _means = Allocate();
-
-            int maxCount = _rawData.Length * 10;
-            int ct = 0;
-
-            while (changed == true && success == true && ct < maxCount)
-            {
-                ++ct;
-                success = UpdateMeans();
-                changed = UpdateClustering();
-            }
-        }
-        private double[][] NormalizeData()
-        {
-            var result = new double[_rawData.Length][];
-            _sampleMeans = new double[_rawData[0].Length];
-            _sampleStandardDeviations = new double[_rawData[0].Length];
-
-            for (int i = 0; i < _rawData.Length; ++i)
-            {
-                var current = _rawData[i];
-                result[i] = new double[current.Length];
-                Array.Copy(current, result[i], current.Length);
-            }
-            for (int j = 0; j < result[0].Length; ++j) // each col
-            {
-                double colSum = 0.0;
-                for (int i = 0; i < result.Length; ++i)
-                    colSum += result[i][j];
-                _sampleMeans[j] = colSum / result.Length;
-            }
-            for (int j = 0; j < result[0].Length; ++j) // each col
-            {
-                double sum = 0.0;
-                for (int i = 0; i < result.Length; ++i)
-                    sum += (result[i][j] - _sampleMeans[j]) * (result[i][j] - _sampleMeans[j]);
-                _sampleStandardDeviations[j] = sum / result.Length;
-            }
-
-            for (int j = 0; j < result[0].Length; ++j) // each col
-            {
-                for (int i = 0; i < result.Length; ++i)
-                    result[i][j] = (result[i][j] - _sampleMeans[j]) / _sampleStandardDeviations[j];
-            }
-            return result;
-        }
 
         public string SerializeModel()
         {
-            var model = new {
+            var model = new
+            {
                 Means = _means,
                 SampleMeans = _sampleMeans,
                 StandardDeviations = _sampleStandardDeviations,
@@ -98,102 +44,162 @@ namespace AnomalyDetectionAlgorithms
             return JsonConvert.SerializeObject(model);
         }
 
+        private void ProcessData()
+        {
+            _normalizedData = NormalizeData();
+
+
+            var changed = true;
+            var success = true;
+
+            _clustering = InitializeClusters();
+            _means = Allocate();
+
+            var maxCount = _rawData.Length * 10;
+            var ct = 0;
+
+            while (changed && success && ct < maxCount)
+            {
+                ++ct;
+                success = UpdateMeans();
+                changed = UpdateClustering();
+            }
+        }
+
+        private double[][] NormalizeData()
+        {
+            var result = new double[_rawData.Length][];
+            _sampleMeans = new double[_rawData[0].Length];
+            _sampleStandardDeviations = new double[_rawData[0].Length];
+
+            for (var i = 0; i < _rawData.Length; ++i)
+            {
+                var current = _rawData[i];
+                result[i] = new double[current.Length];
+                Array.Copy(current, result[i], current.Length);
+            }
+
+            for (var j = 0; j < result[0].Length; ++j) // each col
+            {
+                var colSum = 0.0;
+                for (var i = 0; i < result.Length; ++i)
+                    colSum += result[i][j];
+                _sampleMeans[j] = colSum / result.Length;
+            }
+
+            for (var j = 0; j < result[0].Length; ++j) // each col
+            {
+                var sum = 0.0;
+                for (var i = 0; i < result.Length; ++i)
+                    sum += (result[i][j] - _sampleMeans[j]) * (result[i][j] - _sampleMeans[j]); 
+                _sampleStandardDeviations[j] = sum / result.Length;
+            }
+
+            for (var j = 0; j < result[0].Length; ++j) // each col
+            for (var i = 0; i < result.Length; ++i)
+                result[i][j] = (result[i][j] - _sampleMeans[j]) / _sampleStandardDeviations[j];
+            return result;
+        }
+
         private int[] InitializeClusters(int randomSeed = 0)
         {
-            Random random = new Random(randomSeed);
-            int[] clustering = new int[_normalizedData.Length];
-            for (int i = 0; i < _numClusters; ++i) // make sure each cluster has at least one tuple
+            var random = new Random(randomSeed);
+            var clustering = new int[_normalizedData.Length];
+            for (var i = 0; i < _numClusters; ++i) // make sure each cluster has at least one tuple
                 clustering[i] = i;
-            for (int i = _numClusters; i < clustering.Length; ++i)
+            for (var i = _numClusters; i < clustering.Length; ++i)
                 clustering[i] = random.Next(0, _numClusters); // other assignments random
             return clustering;
         }
 
         private double[][] Allocate()
         {
-            double[][] result = new double[_numClusters][];
-            for (int k = 0; k < _numClusters; ++k)
+            var result = new double[_numClusters][];
+            for (var k = 0; k < _numClusters; ++k)
                 result[k] = new double[_normalizedData[0].Length];
             return result;
         }
 
         private bool UpdateMeans()
         {
-            int[] clusterCounts = new int[_numClusters];
+            var clusterCounts = new int[_numClusters];
 
-            for (int i = 0; i < _normalizedData.Length; ++i)
+            for (var i = 0; i < _normalizedData.Length; ++i)
             {
-                int cluster = _clustering[i];
+                var cluster = _clustering[i];
                 ++clusterCounts[cluster];
             }
 
-            for (int k = 0; k < clusterCounts.Length; ++k)
+            for (var k = 0; k < clusterCounts.Length; ++k)
                 if (clusterCounts[k] == 0)
                     return false;
 
-            for (int k = 0; k < _means.Length; ++k)
+            for (var k = 0; k < _means.Length; ++k)
             {
-                double[] current = _means[k];
-                for (int j = 0; j < current.Length; ++j)
+                var current = _means[k];
+                for (var j = 0; j < current.Length; ++j)
                     current[j] = 0.0;
             }
 
 
-            for (int i = 0; i < _normalizedData.Length; ++i)
+            for (var i = 0; i < _normalizedData.Length; ++i)
             {
-                int cluster = _clustering[i];
-                for (int j = 0; j < _normalizedData[i].Length; ++j)
+                var cluster = _clustering[i];
+                for (var j = 0; j < _normalizedData[i].Length; ++j)
                     _means[cluster][j] += _normalizedData[i][j];
             }
 
-            for (int k = 0; k < _means.Length; ++k)
-                for (int j = 0; j < _means[k].Length; ++j)
-                    _means[k][j] /= clusterCounts[k];
+            for (var k = 0; k < _means.Length; ++k)
+            for (var j = 0; j < _means[k].Length; ++j)
+                _means[k][j] /= clusterCounts[k];
             return true;
         }
 
         private bool UpdateClustering()
         {
-            bool changed = false;
+            var changed = false;
 
-            int[] newClustering = new int[_clustering.Length]; // proposed result
+            var newClustering = new int[_clustering.Length]; // proposed result
             Array.Copy(_clustering, newClustering, _clustering.Length);
 
-            double[][] distances = new double[_normalizedData.Length][]; // distances from curr tuple to each mean
+            var distances = new double[_normalizedData.Length][]; // distances from curr tuple to each mean
 
-            for (int i = 0; i < _normalizedData.Length; ++i) // walk thru each tuple
+            for (var i = 0; i < _normalizedData.Length; ++i) // walk thru each tuple
             {
                 distances[i] = new double[_numClusters];
 
-                for (int k = 0; k < _numClusters; ++k)
-                    distances[i][k] = Distance(_normalizedData[i], _means[k]); // compute distances from curr tuple to all k means
+                for (var k = 0; k < _numClusters; ++k)
+                    distances[i][k] =
+                        Distance(_normalizedData[i], _means[k]); // compute distances from curr tuple to all k means
 
-                int newClusterID = MinIndex(distances[i]); // find closest mean ID
+                var newClusterID = MinIndex(distances[i]); // find closest mean ID
                 if (newClusterID != newClustering[i])
                 {
                     changed = true;
                     newClustering[i] = newClusterID; // update
                 }
             }
+
             var distancesMean = new double[_numClusters];
 
             _clustersRadius = new double[_numClusters];
 
-            for (int i = 0; i < distances.Length; ++i)
-                _clustersRadius[newClustering[i]] = Math.Max(distances[i][newClustering[i]], _clustersRadius[newClustering[i]]);
+            for (var i = 0; i < distances.Length; ++i)
+                _clustersRadius[newClustering[i]] =
+                    Math.Max(distances[i][newClustering[i]], _clustersRadius[newClustering[i]]);
 
             if (changed == false)
                 return false; // no change so bail and don't update clustering[][]
 
             // check proposed clustering[] cluster counts
-            int[] clusterCounts = new int[_numClusters];
-            for (int i = 0; i < _normalizedData.Length; ++i)
+            var clusterCounts = new int[_numClusters];
+            for (var i = 0; i < _normalizedData.Length; ++i)
             {
-                int cluster = newClustering[i];
+                var cluster = newClustering[i];
                 ++clusterCounts[cluster];
             }
 
-            for (int k = 0; k < _numClusters; ++k)
+            for (var k = 0; k < _numClusters; ++k)
                 if (clusterCounts[k] == 0)
                     return false; // bad clustering. no change to clustering[][]
 
@@ -205,13 +211,14 @@ namespace AnomalyDetectionAlgorithms
         {
             // Euclidean distance between two vectors for UpdateClustering()
             // consider alternatives such as Manhattan distance
-            double sumSquaredDiffs = 0.0;
-            for (int j = 0; j < tuple.Length; ++j)
+            var sumSquaredDiffs = 0.0;
+            for (var j = 0; j < tuple.Length; ++j)
             {
                 if (double.IsNaN(tuple[j]))
                     continue;
-                sumSquaredDiffs += Math.Pow((tuple[j] - mean[j]), 2);
+                sumSquaredDiffs += Math.Pow(tuple[j] - mean[j], 2);
             }
+
             return Math.Sqrt(sumSquaredDiffs);
         }
 
@@ -219,16 +226,15 @@ namespace AnomalyDetectionAlgorithms
         {
             // index of smallest value in array
             // helper for UpdateClustering()
-            int indexOfMin = 0;
-            double smallDist = distances[0];
-            for (int k = 0; k < distances.Length; ++k)
-            {
+            var indexOfMin = 0;
+            var smallDist = distances[0];
+            for (var k = 0; k < distances.Length; ++k)
                 if (distances[k] < smallDist)
                 {
                     smallDist = distances[k];
                     indexOfMin = k;
                 }
-            }
+
             return indexOfMin;
         }
     }

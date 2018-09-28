@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.Azure.TypeEdge.Proxy;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using System;
-using System.Threading.Tasks; 
 using ThermostatApplication;
 using ThermostatApplication.Modules;
 using ThermostatApplication.Twins;
-using Microsoft.Azure.TypeEdge.Proxy;
 
 namespace Thermostat.ServiceApp
 {
@@ -14,9 +14,9 @@ namespace Thermostat.ServiceApp
         private static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
-              .AddJsonFile("appsettings.json")
-              .AddEnvironmentVariables()
-              .Build();
+                .AddJsonFile("appSettings.json")
+                .AddEnvironmentVariables()
+                .Build();
 
             ProxyFactory.Configure(configuration["IotHubConnectionString"],
                 configuration["DeviceId"]);
@@ -24,7 +24,8 @@ namespace Thermostat.ServiceApp
 
             while (true)
             {
-                Console.WriteLine("Select Action: (D)efault Twins, (T)emperatureSensorTwin, (O)rchestratorTwin, (V)isualizerTwin, (A)nomaly, (M)odelTrainer, (E)xit");
+                Console.WriteLine(
+                    "Select Action: (D)efault Twins, (T)emperatureSensorTwin, (O)rchestratorTwin, (V)isualizerTwin, (A)nomaly, (M)odelTrainer, (E)xit");
 
                 var res = Console.ReadLine()?.ToUpper();
                 switch (res)
@@ -49,9 +50,6 @@ namespace Thermostat.ServiceApp
                     case "D":
                         await SetDefaultsAsync();
                         break;
-                    default:
-                        break;
-
                 }
             }
         }
@@ -67,13 +65,14 @@ namespace Thermostat.ServiceApp
 
         private static async Task SetTemperatureSensorTwin()
         {
-            Console.WriteLine($"Set Default?(Y/N)");
+            Console.WriteLine("Set Default?(Y/N)");
             var res = Console.ReadLine()?.ToUpper();
             if (res == "Y")
             {
                 await SetTemperatureDefaults();
                 return;
             }
+
             var temperatureSensor = ProxyFactory.GetModuleProxy<ITemperatureSensor>();
             var twin = await temperatureSensor.Twin.GetAsync();
 
@@ -95,7 +94,7 @@ namespace Thermostat.ServiceApp
             Console.WriteLine($"Set the WaveType:{twin.WaveType.ToString()}");
             res = Console.ReadLine();
             if (!string.IsNullOrEmpty(res))
-                twin.WaveType = (WaveformType)Enum.Parse(typeof(WaveformType), res);
+                twin.WaveType = (WaveformType) Enum.Parse(typeof(WaveformType), res);
 
             Console.WriteLine($"Set the VerticalShift:{twin.Offset}");
             res = Console.ReadLine();
@@ -109,13 +108,14 @@ namespace Thermostat.ServiceApp
 
         private static async Task SetOrchestratorTwin()
         {
-            Console.WriteLine($"Set Default?(Y/N)");
+            Console.WriteLine("Set Default?(Y/N)");
             var res = Console.ReadLine()?.ToUpper();
             if (res == "Y")
             {
                 await SetOrchestratorDefaults();
                 return;
             }
+
             var routing = PromptRoutingMode();
 
             var processor = ProxyFactory.GetModuleProxy<IOrchestrator>();
@@ -129,7 +129,7 @@ namespace Thermostat.ServiceApp
 
         private static async Task SetVisualizerTwin()
         {
-            Console.WriteLine($"Set Default?(Y/N)");
+            Console.WriteLine("Set Default?(Y/N)");
             var res = Console.ReadLine()?.ToUpper();
             if (res == "Y")
             {
@@ -150,10 +150,11 @@ namespace Thermostat.ServiceApp
             Console.WriteLine("Enter y-axis label");
             twin.YAxisLabel = Console.ReadLine();
 
-            Console.WriteLine("Enter \"F\" to replace all chart data upon reception of new data package. Otherwise data will be shifted in a rolling window.");
-            string Append = Console.ReadLine()?.ToUpper();
+            Console.WriteLine(
+                "Enter \"F\" to replace all chart data upon reception of new data package. Otherwise data will be shifted in a rolling window.");
+            var Append = Console.ReadLine()?.ToUpper();
 
-            if (Append == ("F"))
+            if (Append == "F")
                 twin.Append = false;
             else
                 twin.Append = true;
@@ -165,7 +166,8 @@ namespace Thermostat.ServiceApp
         {
             Routing result = 0;
 
-            Console.WriteLine("Select Processor routing modes (multiple choices are allowed) : (T)rain, (D)etect, Visualize(S)ource, (F)eatureExtraction, (V)isualizeFeature,  empty for None");
+            Console.WriteLine(
+                "Select Processor routing modes (multiple choices are allowed) : (T)rain, (D)etect, Visualize(S)ource, (F)eatureExtraction, (V)isualizeFeature,  empty for None");
             var res = Console.ReadLine()?.ToUpper();
             if (!string.IsNullOrEmpty(res))
             {
@@ -180,6 +182,7 @@ namespace Thermostat.ServiceApp
                 if (res.Contains("F"))
                     result |= Routing.FeatureExtraction;
             }
+
             return result;
         }
 
@@ -199,6 +202,7 @@ namespace Thermostat.ServiceApp
             var res = await processor.Twin.PublishAsync(twin);
             Console.WriteLine(JsonConvert.SerializeObject(twin, Formatting.Indented));
         }
+
         private static async Task SetTemperatureDefaults()
         {
             Console.WriteLine("Setting TemperatureDefaults");
@@ -215,6 +219,7 @@ namespace Thermostat.ServiceApp
             var res = await temperatureSensor.Twin.PublishAsync(twin);
             Console.WriteLine(JsonConvert.SerializeObject(twin, Formatting.Indented));
         }
+
         private static async Task SetTrainerDefaults()
         {
             Console.WriteLine("Setting TrainerDefaults");
@@ -228,6 +233,7 @@ namespace Thermostat.ServiceApp
             var res = await dataTrainer.Twin.PublishAsync(twin);
             Console.WriteLine(JsonConvert.SerializeObject(res, Formatting.Indented));
         }
+
         private static async Task SetOrchestratorDefaults()
         {
             Console.WriteLine("Setting Orchestrator");

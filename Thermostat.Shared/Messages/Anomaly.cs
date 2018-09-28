@@ -1,7 +1,4 @@
 ﻿using Microsoft.Azure.TypeEdge.Modules.Messages;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ThermostatApplication.Messages
 {

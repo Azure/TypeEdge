@@ -1,6 +1,5 @@
-﻿using Microsoft.Azure.TypeEdge;
-using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.Azure.TypeEdge;
 
 namespace Modules
 {

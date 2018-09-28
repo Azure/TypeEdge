@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Azure.TypeEdge.Modules.Messages;
+﻿using Microsoft.Azure.TypeEdge.Modules.Messages;
 
 namespace ThermostatApplication.Messages
 {

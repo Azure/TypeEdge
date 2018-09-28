@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ThermostatApplication.Twins
+﻿namespace ThermostatApplication.Twins
 {
-    public enum WaveformType : int
+    public enum WaveformType
     {
         Flat = 0,
         Sine = 1,

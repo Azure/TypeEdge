@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using SignalRChat.Hubs;
 
 namespace VisualizationWeb
@@ -28,11 +22,11 @@ namespace VisualizationWeb
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddCors(options => options.AddPolicy("CorsPolicy",
-            builder =>
-            {
-                builder.AllowAnyMethod().AllowAnyHeader()
-                       .AllowCredentials();
-            }));
+                builder =>
+                {
+                    builder.AllowAnyMethod().AllowAnyHeader()
+                        .AllowCredentials();
+                }));
 
 
             services.AddSignalR();
@@ -54,10 +48,7 @@ namespace VisualizationWeb
             app.UseStaticFiles();
 
             //Route to VisualizerHub, allowing for SingalR
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<VisualizerHub>("/visualizerhub");
-            });
+            app.UseSignalR(routes => { routes.MapHub<VisualizerHub>("/visualizerhub"); });
             app.UseMvc();
         }
     }

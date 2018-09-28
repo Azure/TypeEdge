@@ -1,6 +1,6 @@
 ﻿namespace ThermostatApplication
 {
-    public enum Algorithm: int
+    public enum Algorithm
     {
         kMeans = 0,
         LSTM = 1

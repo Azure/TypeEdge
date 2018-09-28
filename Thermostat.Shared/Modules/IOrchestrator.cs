@@ -3,7 +3,6 @@ using Microsoft.Azure.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.TypeEdge.Twins;
 using ThermostatApplication.Messages;
 using ThermostatApplication.Twins;
-using Microsoft.Azure.TypeEdge.Modules.Messages;
 
 namespace ThermostatApplication.Modules
 {

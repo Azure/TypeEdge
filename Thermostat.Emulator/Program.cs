@@ -1,12 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Edge.Agent.Docker;
+using Microsoft.Azure.TypeEdge;
 using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using Modules;
 using ThermostatApplication.Modules;
-using Microsoft.Azure.TypeEdge;
-using System.IO;
-using Microsoft.Azure.Devices.Edge.Agent.Docker;
 
 namespace ThermostatApplication
 {
@@ -15,9 +15,9 @@ namespace ThermostatApplication
         private static async Task Main(string[] args)
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appSettings.json")
                 .AddEnvironmentVariables()
-                .AddDotenv()
+                .AddDotΕnv()
                 .AddCommandLine(args)
                 .Build();
 

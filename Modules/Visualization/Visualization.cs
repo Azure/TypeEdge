@@ -1,33 +1,54 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ThermostatApplication.Messages;
-using ThermostatApplication.Messages.Visualization;
-using ThermostatApplication.Modules;
-using ThermostatApplication.Twins;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Azure.TypeEdge.Enums;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Enums;
 using Microsoft.Azure.TypeEdge.Modules.Messages;
 using Microsoft.Azure.TypeEdge.Twins;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using ThermostatApplication.Messages;
+using ThermostatApplication.Messages.Visualization;
+using ThermostatApplication.Modules;
+using ThermostatApplication.Twins;
 using VisualizationWeb;
 
 namespace Modules
 {
     public class Visualization : TypeModule, IVisualization
     {
-        readonly object _sync = new object();
-        readonly IConfigurationRoot _configuration;
-        IWebHost _webHost;
-        HubConnection _connection;
-        Dictionary<string, Chart> _chartDataDictionary;
+        private readonly Dictionary<string, Chart> _chartDataDictionary;
+        private readonly IConfigurationRoot _configuration;
+        private readonly object _sync = new object();
+        private HubConnection _connection;
+        private IWebHost _webHost;
+
+        public Visualization(IOrchestrator proxy, IConfigurationRoot configuration)
+        {
+            _configuration = configuration;
+
+            _chartDataDictionary = new Dictionary<string, Chart>();
+
+            proxy.Visualization.Subscribe(this, async e =>
+            {
+                await RenderAsync(e);
+                return MessageResult.Ok;
+            });
+
+            Twin.Subscribe(twin =>
+            {
+                Logger.LogInformation("Twin update");
+
+                ConfigureCharts(twin);
+                return Task.FromResult(TwinResult.Ok);
+            });
+        }
 
         public ModuleTwin<VisualizationTwin> Twin { get; set; }
 
@@ -41,52 +62,34 @@ namespace Modules
                 .UseStartup<Startup>()
                 .Build();
 
-            _connection = new HubConnectionBuilder().WithUrl($"{_configuration["server.urls"].Split(';')[0]}/visualizerhub").Build();
-            
+            _connection = new HubConnectionBuilder()
+                .WithUrl($"{_configuration["server.urls"].Split(';')[0]}/visualizerhub").Build();
+
             return base.Init();
-        }
-
-        public Visualization(IOrchestrator proxy, IConfigurationRoot configuration)
-        {
-            _configuration = configuration;
-
-            _chartDataDictionary = new Dictionary<string, Chart>();
-
-            proxy.Visualization.Subscribe(this, async (e) =>
-            {
-                await RenderAsync(e);
-                return MessageResult.Ok;
-            });
-
-            Twin.Subscribe(twin =>
-            {
-                Logger.LogInformation($"Twin update");
-
-                ConfigureCharts(twin);
-                return Task.FromResult(TwinResult.Ok);
-            });
         }
 
         private void ConfigureCharts(VisualizationTwin twin)
         {
-            if (twin == null|| string.IsNullOrEmpty(twin.ChartName))
+            if (twin == null || string.IsNullOrEmpty(twin.ChartName))
                 return;
             lock (_sync)
-                _chartDataDictionary[twin.ChartName] = new Chart()
+            {
+                _chartDataDictionary[twin.ChartName] = new Chart
                 {
                     Append = twin.Append,
-                    Headers = new string[2] { twin.XAxisLabel, twin.YAxisLabel },
+                    Headers = new[] {twin.XAxisLabel, twin.YAxisLabel},
                     Name = twin.ChartName,
                     X_Label = twin.XAxisLabel,
                     Y_Label = twin.YAxisLabel
                 };
+            }
         }
 
         public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
             ConfigureCharts(await Twin.GetAsync());
-            await _webHost.StartAsync();
-            await _connection.StartAsync();
+            await _webHost.StartAsync(cancellationToken);
+            await _connection.StartAsync(cancellationToken);
             return ExecutionResult.Ok;
         }
 
@@ -118,7 +121,10 @@ namespace Modules
             {
                 await _connection.InvokeAsync("SendInput", JsonConvert.SerializeObject(visualizationMessage));
             }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
 }

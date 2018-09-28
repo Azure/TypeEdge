@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ThermostatApplication.ML
+﻿namespace ThermostatApplication.ML
 {
     public interface ITrainer
     {

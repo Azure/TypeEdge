@@ -17,35 +17,35 @@ class Chart {
                 newPoints[i] = newPoints[i].concat(["null"]);
             }
             this.points = newPoints.concat(this.points);
-        }
-        else {
+        } else {
             for (var i = 0; i < newPoints.length; i++) {
                 newPoints[i] = newPoints[i].concat(["null"]);
             }
             this.points = newPoints;
         }
-        this.points = this.points.sort(function (a, b) { return a[0] - b[0] }).reverse().slice(0, this.numToDraw);
+        this.points = this.points.sort(function(a, b) { return a[0] - b[0] }).reverse().slice(0, this.numToDraw);
     }
+
     updateAnomaly(newPoints) {
         if (this.append === true) {
             for (var i = 0; i < newPoints.length; i++) {
-                newPoints[i] = newPoints[i].concat(['point { size: 18; shape-type: star; fill-color: #a52714; }']);
+                newPoints[i] = newPoints[i].concat(["point { size: 18; shape-type: star; fill-color: #a52714; }"]);
             }
             this.points = newPoints.concat(this.points);
-        }
-        else {
+        } else {
             for (var i = 0; i < newPoints.length; i++) {
-                newPoints[i] = newPoints[i].concat(['point { size: 18; shape-type: star; fill-color: #a52714; }']);
+                newPoints[i] = newPoints[i].concat(["point { size: 18; shape-type: star; fill-color: #a52714; }"]);
             }
             this.points = newPoints;
         }
         this.points = this.points.slice(0, this.numToDraw);
     }
+
     constructor(chart) {
         this.chartName = chart.Name;
         this.xlabel = chart.X_Label;
         this.ylabel = chart.Y_Label;
-        this.headers = chart.Headers.concat([{ 'type': 'string', 'role': 'style' }]);
+        this.headers = chart.Headers.concat([{ 'type': "string", 'role': "style" }]);
         this.points = [];
         this.append = chart.Append;
 
@@ -67,7 +67,7 @@ class Chart {
         displayNumButton.class = "slider";
         displayNumButton.id = "displayNum" + this.chartName;
         displayNumButton.name = this.chartName;
-        displayNumButton.onclick = function () {
+        displayNumButton.onclick = function() {
             // Since the number of elements to display must be a power of 2, we use the sliding
             // bar to determine the exponent of number to display.
             var name = "displayNum" + displayNumButton.name;
@@ -91,7 +91,7 @@ class Chart {
         frameGoButton.id = "frameButton" + this.chartName;
         frameGoButton.value = "Go!";
         frameGoButton.name = this.chartName;
-        frameGoButton.onclick = function () {
+        frameGoButton.onclick = function() {
             var framerate = parseInt(document.getElementById("frameRate" + frameButton.name).value);
             if (!isNaN(framerate) && framerate != 0) {
                 charts[frameButton.name].frames = framerate;
@@ -108,9 +108,9 @@ class Chart {
         pauseButton.id = "pauseButton" + this.chartName;
         pauseButton.value = "Pause/Play";
         pauseButton.name = this.chartName;
-        pauseButton.onclick = function () {
+        pauseButton.onclick = function() {
             charts[pauseButton.name].pause = !charts[pauseButton.name].pause;
-        }
+        };
         chartElement.append(pauseButton);
 
         /* End Pause Button */
@@ -122,13 +122,12 @@ class Chart {
         fftButton.id = "fftButton" + this.chartName;
         fftButton.value = "Render FFT Pause/Play";
         fftButton.name = this.chartName;
-        fftButton.onclick = function () {
+        fftButton.onclick = function() {
             charts[fftButton.name].toDrawfft = !charts[pauseButton.name].toDrawfft;
-        }
+        };
         chartElement.append(fftButton);
 
         /* End FFT Button */
-
 
 
         /* Create charts */
@@ -143,10 +142,19 @@ class Chart {
         chartElement.appendChild(this.FFTChart);
 
         this.options = {
-            title: this.chartName, hAxis: { title: this.xlabel }, vAxis: { title: this.ylabel }, curveType: 'function', legend: { position: 'bottom' }, pointSize: 1
+            title: this.chartName,
+            hAxis: { title: this.xlabel },
+            vAxis: { title: this.ylabel },
+            curveType: "function",
+            legend: { position: "bottom" },
+            pointSize: 1
         };
         this.FFTOptions = {
-            title: 'FFT Chart', hAxis: { title: 'Frequency' }, vAxis: { title: 'Amplitude' }, curveType: 'function', legend: { position: 'bottom' }
+            title: "FFT Chart",
+            hAxis: { title: "Frequency" },
+            vAxis: { title: "Amplitude" },
+            curveType: "function",
+            legend: { position: "bottom" }
         };
         //console.log(document.getElementById(this.chartName));
         this.googleChart = new google.visualization.LineChart(document.getElementById(this.chartName));
@@ -157,11 +165,12 @@ class Chart {
 
 function getTopNums(chart) {
     var tempArray2 = [];
-    chart.points.slice(0, chart.numToDraw).forEach(function (element) {
+    chart.points.slice(0, chart.numToDraw).forEach(function(element) {
         tempArray2.push([element[0], element[1]]);
     });
     return tempArray2;
 }
+
 function getTop(chart) {
     var tempArray = chart.points.slice(0, chart.numToDraw);
     tempArray.unshift(chart.headers);
@@ -169,45 +178,44 @@ function getTop(chart) {
 }
 
 function load() {
-    google.charts.load('current', { 'packages': ['corechart'] });
-    google.charts.setOnLoadCallback(function () {
+    google.charts.load("current", { 'packages': ["corechart"] });
+    google.charts.setOnLoadCallback(function() {
         // Called when a new message is received.
         // This method accepts an array of strings for header information and an array of strings for inputs.
-        connection.on("ReceiveInput", (obj) => {
-            const Msg = JSON.parse(obj);
+        connection.on("ReceiveInput",
+            (obj) => {
+                const Msg = JSON.parse(obj);
 
-            // First, check if we have this chart already and it's just an update.
+                // First, check if we have this chart already and it's just an update.
 
-            var messageArray = Msg.messages;
-            for (var i = 0; i < messageArray.length; i++) {
-                var msg = messageArray[i];
-                if (!charts.hasOwnProperty(msg.Chart.Name)) {
-                    // Does not exist, so let's create it.
-                    charts[msg.Chart.Name] = new Chart(msg.Chart);
-                }
-
-                if (msg.IsAnomaly) {
-                    charts[msg.Chart.Name].updateAnomaly(msg.Points);
-                }
-                else {
-                    charts[msg.Chart.Name].updatePoints(msg.Points);
-                }
-
-                // Draw charts if user wants
-                var internal_msg = charts[msg.Chart.Name];
-                if (!internal_msg.pause && internal_msg.frameNum % internal_msg.frames == 0) {
-                    drawChart(internal_msg);
-                    if (internal_msg.toDrawfft) {
-                        drawFFT(internal_msg);
+                var messageArray = Msg.messages;
+                for (var i = 0; i < messageArray.length; i++) {
+                    var msg = messageArray[i];
+                    if (!charts.hasOwnProperty(msg.Chart.Name)) {
+                        // Does not exist, so let's create it.
+                        charts[msg.Chart.Name] = new Chart(msg.Chart);
                     }
+
+                    if (msg.IsAnomaly) {
+                        charts[msg.Chart.Name].updateAnomaly(msg.Points);
+                    } else {
+                        charts[msg.Chart.Name].updatePoints(msg.Points);
+                    }
+
+                    // Draw charts if user wants
+                    var internal_msg = charts[msg.Chart.Name];
+                    if (!internal_msg.pause && internal_msg.frameNum % internal_msg.frames == 0) {
+                        drawChart(internal_msg);
+                        if (internal_msg.toDrawfft) {
+                            drawFFT(internal_msg);
+                        }
+                    }
+                    internal_msg.frameNum += 1;
                 }
-                internal_msg.frameNum += 1;
-            }
-        });
+            });
     });
 
 }
-
 
 
 // This actually draws the chart. Possible parameterization: allow the user to determine
@@ -227,6 +235,7 @@ function drawChart(chart) {
     /* With resources cleared, redraw */
     chart.googleChart.draw(dataTable, chart.options);
 }
+
 function drawFFT(chart) {
     var fft = FFTNayuki(chart.numToDraw);
 
@@ -235,7 +244,10 @@ function drawFFT(chart) {
     var reals = [];
     var imags = [];
     // Format array correctly and send to FFT. We send 0 for the imaginaries.
-    topNumbers.forEach((val, i) => { reals.push(val[1]); imags.push(0); });
+    topNumbers.forEach((val, i) => {
+        reals.push(val[1]);
+        imags.push(0);
+    });
     forward(reals, imags);
 
     // Format array for graph 
@@ -275,7 +287,7 @@ function FFTNayuki(n) {
 
     for (var i = 0; i < 32; i++) {
         if (1 << i === n) {
-            this.levels = i;  // Equal to log2(n)
+            this.levels = i; // Equal to log2(n)
         }
     }
     if (this.levels === -1) {
@@ -293,7 +305,7 @@ function FFTNayuki(n) {
      * Computes the discrete Fourier transform (DFT) of the given complex vector, storing the result back into the vector.
      * The vector's length must be equal to the size n that was passed to the object constructor, and this must be a power of 2. Uses the Cooley-Tukey decimation-in-time radix-2 algorithm.
      */
-    this.forward = function (real, imag) {
+    this.forward = function(real, imag) {
 
         var n = this.n;
 
@@ -315,7 +327,7 @@ function FFTNayuki(n) {
             var halfsize = size / 2;
             var tablestep = n / size;
             for (i = 0; i < n; i += size) {
-                for (j = i, k = 0; j < i + halfsize; j++ , k += tablestep) {
+                for (j = i, k = 0; j < i + halfsize; j++, k += tablestep) {
                     var tpre = real[j + halfsize] * this.cosTable[k] +
                         imag[j + halfsize] * this.sinTable[k];
                     var tpim = -real[j + halfsize] * this.sinTable[k] +
@@ -337,13 +349,13 @@ function FFTNayuki(n) {
             }
             return y;
         }
-    }
+    };
 
     /* 
      * Computes the inverse discrete Fourier transform (IDFT) of the given complex vector, storing the result back into the vector.
      * The vector's length must be equal to the size n that was passed to the object constructor, and this must be a power of 2. This is a wrapper function. This transform does not perform scaling, so the inverse is not a true inverse.
      */
-    this.inverse = function (real, imag) {
+    this.inverse = function(real, imag) {
         forward(imag, real);
-    }
+    };
 }
