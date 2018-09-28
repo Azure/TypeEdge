@@ -1,6 +1,6 @@
 # Microsoft Azure TypeEdge
 
-**TypeEdge** introduces a strongly-typed flavor of the inherently loosely coupled vanilla [Azure IoT Edge](https:/azure.microsoft.com/en-us/services/iot-edge/).
+**TypeEdge** introduces a strongly-typed flavor of the inherently loosely coupled vanilla [Azure IoT Edge](https:/azure.microsoft.com/en-us/services/iot-edge).
 
 Specifically, **TypeEdge**:
 
