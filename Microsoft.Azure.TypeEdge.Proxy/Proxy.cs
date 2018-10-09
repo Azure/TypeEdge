@@ -46,16 +46,13 @@ namespace Microsoft.Azure.TypeEdge.Proxy
             {
                 //known properties
                 var genericDef = invocation.Method.ReturnType.GetGenericTypeDefinition();
-                if (genericDef.IsAssignableFrom(typeof(Input<>))
-                    || genericDef.IsAssignableFrom(typeof(Output<>))
-                    || genericDef.IsAssignableFrom(typeof(ModuleTwin<>))
-                    || genericDef.IsAssignableFrom(typeof(Volume<>)))
-                {
-                    var value = Activator.CreateInstance(
-                        genericDef.MakeGenericType(invocation.Method.ReturnType.GenericTypeArguments),
-                        invocation.Method.Name.Replace("get_", ""), this);
-                    invocation.ReturnValue = value;
-                }
+                if (!genericDef.IsAssignableFrom(typeof(Input<>)) && !genericDef.IsAssignableFrom(typeof(Output<>)) &&
+                    !genericDef.IsAssignableFrom(typeof(ModuleTwin<>)) &&
+                    !genericDef.IsAssignableFrom(typeof(Volume<>))) return;
+                var value = Activator.CreateInstance(
+                    genericDef.MakeGenericType(invocation.Method.ReturnType.GenericTypeArguments),
+                    invocation.Method.Name.Replace("get_", ""), this);
+                invocation.ReturnValue = value;
             }
             else if (!invocation.Method.IsSpecialName)
             {

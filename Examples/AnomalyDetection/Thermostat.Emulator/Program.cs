@@ -28,7 +28,7 @@ namespace ThermostatApplication
             host.RegisterModule<IModelTraining, ModelTraining>();
             host.RegisterModule<IVisualization, Visualization>();
             host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
-
+            
             host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
             var dockerRegistry = configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";

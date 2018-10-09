@@ -131,8 +131,7 @@ namespace Microsoft.Azure.TypeEdge
         {
             var assembly = Assembly.GetEntryAssembly();
             var moduleType = assembly.GetTypes().SingleOrDefault(t =>
-                t.GetInterfaces().SingleOrDefault(i =>
-                    i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null) != null);
+                t.GetProxyInterface() != null);
 
             return moduleType?.GetProxyInterface().GetModuleName();
         }
@@ -172,12 +171,6 @@ namespace Microsoft.Azure.TypeEdge
             var moduleInterfaceType = moduleType.GetProxyInterface();
             moduleTypes = (moduleType, moduleInterfaceType);
             return true;
-        }
-
-        public static Type GetProxyInterface(this Type type)
-        {
-            return type.GetInterfaces()
-                .SingleOrDefault(i => i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null);
-        }
+        }        
     }
 }
