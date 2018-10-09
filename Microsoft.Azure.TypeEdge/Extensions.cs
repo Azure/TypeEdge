@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Azure.TypeEdge.Attributes;
 using Microsoft.Azure.TypeEdge.DovEnv;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
@@ -126,6 +127,12 @@ namespace Microsoft.Azure.TypeEdge
             }
 
             return obj;
+        }
+
+        public static Type GetProxyInterface(this Type type)
+        {
+            return type.GetInterfaces()
+                .SingleOrDefault(i => i.GetCustomAttribute(typeof(TypeModuleAttribute), true) != null);
         }
     }
 }

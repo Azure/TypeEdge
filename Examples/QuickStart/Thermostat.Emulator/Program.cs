@@ -3,9 +3,11 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Edge.Agent.Docker;
 using Microsoft.Azure.TypeEdge;
+using Microsoft.Azure.TypeEdge.Description;
 using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using Modules;
+using NJsonSchema;
 using ThermostatApplication.Modules;
 
 namespace ThermostatApplication
@@ -25,6 +27,9 @@ namespace ThermostatApplication
 
             //register the modules
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
+
+            var description = ServiceDescriptor.Describe<TemperatureSensor>(e => JsonSchema4.FromTypeAsync(e).Result.ToJson());
+
 
             //host.RegisterExternalModule(new TypeEdge.Host.Docker.DockerModule("tempSensor",
             //    new HostingSettings("mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0", null),

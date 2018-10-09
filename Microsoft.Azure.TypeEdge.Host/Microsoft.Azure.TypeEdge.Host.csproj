@@ -42,5 +42,6 @@
 
   <ItemGroup>
     <PackageReference Include="Docker.DotNet" Version="3.125.2" />
+    <PackageReference Include="NJsonSchema" Version="9.11.0" />
   </ItemGroup>
 </Project>
