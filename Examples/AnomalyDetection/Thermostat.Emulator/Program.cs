@@ -3,11 +3,9 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Edge.Agent.Docker;
 using Microsoft.Azure.TypeEdge;
-using Microsoft.Azure.TypeEdge.Description;
 using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Extensions.Configuration;
 using Modules;
-using NJsonSchema;
 using ThermostatApplication.Modules;
 
 namespace ThermostatApplication
@@ -30,10 +28,7 @@ namespace ThermostatApplication
             host.RegisterModule<IModelTraining, ModelTraining>();
             host.RegisterModule<IVisualization, Visualization>();
             host.RegisterModule<IAnomalyDetection, AnomalyDetection>();
-
-            var description = ServiceDescriptor.Describe<Orchestrator>(e => JsonSchema4.FromTypeAsync(e).Result.ToJson());
             
-
             host.Upstream.Subscribe(host.GetProxy<IAnomalyDetection>().Anomaly);
 
             var dockerRegistry = configuration.GetValue<string>("DOCKER_REGISTRY") ?? "";
