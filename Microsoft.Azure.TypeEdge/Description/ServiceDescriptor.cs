@@ -10,37 +10,61 @@ namespace Microsoft.Azure.TypeEdge.Description
 {
     public static class ServiceDescriptor
     {
+        public static ServiceDescription Describe(Type type)
+        {
+            return Describe(type, new SchemaGenerator().Generate);
+        }
+
+        public static ServiceDescription Describe<T>()
+            where T : TypeModule
+        {
+            return Describe(typeof(T));
+        }
+
         public static ServiceDescription Describe<T>(Func<Type, string> schemaGenerator)
-        where T : TypeModule
+            where T : TypeModule
+        {
+            return Describe(typeof(T), schemaGenerator);
+        }
+
+        public static ServiceDescription Describe(Type type, Func<Type, string> schemaGenerator)
         {
             return new ServiceDescription
             {
-                InputDescriptions = GetEndpointDescription<T>(typeof(Input<>), schemaGenerator),
-                OutputDescriptions = GetEndpointDescription<T>(typeof(Output<>), schemaGenerator),
-                TwinDescription = GetTwinDescription<T>(typeof(ModuleTwin<>), schemaGenerator),
-                DirectMethodDescriptions = GetDirectMethodDescriptions<T>(schemaGenerator)
+                Name = type.Name,
+                InputDescriptions = GetEndpointDescription(type, typeof(Input<>), schemaGenerator),
+                OutputDescriptions = GetEndpointDescription(type, typeof(Output<>), schemaGenerator),
+                TwinDescriptions = GetTwinDescription(type, typeof(ModuleTwin<>), schemaGenerator),
+                DirectMethodDescriptions = GetDirectMethodDescriptions(type, schemaGenerator)
             };
         }
 
-        private static DirectMethodDescription[] GetDirectMethodDescriptions<T>(Func<Type, string> schemaGenerator)
+        private static DirectMethodDescription[] GetDirectMethodDescriptions(Type type,
+            Func<Type, string> schemaGenerator)
         {
-            return typeof(T).GetProxyInterface().GetMethods().Where(m => !m.IsSpecialName).Select(e => new DirectMethodDescription(e, schemaGenerator)).ToArray();
+            return type.GetProxyInterface().GetMethods().Where(m => !m.IsSpecialName)
+                .Select(e => new DirectMethodDescription(e, schemaGenerator)).ToArray();
         }
 
-        private static EndpointDescription[] GetEndpointDescription<T>(Type propertyType, Func<Type, string> schemaGenerator)
+        private static EndpointDescription[] GetEndpointDescription(Type type, Type propertyType,
+            Func<Type, string> schemaGenerator)
         {
-            return GetPropertyInfos<T>(propertyType)
-                .Select(e => new EndpointDescription(e.Name, e.PropertyType.GenericTypeArguments[0], schemaGenerator)).ToArray();
+            return GetPropertyInfos(type, propertyType)
+                .Select(e => new EndpointDescription(e.Name, e.PropertyType.GenericTypeArguments[0], schemaGenerator))
+                .ToArray();
         }
 
-        private static TwinDescription GetTwinDescription<T>(Type propertyType, Func<Type, string> schemaGenerator)
+        private static TwinDescription[] GetTwinDescription(Type type, Type propertyType,
+            Func<Type, string> schemaGenerator)
         {
-            return new TwinDescription(GetPropertyInfos<T>(propertyType).Select(e => e.PropertyType.GenericTypeArguments[0]), schemaGenerator);
+            return GetPropertyInfos(type, propertyType)
+                .Select(e => new TwinDescription(e.Name, e.PropertyType.GenericTypeArguments[0], schemaGenerator))
+                .ToArray();
         }
 
-        private static IEnumerable<PropertyInfo> GetPropertyInfos<T>(Type propertyType)
+        private static IEnumerable<PropertyInfo> GetPropertyInfos(Type type, Type propertyType)
         {
-            return typeof(T).GetProperties().Where(e =>
+            return type.GetProperties().Where(e =>
                 e.PropertyType.IsGenericType &&
                 e.PropertyType.GetGenericTypeDefinition().IsAssignableFrom(propertyType));
         }

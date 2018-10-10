@@ -138,7 +138,8 @@ namespace Microsoft.Azure.TypeEdge.Modules
                 Logger.LogWarning($"Missing {Constants.EdgeHubConnectionStringKey} variable.");
 
             var settings = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
-            var disableSslCertificateValidationKey = configuration.GetValue($"{Constants.DisableSslCertificateValidationKey}", false);
+            var disableSslCertificateValidationKey =
+                configuration.GetValue($"{Constants.DisableSslCertificateValidationKey}", false);
 
             if (disableSslCertificateValidationKey)
                 settings.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
@@ -211,10 +212,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
 
             var volumePath = volumeName.ToLower();
 
-            if (!Directory.Exists(volumePath))
-            {
-                Directory.CreateDirectory(volumePath);
-            }
+            if (!Directory.Exists(volumePath)) Directory.CreateDirectory(volumePath);
 
             Volumes[volumeName] = volumePath;
         }
@@ -415,6 +413,9 @@ namespace Microsoft.Azure.TypeEdge.Modules
             }
 
             input.SetBytes(messageBytes);
+
+            foreach (var messageProperty in message.Properties)
+                input.Properties.Add(messageProperty.Key, messageProperty.Value);
 
             var invocationResult = callback.Handler.DynamicInvoke(input);
             var result = await (Task<MessageResult>) invocationResult;

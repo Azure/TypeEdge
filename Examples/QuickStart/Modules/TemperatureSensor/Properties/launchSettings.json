@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TemperatureSensor": {
+      "commandName": "Project",
+      "commandLineArgs": "metadata=true"
+    }
+  }
+}
