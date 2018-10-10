@@ -14,7 +14,9 @@ using Microsoft.Azure.TypeEdge.Proxy;
 using Microsoft.Azure.TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using static System.String;
+using ServiceDescriptor = Microsoft.Azure.TypeEdge.Description.ServiceDescriptor;
 
 namespace Microsoft.Azure.TypeEdge
 {
@@ -43,14 +45,12 @@ namespace Microsoft.Azure.TypeEdge
 
             if (IsNullOrEmpty(moduleName))
             {
-                Console.WriteLine($"WARN:No {Constants.ModuleNameConfigName} in configuration. ");
-
                 moduleName = DiscoverModuleName();
                 if (IsNullOrEmpty(moduleName))
                 {
+                    Console.WriteLine($"WARN:No {Constants.ModuleNameConfigName} in configuration. ");
                     Console.WriteLine("Exiting...");
                     return;
-                    //throw new ArgumentException($"No moduleName in arguments");
                 }
             }
 
@@ -65,6 +65,13 @@ namespace Microsoft.Azure.TypeEdge
 
             if (moduleType == null)
                 throw new ArgumentException($"No module called {moduleName} in calling assembly");
+
+            if (configuration.GetValue("metadata", false))
+            {
+                var description = ServiceDescriptor.Describe(moduleType);
+                Console.WriteLine(JsonConvert.SerializeObject(description, Formatting.Indented));
+                return;
+            }
 
             var connectionString = configuration.GetValue<string>($"{Constants.EdgeHubConnectionStringKey}");
 
@@ -105,9 +112,9 @@ namespace Microsoft.Azure.TypeEdge
 
             var moduleDependencies = moduleType.GetConstructors().First().GetParameters();
             var moduleDependencyTypes = moduleDependencies.Where(i => i.ParameterType.IsInterface &&
-                                                                    i.ParameterType.GetCustomAttribute(
-                                                                        typeof(TypeModuleAttribute),
-                                                                        true) != null).Select(e => e.ParameterType);
+                                                                      i.ParameterType.GetCustomAttribute(
+                                                                          typeof(TypeModuleAttribute),
+                                                                          true) != null).Select(e => e.ParameterType);
 
             var proxyGenerator = new ProxyGenerator();
             foreach (var dependency in moduleDependencyTypes)
@@ -171,6 +178,6 @@ namespace Microsoft.Azure.TypeEdge
             var moduleInterfaceType = moduleType.GetProxyInterface();
             moduleTypes = (moduleType, moduleInterfaceType);
             return true;
-        }        
+        }
     }
 }

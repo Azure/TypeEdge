@@ -38,7 +38,6 @@ namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
                     _volume.Delete(fileName);
 
                 return res;
-
             });
 
             Module.SubscribeRoute(output.Name,

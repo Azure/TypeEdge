@@ -111,10 +111,12 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
             try
             {
                 var containers =
-                    await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters {All = true}, cancellationToken);
+                    await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters {All = true},
+                        cancellationToken);
                 if (containers
-                        .SingleOrDefault(e => e.Image == (_moduleWithIdentity.Module as Devices.Edge.Agent.Docker.DockerModule)?.Config
-                                              .Image) != null)
+                        .SingleOrDefault(e =>
+                            e.Image == (_moduleWithIdentity.Module as Devices.Edge.Agent.Docker.DockerModule)?.Config
+                            .Image) != null)
                 {
                     Console.WriteLine($"Removing {_moduleWithIdentity.Module.Name}...");
                     await (await _dockerFactory.RemoveAsync(_moduleWithIdentity.Module))

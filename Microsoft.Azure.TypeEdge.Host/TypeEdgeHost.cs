@@ -53,6 +53,7 @@ namespace Microsoft.Azure.TypeEdge.Host
             _deviceId = configuration.GetValue<string>("DeviceId");
             _iotHubConnectionString = configuration.GetValue<string>("IotHubConnectionString");
 
+
             if (string.IsNullOrEmpty(_iotHubConnectionString))
                 throw new Exception("Missing \"IotHubConnectionString\" value in configuration");
 
@@ -449,7 +450,7 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             var registryManager = RegistryManager.CreateFromConnectionString(_iotHubConnectionString);
             var device = await registryManager.GetDeviceAsync(_deviceId) ?? await registryManager.AddDeviceAsync(
-                             new Device(_deviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
+                             new Device(_deviceId) {Capabilities = new DeviceCapabilities {IotEdge = true}});
             var sasKey = device.Authentication.SymmetricKey.PrimaryKey;
 
             try

@@ -1,0 +1,60 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+using Microsoft.Azure.TypeEdge.Attributes;
+using Microsoft.Azure.TypeEdge.Modules.Endpoints;
+using Microsoft.Azure.TypeEdge.Twins;
+ 
+namespace <#= _codeGeneratorSettings.Namespace #>
+{
+    [TypeModule]
+    public interface I<#= _serviceDescription.Name #> 
+    {
+    <# if(_serviceDescription.InputDescriptions!=null)
+		foreach (var endpoint in _serviceDescription.InputDescriptions)
+		{
+	#>
+        Input<<#= endpoint.TypeDescription.Name #>> <#= endpoint.Name #> { get; set; }
+	<#
+		}
+    #>
+
+	<# if(_serviceDescription.OutputDescriptions!=null)
+		foreach (var endpoint in _serviceDescription.OutputDescriptions)
+		{
+	#>
+        Output<<#= endpoint.TypeDescription.Name #>> <#= endpoint.Name #> { get; set; }
+	<#
+		}
+    #>
+
+	<# if(_serviceDescription.TwinDescriptions!=null)
+		foreach (var twin in _serviceDescription.TwinDescriptions)
+		{
+	#>
+        ModuleTwin<<#= twin.TypeDescription.Name #>> <#= twin.Name #> { get; set; }
+	<#
+		}
+    #>
+
+
+	<# if(_serviceDescription.DirectMethodDescriptions!=null)
+		foreach (var method in _serviceDescription.DirectMethodDescriptions)
+		{
+		    string returnType = "void";
+			string arguments = "";
+		    if(method.ReturnTypeDescription!=null)
+			    returnType = method.ReturnTypeDescription.Name;
+			if(method.ArgumentsTypeDescription!=null)
+			   arguments = string.Join( ",",  method.ArgumentsTypeDescription.Select(e => $"{e.TypeDescription.Name} {e.Name}").ToArray());
+	#>
+        <#= returnType #> <#= method.Name #>(<#= arguments #>);
+	<#
+		}
+    #>
+
+    }
+}
