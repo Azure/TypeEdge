@@ -63,35 +63,35 @@
     </contentFiles>
   </metadata>
   <files>
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.dll"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.pdb"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.dll"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.pdb"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.dll" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.dll"    target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.pdb"    target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.dll"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.pdb"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.dll" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.dll"           target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.pdb"           target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.dll"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.pdb"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.pdb"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.TypeEdge.dll"                target="lib\netcoreapp2.1\Microsoft.Azure.TypeEdge.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.TypeEdge.pdb"                target="lib\netcoreapp2.1\Microsoft.Azure.TypeEdge.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.dll"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.pdb"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.dll"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.pdb"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.dll" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.CloudProxy.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Core.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Http.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.pdb"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Mqtt.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.dll"    target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.pdb"    target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Service.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.dll"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.pdb"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.dll" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Storage.RocksDb.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.dll"           target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.pdb"           target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Util.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.dll"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.pdb"        target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Routing.Core.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.TypeEdge.dll"                target="lib\netcoreapp2.1\Microsoft.Azure.TypeEdge.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.TypeEdge.pdb"                target="lib\netcoreapp2.1\Microsoft.Azure.TypeEdge.pdb"  />
 
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.TypeEdge.Host.dll" target="lib\netcoreapp2.1\Microsoft.Azure.TypeEdge.Host.dll"  />
-    <file src="bin\Debug\netcoreapp2.1\Microsoft.Azure.TypeEdge.Host.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.TypeEdge.Host.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.TypeEdge.Host.dll" target="lib\netcoreapp2.1\Microsoft.Azure.TypeEdge.Host.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.TypeEdge.Host.pdb" target="lib\netcoreapp2.1\Microsoft.Azure.TypeEdge.Host.pdb"  />
 
     <file src="Microsoft.Azure.TypeEdge.Host.targets" target="build\Microsoft.Azure.TypeEdge.Host.targets" />
     <file src="Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" target="build\Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" />
