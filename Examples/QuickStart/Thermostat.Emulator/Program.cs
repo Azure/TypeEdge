@@ -26,7 +26,8 @@ namespace ThermostatApplication
             //register the modules
             host.RegisterModule<ITemperatureSensor, TemperatureSensor>();
 
-            //var description = ServiceDescriptor.Describe<TemperatureSensor>(e => JsonSchema4.FromTypeAsync(e).Result.ToJson());
+            //var description = Microsoft.Azure.TypeEdge.Description.ServiceDescriptor.Describe<TemperatureSensor>();
+            //Microsoft.Azure.TypeEdge.Host.Service.ServiceGenerator.CreateFiles(description);
 
             //host.RegisterExternalModule(new TypeEdge.Host.Docker.DockerModule("tempSensor",
             //    new HostingSettings("mcr.microsoft.com/azureiotedge-simulated-temperature-sensor:1.0", null),

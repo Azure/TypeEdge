@@ -6,7 +6,7 @@ namespace Microsoft.Azure.TypeEdge.Modules.Messages
 {
     public abstract class EdgeMessage : IEdgeMessage
     {
-        public IDictionary<string, string> Properties { get; set; }
+        [JsonIgnore] public IDictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
 
         public byte[] GetBytes()
         {
