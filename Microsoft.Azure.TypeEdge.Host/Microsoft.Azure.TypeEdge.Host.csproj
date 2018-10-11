@@ -89,6 +89,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(Configuration) == 'Release'">
-    <Exec Command="dotnet pack --no-build" />
+    <Exec Command="dotnet pack --no-build -c Release" />
   </Target>
 </Project>
