@@ -59,7 +59,7 @@
       <files include="build/Config/appsettings_hub.json" buildAction="None" copyToOutput="true"/>
       <files include="build/Certificates/edge-chain-ca/cert/edge-chain-ca.cert.pem" buildAction="None" copyToOutput="true" />
       <files include="build/Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem" buildAction="None" copyToOutput="true" />
-      <files include="build/Certificates/edge-hub-server/cert/edge-hub-server.cert.pem" buildAction="None" copyToOutput="true" />
+      <files include="build/Certificates/edge-hub-server/cert/edge-hub-server.cert.pfx" buildAction="None" copyToOutput="true" />
     </contentFiles>
   </metadata>
   <files>
@@ -96,7 +96,7 @@
     <file src="Microsoft.Azure.TypeEdge.Host.targets" target="build\Microsoft.Azure.TypeEdge.Host.targets" />
     <file src="Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" target="build\Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem" />
     <file src="Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem" target="build\Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem" />
-    <file src="Certificates\edge-hub-server\cert\edge-hub-server.cert.pem" target="build\Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" />
+    <file src="Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" target="build\Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx" />
 
     <file src="appsettings_hub.json" target="build\Config\appsettings_hub.json" />
 
