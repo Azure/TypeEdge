@@ -1,11 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
     <Authors>Microsoft</Authors>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <Configurations>Debug;Release;TemplateDevelopment</Configurations>
+    <Configurations>Debug;Release</Configurations>
+
+    <Version>0.4.4.16</Version>
+    <NuspecProperties>version=$(Version)</NuspecProperties>
 
     <NuspecFile>.nuspec</NuspecFile>
 
@@ -18,6 +22,9 @@
     <None Remove="deviceconfig.json" />
   </ItemGroup>
 
+  <PropertyGroup Condition="$(Configuration) == 'Release'">
+    <BumpRevision>True</BumpRevision>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\IoT.Edge\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Core\Microsoft.Azure.Devices.Edge.Agent.Core.csproj" />
@@ -42,6 +49,10 @@
 
   <ItemGroup>
     <PackageReference Include="Docker.DotNet" Version="3.125.2" />
+    <PackageReference Include="MSBump" Version="2.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.10" />
     <PackageReference Include="System.CodeDom" Version="4.5.0" />
   </ItemGroup>
@@ -76,4 +87,8 @@
       <LastGenOutput>Service.cs</LastGenOutput>
     </None>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(Configuration) == 'Release'">
+    <Exec Command="dotnet pack --no-build" />
+  </Target>
 </Project>

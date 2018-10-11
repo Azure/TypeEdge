@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="paloukari.Python.Runtime" Version="2.4.64" />
-    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.*" />
   </ItemGroup>
   
   <ItemGroup>

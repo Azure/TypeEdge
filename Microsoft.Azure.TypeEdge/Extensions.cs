@@ -5,16 +5,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Azure.TypeEdge.Attributes;
+using System.Threading.Tasks; 
+using Microsoft.Azure.TypeEdge.Attributes; 
 using Microsoft.Azure.TypeEdge.DovEnv;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders; 
 using Microsoft.Extensions.FileProviders.Physical;
-
+ 
 namespace Microsoft.Azure.TypeEdge
 {
-    public static class Extensions
+    public static class Extensions 
     {
         public static IConfigurationBuilder AddDotΕnv(this IConfigurationBuilder builder)
         {
