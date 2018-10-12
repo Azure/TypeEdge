@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release</Configurations>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+
+    <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
+    <PackageReference Include="RocksDbNative" Version="5.4.6.10" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Host" Version="0.4.4.14" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Proxy" Version="0.4.4.5" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+    <ProjectReference Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Certificates\**\*.*" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Link>Certificates\%(RecursiveDir)%(FileName)%(Extension)</Link>
+    </None>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <None Include="..\..\..\Microsoft.Azure.TypeEdge.Host\appsettings_hub.json" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <Link>appsettings_hub.json</Link>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
