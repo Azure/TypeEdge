@@ -1,5 +1,7 @@
 # Microsoft Azure TypeEdge
 
+[![Build Status](https://dev.azure.com/epicstuff/TypeEdge/_apis/build/status/Azure.TypeEdge)](https://dev.azure.com/epicstuff/TypeEdge/_build/latest?definitionId=15)
+
 **TypeEdge** introduces a strongly-typed flavor of the inherently loosely coupled vanilla [Azure IoT Edge](https:/azure.microsoft.com/en-us/services/iot-edge).
 
 Specifically, **TypeEdge**:
