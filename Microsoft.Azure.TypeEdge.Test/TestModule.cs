@@ -36,7 +36,7 @@ namespace Microsoft.Azure.TypeEdge.Test
         public int TestDirectMethod(int value)
         {
             Logger.LogInformation($"GenerateAnomaly called with value:{value}");
-            return value + Twin.GetAsync().Result.Offset;
+            return value;
         }
 
         public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)

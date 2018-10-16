@@ -14,6 +14,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit.runner.console" Version="2.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
 
     <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
@@ -23,19 +27,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
-    <ProjectReference Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+    <ProjectReference Include="..\Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
+    <ProjectReference Include="..\Microsoft.Azure.TypeEdge.Proxy\Microsoft.Azure.TypeEdge.Proxy.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Certificates\**\*.*" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <None Include="..\Microsoft.Azure.TypeEdge.Host\Certificates\**\*.*" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
       <Link>Certificates\%(RecursiveDir)%(FileName)%(Extension)</Link>
     </None>
   </ItemGroup>
 
 
   <ItemGroup>
-    <None Include="..\..\..\Microsoft.Azure.TypeEdge.Host\appsettings_hub.json" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <None Include="..\Microsoft.Azure.TypeEdge.Host\appsettings_hub.json" CopyToOutputDirectory="PreserveNewest" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
       <Link>appsettings_hub.json</Link>
     </None>
   </ItemGroup>

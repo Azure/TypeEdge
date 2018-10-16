@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Microsoft.Azure.Devices.Edge.Agent.Docker;
+using Microsoft.Azure.Devices.Edge.Util;
 using Microsoft.Azure.TypeEdge.Host;
 using Microsoft.Azure.TypeEdge.Proxy;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,6 @@ namespace Microsoft.Azure.TypeEdge.Test
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appSettings.json")
                 .AddEnvironmentVariables()
-                .AddDotΕnv()
                 .Build();
 
             var host = new TypeEdgeHost(configuration);
@@ -42,21 +42,22 @@ namespace Microsoft.Azure.TypeEdge.Test
             host.BuildEmulatedDevice(sasToken);
 
             //run the emulated device
-            var runTask = host.RunAsync();
-            Console.WriteLine("Waiting for 15 seconds...");
-            Thread.Sleep(15000);
+            var task = host.RunAsync();
+            Console.WriteLine("Waiting for 20 seconds...");
+            Thread.Sleep(20 * 1000);
+
+            ProxyFactory.Configure(configuration["IotHubConnectionString"],
+                configuration["DeviceId"]);
+
             var testModule = ProxyFactory.GetModuleProxy<ITestModule>();
             var offset = new Random().Next(0, 1000);
-            var res = testModule.Twin.PublishAsync(new TestTwin { Offset = offset }).Result;
+            var lastTwin = testModule.Twin.GetAsync().Result;
+            lastTwin.Offset = offset;
+            var res = testModule.Twin.PublishAsync(lastTwin).Result;
             var res2 = testModule.TestDirectMethod(10);
 
             Assert.Equal(res.Offset, offset);
-            Assert.Equal(res2, offset + 10);
-
-
-            Console.WriteLine("Press <ENTER> to exit..");
-            Console.ReadLine();
-
+            Assert.Equal(10, res2);
         }
     }
 }

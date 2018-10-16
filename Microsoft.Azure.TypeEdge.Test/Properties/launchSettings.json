@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Microsoft.Azure.TypeEdge.Test": {
+      "commandName": "Project"
+    }
+  }
+}
