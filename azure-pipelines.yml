@@ -23,8 +23,17 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    
+# Azure Key Vault
+# Download Azure Key Vault Secrets
+- task: AzureKeyVault@1
+  inputs:
+    azureSubscription: 'SpyrosgKeyVaultConnection'
+    keyVaultName: 'TypeEdgePipeline'
+    secretsFilter: '*'
 
 - task: VSTest@2
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    
