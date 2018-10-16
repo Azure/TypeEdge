@@ -243,7 +243,7 @@ namespace Microsoft.Azure.TypeEdge.Host
 
         private void BuildHub(string deviceSasKey)
         {
-            var currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var currentLocation = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
 
             Environment.SetEnvironmentVariable(HubService.Constants.EdgeHubServerCertificateFileKey,
                 Path.Combine(currentLocation, @"Certificates/edge-hub-server/cert/edge-hub-server.cert.pfx"));
@@ -290,7 +290,7 @@ namespace Microsoft.Azure.TypeEdge.Host
         private void ConfigureModules()
         {
             var certificatePath = @"Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem";
-            var currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var currentLocation = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
 
 
             foreach (var module in _modules)
