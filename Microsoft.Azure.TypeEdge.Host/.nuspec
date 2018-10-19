@@ -4,9 +4,16 @@
     <id>Microsoft.Azure.TypeEdge.Host</id>
     <version>$version$</version>
     <authors>Microsoft</authors>
-    <owners>Microsoft</owners>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Package Description</description>
+
+
+    <projectUrl>https://aka.ms/TypeEdge</projectUrl>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <licenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</licenseUrl>
+    <description>TypeEdge introduces a strongly-typed flavor of the inherently loosely coupled vanilla Azure IoT Edge.</description>
+    <tags>Microsoft;Azure;IoT;Edge</tags>
+    <iconUrl>https://github.com/Azure/TypeEdge/blob/master/Templates/favicon.ico</iconUrl>
+    
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <dependencies>
       <group targetFramework=".NETCoreApp2.1">
         <dependency id="Microsoft.Azure.TypeEdge" version="0.4.4" exclude="Build,Analyzers" />
