@@ -8,7 +8,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <Configurations>Debug;Release</Configurations>
 
-    <Version>0.4.4.22</Version>
+    <Version>0.4.4.25</Version>
     <NuspecProperties>version=$(Version)</NuspecProperties>
 
     <NuspecFile>.nuspec</NuspecFile>

@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.14" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.21" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
   </ItemGroup>
 
   <ItemGroup>

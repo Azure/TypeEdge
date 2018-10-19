@@ -54,7 +54,8 @@ namespace SignPackages
             string nugetInputTemplate,
             string esrpClient)
         {
-            var _file = Directory.GetFiles(currentDirectory, $"{file}.?.*.nupkg").OrderByDescending(e => {
+            var _file = Directory.GetFiles(currentDirectory, $"{file}.?.*.nupkg").OrderByDescending(e =>
+            {
                 var version = Path.GetFileName(e).Replace($"{file}.", "").Replace(".nupkg", "");
 
                 long multiplier = 100;
@@ -67,11 +68,16 @@ namespace SignPackages
                 return res;
             }).First();
             Console.WriteLine($"Signing {_file}...");
-
+            if (IsSigned(currentDirectory, _file))
+            {
+                Console.WriteLine($"File {_file} already signed.");
+                return;
+            }
             _SignPackage(_file, currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
-            VerifyPackage(currentDirectory, _file);
+            if (!IsSigned(currentDirectory, _file))
+                throw new Exception($"Cannot verify {_file}");
         }
-        private static void VerifyPackage(string folder, string file)
+        private static bool IsSigned(string folder, string file)
         {
             var command = $@"/C nuget verify -signature -CertificateFingerprint 3F9001EA83C560D712C24CF213C3D312CB3BFF51EE89435D3430BD06B5D0EECE {file}";
 
@@ -91,10 +97,8 @@ namespace SignPackages
             proc.WaitForExit();
 
             var res = proc.ExitCode;
-            if (res != 0)
-                throw new Exception($"Cannot verify {file}");
             proc.Close();
-
+            return res == 0;
         }
 
         private static void _SignPackage(string file,

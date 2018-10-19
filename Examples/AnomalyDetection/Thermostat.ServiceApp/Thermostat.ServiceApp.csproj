@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge.Proxy" Version="0.4.4.5" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Proxy" Version="0.4.4.12" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
   </ItemGroup>
 
 
