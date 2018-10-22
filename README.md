@@ -34,7 +34,7 @@ Here is the quickest way to get started with **TypeEdge**. In this quick start y
 
 1. Install the TypeEdge .NET Core solution template. Just type:
     ```
-    dotnet new -i TypeEdge.Application
+    dotnet new -i Microsoft.Azure.TypeEdge.Templates.Application
     ```
 
     >**Note:** to **upgrade to a newer template version**, you need to clear the dotnet http and template cache first
