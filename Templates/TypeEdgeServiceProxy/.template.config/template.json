@@ -1,9 +1,9 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "author": "Spyros Garyfallos",
+  "author": "Microsoft",
   "classifications": [ "TypeEdge", "Azure", "IoT", "Edge", "Service", "Proxy" ],
   "name": "Type Edge Service Proxy",
-  "identity": "TypeEdge.ServiceProxy.CSharp",
+  "identity": "Microsoft.Azure.TypeEdge.Templates.ServiceProxy.CSharp",
   "groupIdentity": "TypeEdgeServiceProxy",
   "shortName": "typeedgeserviceproxy",
   "tags": {

@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
-        <id>TypeEdge.ServiceProxy</id>
-        <version>0.1.2</version>
+        <id>Microsoft.Azure.TypeEdge.Templates.ServiceProxy</id>
         <description>Creates a new Azure IoT Edge Service Proxy project for TypeEdge, a strongly typed Azure IoT Edge framework</description>
-        <authors>paloukari</authors>
-    	<owners>paloukari</owners>
-    	<requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <version>$version$</version>
+        <authors>Microsoft</authors>
+        <projectUrl>https://aka.ms/TypeEdge</projectUrl>
+        <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+        <licenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</licenseUrl>
+        <tags>Microsoft;Azure;IoT;Edge;TypeEdge</tags>
+        <iconUrl>https://github.com/Azure/TypeEdge/blob/master/Templates/favicon.ico</iconUrl>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
     	<language>en-US</language>
-        <projectUrl>https://github.com/paloukari/TypeEdge</projectUrl>
-        <licenseUrl>https://github.com/paloukari/TypeEdge/blob/master/LICENSE</licenseUrl>
         <packageTypes>
             <packageType name="Template" />
         </packageTypes>

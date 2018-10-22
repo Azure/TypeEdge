@@ -1,9 +1,9 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "author": "Spyros Garyfallos",
+  "author": "Microsoft",
   "classifications": [ "TypeEdge", "Azure", "IoT", "Edge", "ML" ],
   "name": "Type Edge ML",
-  "identity": "TypeEdge.ML.CSharp",
+  "identity": "Microsoft.Azure.TypeEdge.Templates.ML.CSharp",
   "groupIdentity": "TypeEdgeML",
   "shortName": "typeedgeml",
   "tags": {

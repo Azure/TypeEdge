@@ -26,8 +26,8 @@ namespace TypeEdgeApplication
             var host = new TypeEdgeHost(configuration);
 
             //TODO: Register your TypeEdge Modules here
-            host.RegisterModule<ITypeEdgeModule1, TypeEdgeModule1>();
-            host.RegisterModule<ITypeEdgeModule2, TypeEdgeModule2>();
+            host.RegisterModule<ITypeEdgeModule1, Modules.TypeEdgeModule1>();
+            host.RegisterModule<ITypeEdgeModule2, Modules.TypeEdgeModule2>();
 
             //TODO: Define all cross-module subscriptions 
             host.Upstream.Subscribe(host.GetProxy<ITypeEdgeModule2>().Output);

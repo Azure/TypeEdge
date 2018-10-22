@@ -1,9 +1,9 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "author": "Spyros Garyfallos",
+  "author": "Microsoft",
   "classifications": [ "TypeEdge", "Azure", "IoT", "Edge", "Emulator" ],
   "name": "Type Edge Emulator",
-  "identity": "TypeEdge.Emulator.CSharp",
+  "identity": "Microsoft.Azure.TypeEdge.Templates.Emulator.CSharp",
   "groupIdentity": "TypeEdgeEmulator",
   "shortName": "typeedgeemulator",
   "tags": {

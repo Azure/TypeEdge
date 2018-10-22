@@ -1,9 +1,9 @@
 {
   "$schema": "http://json.schemastore.org/template",
-  "author": "Spyros Garyfallos",
+  "author": "Microsoft",
   "classifications": [ "TypeEdge", "Azure", "IoT", "Edge", "Module", "VsCode" ],
   "name": "TypeEdge VsCode Module",
-  "identity": "TypeEdge.Module.VsCode.CSharp",
+  "identity": "Microsoft.Azure.TypeEdge.Templates.Module.VsCode.CSharp",
   "groupIdentity": "TypeEdgeModuleVsCode",
   "shortName": "typeedgemodulevscode",
   "tags": {
