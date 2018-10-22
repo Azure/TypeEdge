@@ -42,10 +42,19 @@ namespace SignPackages
                 esrpClient = dir;
             var dllInputTemplate = File.ReadAllText($"{esrpClient}\\dll_template.json");
             var nugetInputTemplate = File.ReadAllText($"{esrpClient}\\nuget_template.json");
+            
 
             SignPackage("Microsoft.Azure.TypeEdge", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
             SignPackage("Microsoft.Azure.TypeEdge.Host", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
             SignPackage("Microsoft.Azure.TypeEdge.Proxy", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
+
+
+            SignPackage("Microsoft.Azure.TypeEdge.Templates.Emulator", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
+            SignPackage("Microsoft.Azure.TypeEdge.Templates.Module.VsCode", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
+            SignPackage("Microsoft.Azure.TypeEdge.Templates.ML", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
+            SignPackage("Microsoft.Azure.TypeEdge.Templates.ServiceProxy", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
+            SignPackage("Microsoft.Azure.TypeEdge.Templates.Module", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
+            SignPackage("Microsoft.Azure.TypeEdge.Templates.Application", currentDirectory, fileTemplate, dllInputTemplate, nugetInputTemplate, esrpClient);
         }
         private static void SignPackage(string file,
              string currentDirectory,
