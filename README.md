@@ -13,7 +13,7 @@
 
 Here is a quick video that demonstrates the value of **TypeEdge**
 
-[![TypeEdge: Into](images/image.png)](https://youtu.be/8Cv6HRHvFi4)
+[![TypeEdge: Into](images/image.png)](https://youtu.be/z1TSF_ePYyk)
 
 >Note: **TypeEdge** is an **experiment** created by a customer facing team at Microsoft called, Commercial Software Engineering. We work with customers on a daily basis and as a result of that work we created **TypeEdge**. It is being used by partners today around the globe. Please help us improve it by trying it out and providing us feedback.
 
