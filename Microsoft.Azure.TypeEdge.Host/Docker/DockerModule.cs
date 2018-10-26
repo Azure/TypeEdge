@@ -55,8 +55,8 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
             var dockerModule = new Devices.Edge.Agent.Docker.DockerModule(
                 Name,
                 DockerHostingSettings.Version,
-                DockerHostingSettings.DesiredStatus,
-                DockerHostingSettings.RestartPolicy,
+                DockerHostingSettings.DesiredStatus.Value,
+                DockerHostingSettings.RestartPolicy.Value,
                 DockerHostingSettings.Config,
                 null,
                 null

@@ -12,6 +12,10 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
 {
     public class DockerHostingSettings
     {
+        public DockerHostingSettings()
+        {
+
+        }
         public DockerHostingSettings(HostingSettings hostingSettings)
         {
             IsExternalModule = hostingSettings.IsExternalModule;
@@ -24,6 +28,7 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
         }
 
         [JsonIgnore] public bool IsExternalModule { get; }
+        [JsonIgnore] public bool IsSystemModule { get; set; }
 
         [JsonProperty(PropertyName = "version")]
         public string Version { get; private set; }
@@ -32,10 +37,10 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
         public string Type { get; private set; }
 
         [JsonProperty(PropertyName = "status")]
-        public ModuleStatus DesiredStatus { get; private set; }
+        public ModuleStatus? DesiredStatus { get; private set; }
 
         [JsonProperty(PropertyName = "restartPolicy")]
-        public RestartPolicy RestartPolicy { get; private set; }
+        public RestartPolicy? RestartPolicy { get; private set; }
 
         [JsonProperty(Required = Required.Always, PropertyName = "settings")]
         public DockerConfig Config { get; set; }

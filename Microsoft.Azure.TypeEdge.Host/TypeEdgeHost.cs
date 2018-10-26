@@ -391,8 +391,28 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             if (!agentDesired.TryGetValue("modules", out var modules))
                 throw new Exception("Cannot read modules config from $edgeAgent");
+
+            if (!agentDesired.TryGetValue("systemModules", out var systemModules))
+                throw new Exception("Cannot read systemModules config from $edgeAgent");
+
             var modulesConfig = modules as JObject;
 
+            if (hostOverride != null)
+                foreach (var systemModule in (systemModules as JObject))
+                {
+                    var dockerHostingSettings = JsonConvert.DeserializeObject<DockerHostingSettings>((systemModules as JObject)[systemModule.Key].ToJson());
+                    dockerHostingSettings.IsSystemModule = true;
+
+                    var settings = hostOverride(systemModule.Key, dockerHostingSettings);
+
+                    systemModules[systemModule.Key]=JObject.Parse(JsonConvert.SerializeObject(settings,
+                            Newtonsoft.Json.Formatting.None,
+                            new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            }));
+
+                }
             foreach (var module in _modules)
             {
                 var dockerHostingSettings = new DockerHostingSettings(module.HostingSettings);
@@ -450,7 +470,7 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             var registryManager = RegistryManager.CreateFromConnectionString(_iotHubConnectionString);
             var device = await registryManager.GetDeviceAsync(_deviceId) ?? await registryManager.AddDeviceAsync(
-                             new Device(_deviceId) {Capabilities = new DeviceCapabilities {IotEdge = true}});
+                             new Device(_deviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
             var sasKey = device.Authentication.SymmetricKey.PrimaryKey;
 
             try
