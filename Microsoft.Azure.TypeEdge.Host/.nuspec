@@ -16,7 +16,7 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <dependencies>
       <group targetFramework=".NETCoreApp2.1">
-        <dependency id="Microsoft.Azure.TypeEdge" version="0.4.4" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Azure.TypeEdge" version="0.4.4.*" exclude="Build,Analyzers" />
         <dependency id="Docker.DotNet" version="3.125.2.0" exclude="Build,Analyzers" />
         <dependency id="Serilog.Extensions.Logging" version="1.4.0" exclude="Build,Analyzers" />
         <dependency id="Serilog.Extensions.Logging" version="1.4.0" exclude="Build,Analyzers" />

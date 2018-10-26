@@ -6,7 +6,7 @@
     <PackageId>Microsoft.Azure.TypeEdge</PackageId>
     <Authors>Microsoft</Authors>
     
-    <Version>0.4.4.24</Version>
+    <Version>0.4.4.35</Version>
 
     <PackageProjectUrl>https://aka.ms/TypeEdge</PackageProjectUrl>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>

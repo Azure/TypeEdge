@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.21" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
     <PackageReference Include="WaveGenerator" Version="1.2.0" />
   </ItemGroup>
 
