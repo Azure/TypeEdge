@@ -31,7 +31,7 @@ namespace TypeEdgeEmulator
             var manifest = host.GenerateDeviceManifest((e, settings) =>
             {
                 //this is the opportunity for the host to change the hosting settings of the module e
-                if (!settings.IsExternalModule)
+                if (!settings.IsExternalModule && !settings.IsSystemModule)
                     settings.Config = new DockerConfig($"{dockerRegistry}{e}:1.0", settings.Config.CreateOptions);
                 return settings;
             });
