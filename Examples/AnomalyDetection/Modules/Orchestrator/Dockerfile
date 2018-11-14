@@ -6,7 +6,6 @@ FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
 COPY Modules/Orchestrator/Orchestrator.csproj Modules/Orchestrator/
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
-COPY NuGet.Config ./
 RUN dotnet restore Modules/Orchestrator/Orchestrator.csproj
 COPY . . 
 WORKDIR /src/Modules/Orchestrator

@@ -6,7 +6,6 @@ FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
 COPY Modules/TemperatureSensor/TemperatureSensor.csproj Modules/TemperatureSensor/
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
-COPY NuGet.Config ./
 RUN dotnet restore Modules/TemperatureSensor/TemperatureSensor.csproj
 COPY . .
 WORKDIR /src/Modules/TemperatureSensor

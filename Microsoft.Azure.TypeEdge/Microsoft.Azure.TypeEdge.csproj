@@ -6,13 +6,13 @@
     <PackageId>Microsoft.Azure.TypeEdge</PackageId>
     <Authors>Microsoft</Authors>
     
-    <Version>0.4.4.35</Version>
+    <Version>0.4.4.36</Version>
 
     <PackageProjectUrl>https://aka.ms/TypeEdge</PackageProjectUrl>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</PackageLicenseUrl>
     <Description>TypeEdge introduces a strongly-typed flavor of the inherently loosely coupled vanilla Azure IoT Edge.</Description>
-    <PackageTags>Microsoft;Azure;IoT;Edge</PackageTags>
+    <PackageTags>Microsoft;Azure;IoT;Edge;Experimental</PackageTags>
     <PackageIconUrl>https://github.com/Azure/TypeEdge/blob/master/Templates/favicon.ico</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     

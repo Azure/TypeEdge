@@ -34,7 +34,6 @@ COPY Modules/TypeEdgeModule1/TypeEdgeModule1.csproj Modules/TypeEdgeModule1/
 COPY Modules/TypeEdgeModule2/TypeEdgeModule2.csproj Modules/TypeEdgeModule2/
 COPY Modules/TypeEdgeModule3/TypeEdgeModule3.csproj Modules/TypeEdgeModule3/
 
-COPY NuGet.Config ./
 RUN dotnet restore TypeEdgeML.Emulator/TypeEdgeML.Emulator.csproj
 COPY . .
 COPY ./.env Thermostat.Emulator/

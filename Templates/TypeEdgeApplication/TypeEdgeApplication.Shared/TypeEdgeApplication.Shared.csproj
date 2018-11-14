@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.*" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.36" />
   </ItemGroup>
 
 </Project>

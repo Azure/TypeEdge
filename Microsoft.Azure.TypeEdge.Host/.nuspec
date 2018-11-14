@@ -10,7 +10,7 @@
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <licenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</licenseUrl>
     <description>TypeEdge introduces a strongly-typed flavor of the inherently loosely coupled vanilla Azure IoT Edge.</description>
-    <tags>Microsoft;Azure;IoT;Edge</tags>
+    <tags>Microsoft;Azure;IoT;Edge;Experimental</tags>
     <iconUrl>https://github.com/Azure/TypeEdge/blob/master/Templates/favicon.ico</iconUrl>
     
     <requireLicenseAcceptance>true</requireLicenseAcceptance>

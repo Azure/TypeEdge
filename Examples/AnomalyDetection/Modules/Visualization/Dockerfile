@@ -10,7 +10,6 @@ COPY Modules/Visualization/Visualization.csproj Modules/Visualization/
 COPY Modules/VisualizationWeb/VisualizationWeb.csproj Modules/VisualizationWeb/
 
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
-COPY NuGet.Config ./
 RUN dotnet restore Modules/Visualization/Visualization.csproj
 COPY . . 
 WORKDIR /src/Modules/Visualization

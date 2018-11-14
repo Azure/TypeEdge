@@ -6,7 +6,6 @@ FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
 COPY Modules/AnomalyDetection/AnomalyDetection.csproj Modules/AnomalyDetection/
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
-COPY NuGet.Config ./
 RUN dotnet restore Modules/AnomalyDetection/AnomalyDetection.csproj
 COPY . . 
 WORKDIR /src/Modules/AnomalyDetection

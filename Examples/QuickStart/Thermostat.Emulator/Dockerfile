@@ -36,12 +36,7 @@ FROM microsoft/dotnet:2.1.302-sdk AS build
 WORKDIR /src
 COPY Thermostat.Emulator/Thermostat.Emulator.csproj Thermostat.Emulator/
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
-COPY Modules/Orchestrator/Orchestrator.csproj Modules/Orchestrator/
 COPY Modules/TemperatureSensor/TemperatureSensor.csproj Modules/TemperatureSensor/
-COPY Modules/ModelTraining/ModelTraining.csproj Modules/ModelTraining/
-COPY Modules/AnomalyDetection/AnomalyDetection.csproj Modules/AnomalyDetection/
-COPY Modules/Visualization/Visualization.csproj Modules/Visualization/
-COPY Modules/VisualizationWeb/VisualizationWeb.csproj Modules/VisualizationWeb/
 
 COPY ./.env Thermostat.Emulator/
 COPY NuGet.Config ./
