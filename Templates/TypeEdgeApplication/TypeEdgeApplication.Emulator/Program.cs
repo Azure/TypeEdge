@@ -38,7 +38,7 @@ namespace TypeEdgeApplication
             {
                 //this is the opportunity for the host to change the hosting settings of the module e
                 if (!settings.IsExternalModule && !settings.IsSystemModule)
-                    settings.Config = new DockerConfig($"{dockerRegistry}{e}:1.0", settings.Config.CreateOptions);
+                    settings.Config = new DockerConfig($"{dockerRegistry}{e}:latest", settings.Config.CreateOptions);
                 return settings;
             });
             File.WriteAllText("../../../manifest.json", manifest);

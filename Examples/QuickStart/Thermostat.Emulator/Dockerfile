@@ -38,7 +38,6 @@ COPY Thermostat.Emulator/Thermostat.Emulator.csproj Thermostat.Emulator/
 COPY Thermostat.Shared/Thermostat.Shared.csproj Thermostat.Shared/
 COPY Modules/TemperatureSensor/TemperatureSensor.csproj Modules/TemperatureSensor/
 
-COPY ./.env Thermostat.Emulator/
 COPY NuGet.Config ./
 RUN dotnet restore Thermostat.Emulator/Thermostat.Emulator.csproj
 COPY . .

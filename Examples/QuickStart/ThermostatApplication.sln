@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27703.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{8D822B22-E5A9-4165-B27B-458A70D2B44F}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thermostat.Emulator", "Thermostat.Emulator\Thermostat.Emulator.csproj", "{1A622C23-B9BD-4903-A28D-28B446BB358E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thermostat.Shared", "Thermostat.Shared\Thermostat.Shared.csproj", "{7DB0AED8-EA6D-466E-B173-6C6BA4A692CF}"
@@ -15,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Thermostat.ServiceApp", "Th
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TemperatureSensor", "Modules\TemperatureSensor\TemperatureSensor.csproj", "{D6E0653E-E1CB-46CD-8D2B-0D6D430A5DFA}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2B7EDC32-1E75-4AAA-A0B9-9B19B53D9587}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,12 +22,6 @@ Global
 		TemplateDevelopment|Any CPU = TemplateDevelopment|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.TemplateDevelopment|Any CPU.ActiveCfg = Release|Any CPU
-		{1373DBDC-DC13-429E-8C17-2E4D85CF42BA}.TemplateDevelopment|Any CPU.Build.0 = Release|Any CPU
 		{1A622C23-B9BD-4903-A28D-28B446BB358E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1A622C23-B9BD-4903-A28D-28B446BB358E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A622C23-B9BD-4903-A28D-28B446BB358E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -52,6 +46,12 @@ Global
 		{D6E0653E-E1CB-46CD-8D2B-0D6D430A5DFA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6E0653E-E1CB-46CD-8D2B-0D6D430A5DFA}.TemplateDevelopment|Any CPU.ActiveCfg = Release|Any CPU
 		{D6E0653E-E1CB-46CD-8D2B-0D6D430A5DFA}.TemplateDevelopment|Any CPU.Build.0 = Release|Any CPU
+		{2B7EDC32-1E75-4AAA-A0B9-9B19B53D9587}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B7EDC32-1E75-4AAA-A0B9-9B19B53D9587}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B7EDC32-1E75-4AAA-A0B9-9B19B53D9587}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B7EDC32-1E75-4AAA-A0B9-9B19B53D9587}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B7EDC32-1E75-4AAA-A0B9-9B19B53D9587}.TemplateDevelopment|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B7EDC32-1E75-4AAA-A0B9-9B19B53D9587}.TemplateDevelopment|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

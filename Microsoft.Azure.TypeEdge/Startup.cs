@@ -73,9 +73,10 @@ namespace Microsoft.Azure.TypeEdge
                 return;
             }
 
-            var connectionString = configuration.GetValue<string>($"{Constants.EdgeHubConnectionStringKey}");
 
-            if (IsNullOrEmpty(connectionString))
+            var _inContainer = File.Exists(@"/.dockerenv");
+            var _in_Docker_Compose = Directory.Exists(Constants.ComposeConfigurationPath);
+            if(_inContainer && _in_Docker_Compose)
             {
                 //check the file system, we are in docker-compose mode
                 var fileName = Path.Combine(Constants.ComposeConfigurationPath, $"{moduleName}.env");

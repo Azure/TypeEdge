@@ -12,20 +12,10 @@ namespace Microsoft.Azure.TypeEdge.Host.Hub
     internal class EdgeHub : TypeModule
     {
         public override string Name => Agent.Constants.EdgeHubModuleIdentityName;
-        private IConfigurationRoot HubServiceConfiguration { get; set; }
-
-        public override InitializationResult Init()
-        {
-            HubServiceConfiguration = new ConfigurationBuilder()
-                .AddEnvironmentVariables()
-                .Build();
-
-            return InitializationResult.Ok;
-        }
 
         public override async Task<ExecutionResult> RunAsync(CancellationToken cancellationToken)
         {
-            if (await Program.MainAsync(HubServiceConfiguration) == 0)
+            if (await Task.Run(() => Program.Main()) == 0)
                 return ExecutionResult.Ok;
             return ExecutionResult.Error;
         }

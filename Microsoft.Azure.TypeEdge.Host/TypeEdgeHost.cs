@@ -65,12 +65,12 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             Upstream = new Upstream<JsonMessage>(_hub);
 
-            _inContainer = File.Exists(@"/.dockerenv");
+            _inContainer = File.Exists(@"/.dockerenv");  
 
             _externalModules = new ModuleCollection();
         }
 
-        public Upstream<JsonMessage> Upstream { get; set; }
+        public Upstream<JsonMessage> Upstream { get; set; } 
 
         public void RegisterModule<TIModule, TTModule>()
             where TIModule : class
@@ -243,21 +243,20 @@ namespace Microsoft.Azure.TypeEdge.Host
 
         private void BuildHub(string deviceSasKey)
         {
-            var currentLocation = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
+            var currentLocation = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location); 
             if (_inContainer)
                 currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-            Environment.SetEnvironmentVariable(HubService.Constants.EdgeHubServerCertificateFileKey,
-                Path.Combine(currentLocation, @"Certificates/edge-hub-server/cert/edge-hub-server.cert.pfx"));
+            Environment.SetEnvironmentVariable(HubService.Constants.ConfigKey.EdgeHubDevServerCertificateFile,
+                Path.Combine(currentLocation, @"Certificates/edge-hub-dev/edge-hub-server.ca.pem"));
 
-            Environment.SetEnvironmentVariable(HubService.Constants.SslCertEnvName,
-                "edge-hub-server.cert.pfx");
+            Environment.SetEnvironmentVariable(HubService.Constants.ConfigKey.EdgeHubDevServerPrivateKeyFile,
+                Path.Combine(currentLocation, @"Certificates/edge-hub-dev/edge-hub-server.pem"));
 
-            Environment.SetEnvironmentVariable(HubService.Constants.SslCertPathEnvName,
-                Path.Combine(currentLocation, @"Certificates/edge-hub-server/cert"));
+            Environment.SetEnvironmentVariable(HubService.Constants.ConfigKey.EdgeHubDevTrustBundleFile,
+                Path.Combine(currentLocation, @"Certificates/edge-hub-dev/edge-hub-server.ca.pem"));
 
-            Environment.SetEnvironmentVariable(HubService.Constants.EdgeHubServerCAChainCertificateFileKey,
-                Path.Combine(currentLocation, @"Certificates/edge-chain-ca/cert/edge-chain-ca.cert.pem"));
+            Environment.SetEnvironmentVariable("AuthenticationMode","Cloud");
 
             var storageFolder = Path.Combine(currentLocation, @"Storage");
 
@@ -471,10 +470,10 @@ namespace Microsoft.Azure.TypeEdge.Host
         private async Task<string> ProvisionDeviceAsync(string manifest)
         {
             IotHubConnectionStringBuilder.Create(_iotHubConnectionString);
-
+            
             var registryManager = RegistryManager.CreateFromConnectionString(_iotHubConnectionString);
             var device = await registryManager.GetDeviceAsync(_deviceId) ?? await registryManager.AddDeviceAsync(
-                             new Device(_deviceId) { Capabilities = new DeviceCapabilities { IotEdge = true } });
+                             new Device(_deviceId));
             var sasKey = device.Authentication.SymmetricKey.PrimaryKey;
 
             try

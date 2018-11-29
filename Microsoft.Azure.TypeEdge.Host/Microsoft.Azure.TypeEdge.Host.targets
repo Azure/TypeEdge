@@ -1,15 +1,11 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem">
-      <Link>Certificates\edge-chain-ca\cert\edge-chain-ca.cert.pem</Link>
+    <None Include="$(MSBuildThisFileDirectory)Certificates\edge-hub-dev\edge-hub-server.ca.pem">
+      <Link>Certificates\edge-hub-dev\edge-hub-server.ca.pem</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="$(MSBuildThisFileDirectory)Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem">
-      <Link>Certificates\edge-device-ca\cert\edge-device-ca-root.cert.pem</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx">
-      <Link>Certificates\edge-hub-server\cert\edge-hub-server.cert.pfx</Link>
+    <None Include="$(MSBuildThisFileDirectory)Certificates\edge-hub-dev\edge-hub-server.pem">
+      <Link>Certificates\edge-hub-dev\edge-hub-server.pem</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="$(MSBuildThisFileDirectory)Config\appsettings_hub.json">

@@ -6,7 +6,7 @@
     <PackageId>Microsoft.Azure.TypeEdge.Proxy</PackageId>
     <Authors>Microsoft</Authors>
 
-    <Version>0.4.4.36</Version>
+    <Version>0.4.4.39</Version>
 
     <PackageProjectUrl>https://aka.ms/TypeEdge</PackageProjectUrl>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
@@ -30,7 +30,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Devices" Version="1.16.0" />
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.17.1" />
+    <PackageReference Include="Microsoft.Azure.Devices.Shared" Version="1.15.1" />
     <PackageReference Include="MSBump" Version="2.3.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
