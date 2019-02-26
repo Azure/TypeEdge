@@ -2,7 +2,7 @@
 
 [![Build Status](https://dev.azure.com/epicstuff/TypeEdge/_apis/build/status/Azure.TypeEdge)](https://dev.azure.com/epicstuff/TypeEdge/_build/latest?definitionId=15)
 
-**TypeEdge** is a strongly-typed development experience for [Azure IoT Edge](https:/azure.microsoft.com/en-us/services/iot-edge).
+**TypeEdge** is a strongly-typed development experience for [Azure IoT Edge](https://azure.microsoft.com/services/iot-edge/).
 
 **TypeEdge**:
 
