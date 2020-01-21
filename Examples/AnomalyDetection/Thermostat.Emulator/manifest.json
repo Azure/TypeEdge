@@ -7,14 +7,15 @@
           "type": "docker",
           "settings": {
             "minDockerVersion": "v1.25",
-            "loggingOptions": ""
+            "loggingOptions": "",
+            "registryCredentials": {}
           }
         },
         "systemModules": {
           "edgeAgent": {
             "type": "docker",
             "settings": {
-              "image": "typeedge.azurecr.io/edgeAgent:latest",
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
               "createOptions": "{}"
             }
           },
@@ -23,8 +24,8 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "typeedge.azurecr.io/edgeHub:latest",
-              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}],\"5671/tcp\":[{\"HostPort\":\"5671\"}]}}}"
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}]}}}"
             }
           }
         },

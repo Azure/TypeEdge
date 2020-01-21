@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>latest</LangVersion>
     <OutputType>Exe</OutputType>
     <Configurations>Debug;Release</Configurations>
@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge.Proxy" Version="0.4.4.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Proxy" Version="1.0.10.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
   </ItemGroup>
 
 

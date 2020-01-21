@@ -23,17 +23,9 @@
     <PackageReference Include="RocksDbNative" Version="5.17.2" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge.Host" Version="0.4.4.*" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'"/>
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Host" Version="1.0.10.*" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" />
     <ProjectReference Include="..\..\..\Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.21.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Devices.Shared" Version="1.16.0" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <ProjectReference Include="..\Modules\TemperatureSensor\TemperatureSensor.csproj" />

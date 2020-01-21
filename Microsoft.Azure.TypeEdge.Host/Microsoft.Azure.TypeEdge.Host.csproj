@@ -6,7 +6,7 @@
     <Authors>Microsoft</Authors>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <Configurations>Debug;Release</Configurations>
-    <Version>1.0.10.1</Version>
+    <Version>1.0.10.38</Version>
     <NuspecProperties>version=$(Version)</NuspecProperties>
     <NuspecFile>.nuspec</NuspecFile>
     <AssemblyName>Microsoft.Azure.TypeEdge.Host</AssemblyName>

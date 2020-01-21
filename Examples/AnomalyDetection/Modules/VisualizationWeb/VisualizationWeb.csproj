@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <DockerComposeProjectPath>..\..\docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>ab76f0af-b3ab-4686-90f7-1a31d9a8504a</UserSecretsId>
   </PropertyGroup>

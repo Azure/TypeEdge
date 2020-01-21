@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <LangVersion>latest</LangVersion>
@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="1.0.2" />
-    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="1.0.10.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
   </ItemGroup>
 
   <ItemGroup>

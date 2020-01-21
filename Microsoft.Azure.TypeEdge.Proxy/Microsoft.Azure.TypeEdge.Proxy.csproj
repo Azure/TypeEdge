@@ -4,7 +4,7 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.TypeEdge.Proxy</PackageId>
     <Authors>Microsoft</Authors>
-    <Version>1.0.10.1</Version>
+    <Version>1.0.10.9</Version>
     <PackageProjectUrl>https://aka.ms/TypeEdge</PackageProjectUrl>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</PackageLicenseUrl>
@@ -32,7 +32,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.Azure.TypeEdge\Microsoft.Azure.TypeEdge.csproj"/>
+    <ProjectReference Include="..\Microsoft.Azure.TypeEdge\Microsoft.Azure.TypeEdge.csproj" />
   </ItemGroup>
   <!--<ItemGroup>
     <PackageReference Include="Microsoft.Azure.Devices" Version="1.18.2" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" />

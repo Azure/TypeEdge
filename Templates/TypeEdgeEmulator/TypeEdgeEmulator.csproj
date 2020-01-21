@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge.Host" Version="0.4.4.*" />
+    <PackageReference Include="rocksdb-native-arm" Version="5.4.6" />
+    <PackageReference Include="RocksDbNative" Version="5.17.2" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Host" Version="1.0.10.*"/>
   </ItemGroup>
 
 </Project>

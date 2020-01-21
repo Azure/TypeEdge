@@ -16,21 +16,20 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <dependencies>
       <group targetFramework=".NETCoreApp2.1">
-        <dependency id="Microsoft.Azure.TypeEdge" version="0.4.4.*" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Azure.TypeEdge" version="1.0.10.*" exclude="Build,Analyzers" />
         <dependency id="Docker.DotNet" version="3.125.2.0" exclude="Build,Analyzers" />
-        <dependency id="Serilog.Extensions.Logging" version="1.4.0" exclude="Build,Analyzers" />
-        <dependency id="Serilog.Extensions.Logging" version="1.4.0" exclude="Build,Analyzers" />
-        <dependency id="Serilog.Sinks.Console" version="2.1.0" exclude="Build,Analyzers" />
+        <dependency id="Serilog.Extensions.Logging" version="2.0.2" exclude="Build,Analyzers" />
+        <dependency id="Serilog.Sinks.Console" version="3.1.1" exclude="Build,Analyzers" />
         <dependency id="Microsoft.Extensions.DependencyInjection" version="2.1.1" exclude="Build,Analyzers" />
-        <dependency id="Microsoft.Azure.Devices" version="1.17.1" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Azure.Devices" version="1.18.2" exclude="Build,Analyzers" />
         <dependency id="System.IO.FileSystem.Watcher" version="4.3.0" />
-        <dependency id="System.Reactive" version="3.1.1" />
+        <dependency id="System.Reactive" version="4.1.3" />
         <dependency id="System.Threading.Thread" version="4.3.0" />
-        <dependency id="Microsoft.Azure.Amqp" version="2.3.5" />
+        <dependency id="Microsoft.Azure.Amqp" version="2.4.2" />
         <dependency id="Stateless" version="4.0.0" />
-        <dependency id="JetBrains.Annotations" version="11.1.0" />
-        <dependency id="Microsoft.Azure.Devices.Client" version="1.17.0" />
-        <dependency id="System.ValueTuple" version="4.4.0" />
+        <dependency id="JetBrains.Annotations" version="2018.3.0" />
+        <dependency id="Microsoft.Azure.Devices.Client" version="1.21.3" />
+        <dependency id="System.ValueTuple" version="4.5.0" />
         <dependency id="Microsoft.AspNetCore" version="2.1.1" />
         <dependency id="Microsoft.AspNetCore.Hosting" version="2.1.1" />
         <dependency id="Microsoft.AspNetCore.Http" version="2.1.1" />
@@ -38,25 +37,25 @@
         <dependency id="Microsoft.AspNetCore.Http.Features" version="2.1.1" />
         <dependency id="Microsoft.AspNetCore.Mvc" version="2.1.1" />
         <dependency id="Microsoft.AspNetCore.WebSockets" version="2.1.1" />
-        <dependency id="Microsoft.Extensions.Configuration" version="2.1.1" />
-        <dependency id="Microsoft.Extensions.Configuration.Binder" version="2.1.1" />
-        <dependency id="Autofac" version="4.5.0" />
-        <dependency id="Microsoft.Extensions.Configuration" version="2.1.1" />
-        <dependency id="Microsoft.Extensions.Configuration.EnvironmentVariables" version="2.1.1" />	
-        <dependency id="Autofac.Extensions.DependencyInjection" version="4.1.0" />
-        <dependency id="RocksDbNative" version="5.4.6.10" />
-        <dependency id="RocksDbSharp" version="5.4.6.10" />
-        <dependency id="Microsoft.Extensions.Logging" version="2.1.1" />
-        <dependency id="Portable.BouncyCastle" version="1.8.2" />
+        <dependency id="Microsoft.Extensions.Configuration.Binder" version="2.2.0" />
+        <dependency id="Autofac" version="4.9.1" />
+        <dependency id="Microsoft.Extensions.Configuration" version="2.2.0" />
+        <dependency id="Microsoft.Extensions.Configuration.EnvironmentVariables" version="2.2.0" />	
+        <dependency id="Autofac.Extensions.DependencyInjection" version="4.3.1" />
+        <dependency id="RocksDbNative" version="5.17.2" />
+        <dependency id="RocksDbSharp" version="5.17.2" />
+        <dependency id="Microsoft.Extensions.Logging" version="2.2.0" />
+        <dependency id="Portable.BouncyCastle" version="1.8.5" />
         <dependency id="System.Runtime.Loader" version="4.3.0" />
-        <dependency id="System.ValueTuple" version="4.4.0" />
         <dependency id="Antlr4" version="4.6.1-beta002" />
-        <dependency id="Microsoft.Extensions.Logging.Console" version="2.1.1" />
+        <dependency id="Microsoft.Extensions.Logging.Console" version="2.2.0" />
         <dependency id="System.Collections.Immutable" version="1.5.0" />
         <dependency id="System.Reflection.Extensions" version="4.3.0" />
-        <dependency id="System.Reflection.TypeExtensions" version="4.3.0" />
+        <dependency id="System.Reflection.TypeExtensions" version="4.5.1" />
         <dependency id="System.Threading.Tasks.Dataflow" version="4.7.0" />
         <dependency id="Microsoft.Azure.Devices.ProtocolGateway.Core" version="2.0.1" />
+        <dependency id="Nito.AsyncEx.Coordination" version="5.0.0" />
+        
 
       </group>
     </dependencies>

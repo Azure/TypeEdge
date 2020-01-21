@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="0.4.4.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge" Version="1.0.10.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
   </ItemGroup>
 
   <ItemGroup>

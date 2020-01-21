@@ -4,7 +4,7 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.TypeEdge</PackageId>
     <Authors>Microsoft</Authors>
-    <Version>1.0.10.1</Version>
+    <Version>1.0.10.35</Version>
     <PackageProjectUrl>https://aka.ms/TypeEdge</PackageProjectUrl>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</PackageLicenseUrl>
@@ -38,7 +38,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
     <PackageReference Include="MSBump" Version="2.3.2">

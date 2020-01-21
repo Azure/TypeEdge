@@ -26,12 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge.Host" Version="0.4.4.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Host" Version="1.0.10.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
     <ProjectReference Include="..\Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
 
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.TypeEdge.Proxy" Version="0.4.4.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
+    <PackageReference Include="Microsoft.Azure.TypeEdge.Proxy" Version="1.0.10.*" Condition="'$(Configuration)|$(Platform)'!='Debug|AnyCPU'" />
     <ProjectReference Include="..\Microsoft.Azure.TypeEdge.Proxy\Microsoft.Azure.TypeEdge.Proxy.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'" />
   </ItemGroup>
 
