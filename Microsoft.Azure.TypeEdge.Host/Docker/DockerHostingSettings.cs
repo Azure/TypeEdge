@@ -45,9 +45,9 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
         [JsonProperty(Required = Required.Always, PropertyName = "settings")]
         public DockerConfig Config { get; set; }
 
-        private static CreateContainerParameters ProcessCreateOptions(Dictionary<string, object> options)
+        private static Devices.Edge.Agent.Docker.Models.CreateContainerParameters ProcessCreateOptions(Dictionary<string, object> options)
         {
-            var res = new CreateContainerParameters();
+            var res = new Devices.Edge.Agent.Docker.Models.CreateContainerParameters();
 
             if (options != null)
             {

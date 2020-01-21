@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using Castle.DynamicProxy;
 using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Microsoft.Azure.Devices.Shared;
 using Microsoft.Azure.TypeEdge.Enums;
 using Microsoft.Azure.TypeEdge.Modules.Endpoints;
@@ -22,6 +14,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("Microsoft.Azure.TypeEdge.Host")]
 [assembly: InternalsVisibleTo("Microsoft.Azure.TypeEdge.Proxy")]
@@ -44,12 +45,17 @@ namespace Microsoft.Azure.TypeEdge.Modules
             Logger = TypeEdge.Logger.Factory.CreateLogger(GetType());
 
             InstantiateProperties();
+
+            var proxyInterface = GetType().GetProxyInterface();
+
+            if (proxyInterface == null)
+                throw new ArgumentException(
+                    $"{GetType().Name} needs to implement an single interface annotated with the TypeModule Attribute");
+
         }
 
         public void Dispose()
         {
-            Dispose(true);
-
             if (Volumes != null)
                 foreach (var volume in Volumes)
                     try
@@ -64,11 +70,12 @@ namespace Microsoft.Azure.TypeEdge.Modules
                         // ignored
                     }
 
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
 
-        protected T GetProxy<T>()
+        protected static T GetProxy<T>()
             where T : class
         {
             var cb = new ContainerBuilder();
@@ -81,12 +88,12 @@ namespace Microsoft.Azure.TypeEdge.Modules
         {
             //todo: add attributes for static env configuration
             var createOptions = new Dictionary<string, object>();
-            var env = new List<string> {Constants.ModuleNameConfigName + "=" + Name};
+            var env = new List<string> { Constants.ModuleNameConfigName + "=" + Name };
 
 
             if (Volumes.Count > 0)
             {
-                var volumes = string.Join(',', Volumes.Select(e => $"\"/env/{e.Key.ToLower()}\": {{ {e.Value} }}"));
+                var volumes = string.Join(",", Volumes.Select(e => $"\"/env/{e.Key.ToLowerInvariant()}\": {{ {e.Value} }}"));
                 env.Add($", \"Volumes\": {{ {volumes} }}");
             }
 
@@ -100,33 +107,33 @@ namespace Microsoft.Azure.TypeEdge.Modules
 
             // Open a connection to the Edge runtime
             if (string.IsNullOrEmpty(_connectionString))
-                _ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(_transportSettings);
+                _ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(_transportSettings).ConfigureAwait(false);
             else
                 _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, _transportSettings);
 
-            await _ioTHubModuleClient.OpenAsync();
+            await _ioTHubModuleClient.OpenAsync().ConfigureAwait(false);
             Logger.LogInformation("IoT Hub module client initialized.");
 
             // Register callback to be called when a message is received by the module
             foreach (var subscription in _routeSubscriptions)
             {
                 await _ioTHubModuleClient.SetInputMessageHandlerAsync(subscription.Key, MessageHandler,
-                    subscription.Value);
+                    subscription.Value).ConfigureAwait(false);
 
                 Logger.LogInformation($"MessageHandler set for {subscription.Key}");
             }
 
             // Register callback to be called when a twin update is received by the module
-            await _ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, _twinSubscriptions);
+            await _ioTHubModuleClient.SetDesiredPropertyUpdateCallbackAsync(PropertyHandler, _twinSubscriptions).ConfigureAwait(false);
 
             foreach (var subscription in _methodSubscriptions)
             {
-                await _ioTHubModuleClient.SetMethodHandlerAsync(subscription.Key, MethodCallback, subscription.Value);
+                await _ioTHubModuleClient.SetMethodHandlerAsync(subscription.Key, MethodCallback, subscription.Value).ConfigureAwait(false);
                 Logger.LogInformation($"MethodCallback set for{subscription.Key}");
             }
 
             Logger.LogInformation("Running RunAsync..");
-            return await RunAsync(cancellationToken);
+            return await RunAsync(cancellationToken).ConfigureAwait(false);
         }
 
         internal virtual InitializationResult _Init(IConfigurationRoot configuration, IContainer container)
@@ -144,7 +151,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
             if (disableSslCertificateValidationKey)
                 settings.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
                     true;
-            _transportSettings = new ITransportSettings[] {settings};
+            _transportSettings = new ITransportSettings[] { settings };
 
             return Init();
         }
@@ -160,7 +167,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
                 foreach (var prop in edgeMessage.Properties)
                     edgeMessage.Properties.Add(prop.Key, prop.Value);
 
-            await _ioTHubModuleClient.SendEventAsync(outputName, edgeMessage);
+            await _ioTHubModuleClient.SendEventAsync(outputName, edgeMessage).ConfigureAwait(false);
 
             var messageString = Encoding.UTF8.GetString(message.GetBytes());
             Logger.LogInformation($"Message: Body: [{messageString}]");
@@ -172,7 +179,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
             Func<T, Task<MessageResult>> handler)
             where T : IEdgeMessage
         {
-            Logger.LogInformation("SubscribeRoute called");
+            Logger.LogInformation($"SubscribeRoute called for {outName}, {outRoute}, {inName}, {inRoute}");
 
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
@@ -185,7 +192,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
 
         internal void SubscribeRoute(string outName, string outRoute, string inName, string inRoute)
         {
-            Logger.LogInformation("SubscribeRoute called");
+            Logger.LogInformation($"SubscribeRoute called for {outName}, {outRoute}, {inName}, {inRoute}");
 
             if (outRoute != "$downstream")
                 Routes.Add($"FROM {outRoute} INTO {inRoute}");
@@ -201,8 +208,8 @@ namespace Microsoft.Azure.TypeEdge.Modules
         internal async Task ReportTwinAsync<T>(string name, T twin)
             where T : TypeTwin
         {
-            Logger.LogInformation("ReportTwinAsync called");
-            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedProperties());
+            Logger.LogInformation($"ReportTwinAsync called for {name}");
+            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedProperties()).ConfigureAwait(false);
         }
 
         internal void RegisterVolume(string volumeName)
@@ -210,7 +217,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
             if (Volumes.Keys.Contains(volumeName))
                 return;
 
-            var volumePath = volumeName.ToLower();
+            var volumePath = volumeName.ToLowerInvariant();
 
             if (!Directory.Exists(volumePath)) Directory.CreateDirectory(volumePath);
 
@@ -283,7 +290,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
         private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
         private ModuleClient _ioTHubModuleClient;
         private string _connectionString;
-        private ITransportSettings[] _transportSettings;
+        protected ITransportSettings[] _transportSettings;
 
         #endregion
 
@@ -293,13 +300,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
         {
             get
             {
-                var proxyInterface = GetType().GetProxyInterface();
-
-                if (proxyInterface == null)
-                    throw new ArgumentException(
-                        $"{GetType().Name} has needs to implement an single interface annotated with the TypeModule Attribute");
-
-                return proxyInterface.Name.Substring(1).ToLower(CultureInfo.CurrentCulture);
+                return GetType().GetProxyInterface().GetModuleName();
             }
         }
 
@@ -321,14 +322,14 @@ namespace Microsoft.Azure.TypeEdge.Modules
         internal virtual async Task<T> PublishTwinAsync<T>(string name, T twin)
             where T : TypeTwin, new()
         {
-            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedProperties());
+            await _ioTHubModuleClient.UpdateReportedPropertiesAsync(twin.GetReportedProperties()).ConfigureAwait(false);
             return twin;
         }
 
         internal virtual async Task<T> GetTwinAsync<T>(string name)
             where T : TypeTwin, new()
         {
-            var twin = await _ioTHubModuleClient.GetTwinAsync();
+            var twin = await _ioTHubModuleClient.GetTwinAsync().ConfigureAwait(false);
             return TypeTwin.CreateTwin<T>(name, twin);
         }
 
@@ -418,7 +419,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
                 input.Properties.Add(messageProperty.Key, messageProperty.Value);
 
             var invocationResult = callback.Handler.DynamicInvoke(input);
-            var result = await (Task<MessageResult>) invocationResult;
+            var result = await (Task<MessageResult>)invocationResult;
 
             return result == MessageResult.Ok ? MessageResponse.Completed : MessageResponse.Abandoned;
         }
@@ -439,7 +440,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
                     var input = TypeTwin.CreateTwin(callback.Value.Type, callback.Key, desiredProperties);
 
                     var invocationResult = callback.Value.Handler.DynamicInvoke(input);
-                    await (Task<TwinResult>) invocationResult;
+                    await (Task<TwinResult>)invocationResult;
                 }
         }
 

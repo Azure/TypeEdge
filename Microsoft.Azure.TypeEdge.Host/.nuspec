@@ -67,8 +67,8 @@
     </contentFiles>
   </metadata>
   <files>
-    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.dll"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.dll"  />
-    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.pdb"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.pdb"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.dll"   target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.dll"  />
+    <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.pdb"   target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Docker.pdb"  />
     <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.dll"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.dll"  />
     <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.pdb"     target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Agent.Core.pdb"  />
     <file src="bin\Release\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.dll"       target="lib\netcoreapp2.1\Microsoft.Azure.Devices.Edge.Hub.Amqp.dll"  />

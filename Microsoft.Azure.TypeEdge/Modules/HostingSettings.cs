@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Microsoft.Azure.TypeEdge.Modules.Enums;
+﻿using Microsoft.Azure.TypeEdge.Modules.Enums;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.TypeEdge.Modules
 {
@@ -23,6 +23,6 @@ namespace Microsoft.Azure.TypeEdge.Modules
 
         public string ImageName { get; set; }
 
-        public Dictionary<string, object> Options { get; set; }
+        public Dictionary<string, object> Options { get;}
     }
 }

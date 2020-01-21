@@ -1,8 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runtime", "Runtime", "{ABC622C1-4D24-48CF-8B0D-CA63C27CB444}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.TypeEdge", "Microsoft.Azure.TypeEdge\Microsoft.Azure.TypeEdge.csproj", "{54587D56-7C22-4084-9321-84D57C2F6ECB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.TypeEdge.Host", "Microsoft.Azure.TypeEdge.Host\Microsoft.Azure.TypeEdge.Host.csproj", "{6F13F88C-B271-4DA6-9A35-5FD7FEADD3A3}"
@@ -10,8 +12,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.TypeEdge.Proxy", "Microsoft.Azure.TypeEdge.Proxy\Microsoft.Azure.TypeEdge.Proxy.csproj", "{5FC1E03A-7CD6-40AC-A893-2691DA8C9B5C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.Service", "IoT.Edge\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Service\Microsoft.Azure.Devices.Edge.Hub.Service.csproj", "{D4C50202-5092-4ACD-B90B-C1F4AD4234F3}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runtime", "Runtime", "{ABC622C1-4D24-48CF-8B0D-CA63C27CB444}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.Azure.Devices.Edge.Hub.Mqtt", "IoT.Edge\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Mqtt\Microsoft.Azure.Devices.Edge.Hub.Mqtt.csproj", "{4819548E-5F81-4EBC-893B-EB0C024EF61B}"
 EndProject

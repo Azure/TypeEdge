@@ -65,12 +65,12 @@ namespace Microsoft.Azure.TypeEdge.Host
 
             Upstream = new Upstream<JsonMessage>(_hub);
 
-            _inContainer = File.Exists(@"/.dockerenv");  
+            _inContainer = File.Exists(@"/.dockerenv");
 
             _externalModules = new ModuleCollection();
         }
 
-        public Upstream<JsonMessage> Upstream { get; set; } 
+        public Upstream<JsonMessage> Upstream { get; set; }
 
         public void RegisterModule<TIModule, TTModule>()
             where TIModule : class
@@ -161,47 +161,15 @@ namespace Microsoft.Azure.TypeEdge.Host
 
         public async Task RunAsync(CancellationToken cancellationToken)
         {
-            var tasks = new List<Task>
-            {
-                CreateTemporaryConnection(),
-                _hub.RunAsync(cancellationToken)
-            };
+            var hub = _hub.RunAsync(cancellationToken);
 
+            var tasks = new List<Task>() { cancellationToken.WhenCanceled() };
             //start all modules
             if (!_inContainer)
                 foreach (var module in _modules)
                     tasks.Add(module._RunAsync(cancellationToken));
 
-            tasks.Add(cancellationToken.WhenCanceled());
-
-            await Task.WhenAll(tasks.ToArray());
-        }
-
-        private async Task CreateTemporaryConnection()
-        {
-            var moduleConnectionString =
-                GetModuleConnectionStringAsync(_iotHubConnectionString, _deviceId, _modules[0].Name)
-                    .Result;
-
-            var tmpClient = ModuleClient.CreateFromConnectionString(moduleConnectionString,
-                new ITransportSettings[]
-                {
-                    new AmqpTransportSettings(TransportType.Amqp_Tcp_Only)
-                    {
-                        RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
-                        OpenTimeout = new TimeSpan(1)
-                    }
-                }
-            );
-
-            try
-            {
-                await tmpClient.OpenAsync();
-            }
-            catch
-            {
-                // ignored
-            }
+            await Task.WhenAny(tasks.ToArray());
         }
 
         public T GetProxy<T>()
@@ -213,15 +181,16 @@ namespace Microsoft.Azure.TypeEdge.Host
             return cb.Build().Resolve<T>();
         }
 
-
         #region Build
 
         private void BuildDiContainer()
         {
-            var services = new ServiceCollection().AddSingleton(new LoggerFactory()
-                .AddConsole()
-                .AddSerilog()
-                .AddDebug());
+            var services = new ServiceCollection().AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddConsole();
+                loggingBuilder.AddSerilog();
+                loggingBuilder.AddDebug();
+            });
             services.AddLogging();
 
             Log.Logger = new LoggerConfiguration()
@@ -243,7 +212,7 @@ namespace Microsoft.Azure.TypeEdge.Host
 
         private void BuildHub(string deviceSasKey)
         {
-            var currentLocation = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location); 
+            var currentLocation = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
             if (_inContainer)
                 currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
@@ -256,7 +225,7 @@ namespace Microsoft.Azure.TypeEdge.Host
             Environment.SetEnvironmentVariable(HubService.Constants.ConfigKey.EdgeHubDevTrustBundleFile,
                 Path.Combine(currentLocation, @"Certificates/edge-hub-dev/edge-hub-server.ca.pem"));
 
-            Environment.SetEnvironmentVariable("AuthenticationMode","Cloud");
+            Environment.SetEnvironmentVariable("AuthenticationMode", "Cloud");
 
             var storageFolder = Path.Combine(currentLocation, @"Storage");
 
@@ -292,7 +261,7 @@ namespace Microsoft.Azure.TypeEdge.Host
         {
             var certificatePath = @"Certificates/edge-device-ca/cert/edge-device-ca-root.cert.pem";
             var currentLocation = Path.GetDirectoryName(Assembly.GetCallingAssembly().Location);
-            if(_inContainer)
+            if (_inContainer)
                 currentLocation = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
 
@@ -408,7 +377,7 @@ namespace Microsoft.Azure.TypeEdge.Host
 
                     var settings = hostOverride(systemModule.Key, dockerHostingSettings);
 
-                    systemModules[systemModule.Key]=JObject.Parse(JsonConvert.SerializeObject(settings,
+                    systemModules[systemModule.Key] = JObject.Parse(JsonConvert.SerializeObject(settings,
                             Newtonsoft.Json.Formatting.None,
                             new JsonSerializerSettings
                             {
@@ -470,10 +439,14 @@ namespace Microsoft.Azure.TypeEdge.Host
         private async Task<string> ProvisionDeviceAsync(string manifest)
         {
             IotHubConnectionStringBuilder.Create(_iotHubConnectionString);
-            
+
             var registryManager = RegistryManager.CreateFromConnectionString(_iotHubConnectionString);
-            var device = await registryManager.GetDeviceAsync(_deviceId) ?? await registryManager.AddDeviceAsync(
-                             new Device(_deviceId));
+            var device = await registryManager.GetDeviceAsync(_deviceId) ??
+                await registryManager.AddDeviceAsync(
+                    new Device(_deviceId)
+                    {
+                        Capabilities = new DeviceCapabilities() { IotEdge = true }
+                    });
             var sasKey = device.Authentication.SymmetricKey.PrimaryKey;
 
             try

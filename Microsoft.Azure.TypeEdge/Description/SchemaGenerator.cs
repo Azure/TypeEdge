@@ -1,5 +1,5 @@
-﻿using System;
-using Newtonsoft.Json.Schema.Generation;
+﻿using Newtonsoft.Json.Schema.Generation;
+using System;
 
 namespace Microsoft.Azure.TypeEdge.Description
 {

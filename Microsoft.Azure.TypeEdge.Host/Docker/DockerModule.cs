@@ -58,6 +58,8 @@ namespace Microsoft.Azure.TypeEdge.Host.Docker
                 DockerHostingSettings.DesiredStatus.Value,
                 DockerHostingSettings.RestartPolicy.Value,
                 DockerHostingSettings.Config,
+                ImagePullPolicy.OnCreate,
+                Microsoft.Azure.Devices.Edge.Agent.Core.Constants.HighestPriority,
                 null,
                 null
             );

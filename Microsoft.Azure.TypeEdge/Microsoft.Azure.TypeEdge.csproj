@@ -1,13 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.TypeEdge</PackageId>
     <Authors>Microsoft</Authors>
-    
-    <Version>0.4.4.41</Version>
-
+    <Version>1.0.10.1</Version>
     <PackageProjectUrl>https://aka.ms/TypeEdge</PackageProjectUrl>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</PackageLicenseUrl>
@@ -15,50 +12,56 @@
     <PackageTags>Microsoft;Azure;IoT;Edge;Experimental</PackageTags>
     <PackageIconUrl>https://github.com/Azure/TypeEdge/blob/master/Templates/favicon.ico</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
-    
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Microsoft.Azure.TypeEdge</AssemblyName>
     <RootNamespace>Microsoft.Azure.TypeEdge</RootNamespace>
     <Configurations>Debug;Release</Configurations>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="$(Configuration) == 'Release'">
     <BumpRevision>True</BumpRevision>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="App.Metrics.Abstractions" Version="3.0.0-alpha-0780" />
-    <PackageReference Include="App.Metrics.Core" Version="3.0.0-alpha-0780" />
-    <PackageReference Include="App.Metrics.Reporting.InfluxDB" Version="3.0.0-alpha-0067" />
-    <PackageReference Include="App.Metrics.Reporting.TextFile" Version="3.0.0-alpha-0081" />
-    <PackageReference Include="Autofac" Version="4.5.0" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.1.0" />
-    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.4.0" />
-    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.18.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
+    <PackageReference Include="App.Metrics.Abstractions" Version="3.2.0" />
+    <PackageReference Include="App.Metrics.Core" Version="3.2.0" />
+    <PackageReference Include="App.Metrics.Reporting.InfluxDB" Version="3.0.0" />
+    <PackageReference Include="App.Metrics.Reporting.TextFile" Version="3.0.0" />
+    <PackageReference Include="Autofac" Version="4.9.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
+    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
     <PackageReference Include="MSBump" Version="2.3.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.10" />
-    <PackageReference Include="Serilog" Version="2.7.1" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="1.4.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="2.1.0" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.11" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    
   </ItemGroup>
+  <!--<ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.21.3" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" />
+    <ProjectReference Include="..\azure-iot-sdk-csharp\iothub\device\src\Microsoft.Azure.Devices.Client.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"/>
+  </ItemGroup>-->
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.21.3" />
+  </ItemGroup>
+ 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(Configuration) == 'Release'">
     <Exec Command="dotnet pack --no-build -c Release" />
   </Target>
-
 </Project>

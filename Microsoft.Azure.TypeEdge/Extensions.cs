@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Microsoft.Azure.TypeEdge.Attributes;
+using Microsoft.Azure.TypeEdge.DovEnv;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks; 
-using Microsoft.Azure.TypeEdge.Attributes; 
-using Microsoft.Azure.TypeEdge.DovEnv;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders; 
-using Microsoft.Extensions.FileProviders.Physical;
- 
+using System.Threading.Tasks;
+
 namespace Microsoft.Azure.TypeEdge
 {
-    public static class Extensions 
+    public static class Extensions
     {
         public static IConfigurationBuilder AddDotΕnv(this IConfigurationBuilder builder)
         {
@@ -47,14 +47,14 @@ namespace Microsoft.Azure.TypeEdge
             if (string.IsNullOrEmpty(filePath))
                 filePath = DotΕnv.DefaultPath;
 
-            var lookUpPaths = new List<string> {AppContext.BaseDirectory, ""};
+            var lookUpPaths = new List<string> { AppContext.BaseDirectory, "" };
 
             if (provider == null)
             {
                 var exists = false;
                 foreach (var lookUpPath in lookUpPaths)
                 {
-                    var fullPath = Path.Join(lookUpPath, filePath);
+                    var fullPath = Path.Combine(lookUpPath, filePath);
                     if (File.Exists(fullPath))
                     {
                         exists = true;
@@ -93,14 +93,14 @@ namespace Microsoft.Azure.TypeEdge
         {
             var ret = new Dictionary<TKey, TValue>(original.Count,
                 original.Comparer);
-            foreach (var entry in original) ret.Add(entry.Key, (TValue) entry.Value.Clone());
+            foreach (var entry in original) ret.Add(entry.Key, (TValue)entry.Value.Clone());
             return ret;
         }
 
         public static Task WhenCanceled(this CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<bool>();
-            cancellationToken.Register(s => ((TaskCompletionSource<bool>) s).SetResult(true), tcs);
+            cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).SetResult(true), tcs);
             return tcs.Task;
         }
 

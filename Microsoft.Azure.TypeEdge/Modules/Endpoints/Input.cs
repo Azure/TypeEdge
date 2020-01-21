@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Azure.TypeEdge.Modules.Messages;
+﻿using Microsoft.Azure.TypeEdge.Modules.Messages;
 using Microsoft.Azure.TypeEdge.Volumes;
+using System;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
 {
@@ -29,7 +29,7 @@ namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
                 if (_volume == null) return handler(t);
                 //todo: find a typed way to do this
                 var fileName = typeof(T).GetProperty("FileName").GetValue(t) as string;
-                var referenceCount = (int) typeof(T).GetProperty("ReferenceCount").GetValue(t);
+                var referenceCount = (int)typeof(T).GetProperty("ReferenceCount").GetValue(t);
                 var message = _volume.Read(fileName);
 
                 var res = handler(message);

@@ -1,11 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Loader;
-using System.Threading;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Castle.DynamicProxy;
 using Microsoft.Azure.TypeEdge.Attributes;
@@ -15,6 +8,13 @@ using Microsoft.Azure.TypeEdge.Volumes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
+using System.Threading;
+using System.Threading.Tasks;
 using static System.String;
 using ServiceDescriptor = Microsoft.Azure.TypeEdge.Description.ServiceDescriptor;
 
@@ -76,7 +76,7 @@ namespace Microsoft.Azure.TypeEdge
 
             var _inContainer = File.Exists(@"/.dockerenv");
             var _in_Docker_Compose = Directory.Exists(Constants.ComposeConfigurationPath);
-            if(_inContainer && _in_Docker_Compose)
+            if (_inContainer && _in_Docker_Compose)
             {
                 //check the file system, we are in docker-compose mode
                 var fileName = Path.Combine(Constants.ComposeConfigurationPath, $"{moduleName}.env");
@@ -129,10 +129,10 @@ namespace Microsoft.Azure.TypeEdge
             if (Module != null)
             {
                 Module._Init(configuration, container);
-                await Module._RunAsync(cancellationTokenSource.Token);
+                await Module._RunAsync(cancellationTokenSource.Token).ConfigureAwait(false);
             }
 
-            await cancellationTokenSource.Token.WhenCanceled();
+            await cancellationTokenSource.Token.WhenCanceled().ConfigureAwait(false);
         }
 
         private static string DiscoverModuleName()
@@ -147,7 +147,7 @@ namespace Microsoft.Azure.TypeEdge
         public static Task WhenCancelled(CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<bool>();
-            cancellationToken.Register(s => ((TaskCompletionSource<bool>) s).SetResult(true), tcs);
+            cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).SetResult(true), tcs);
             return tcs.Task;
         }
 

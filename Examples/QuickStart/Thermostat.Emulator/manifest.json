@@ -7,7 +7,8 @@
           "type": "docker",
           "settings": {
             "minDockerVersion": "v1.25",
-            "loggingOptions": ""
+            "loggingOptions": "",
+            "registryCredentials": {}
           }
         },
         "systemModules": {
@@ -24,7 +25,7 @@
             "restartPolicy": "always",
             "settings": {
               "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
-              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}],\"5671/tcp\":[{\"HostPort\":\"5671\"}]}}}"
+              "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}]}}}"
             }
           }
         },
@@ -35,7 +36,7 @@
             "status": "running",
             "restartPolicy": "on-failure",
             "settings": {
-              "image": "typeedge.azurecr.io/temperaturesensor:1.0",
+              "image": "typeedge.azurecr.io/temperaturesensor:latest",
               "createOptions": "{\"Env\":[\"moduleName=temperaturesensor\"]}"
             }
           }

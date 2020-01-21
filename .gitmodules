@@ -1,3 +1,6 @@
 [submodule "IoT.Edge"]
 	path = IoT.Edge
 	url = https://github.com/Azure/iotedge
+[submodule "azure-iot-sdk-csharp"]
+	path = azure-iot-sdk-csharp
+	url = https://github.com/Azure/azure-iot-sdk-csharp
