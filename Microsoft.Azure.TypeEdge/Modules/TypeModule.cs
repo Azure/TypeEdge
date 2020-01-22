@@ -107,9 +107,9 @@ namespace Microsoft.Azure.TypeEdge.Modules
 
             // Open a connection to the Edge runtime
             if (string.IsNullOrEmpty(_connectionString))
-                _ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(_transportSettings).ConfigureAwait(false);
+                _ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(TransportSettings).ConfigureAwait(false);
             else
-                _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, _transportSettings);
+                _ioTHubModuleClient = ModuleClient.CreateFromConnectionString(_connectionString, TransportSettings);
 
             await _ioTHubModuleClient.OpenAsync().ConfigureAwait(false);
             Logger.LogInformation("IoT Hub module client initialized.");
@@ -151,7 +151,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
             if (disableSslCertificateValidationKey)
                 settings.RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
                     true;
-            _transportSettings = new ITransportSettings[] { settings };
+            TransportSettings = new ITransportSettings[] { settings };
 
             return Init();
         }
@@ -290,7 +290,6 @@ namespace Microsoft.Azure.TypeEdge.Modules
         private readonly Dictionary<string, SubscriptionCallback> _twinSubscriptions;
         private ModuleClient _ioTHubModuleClient;
         private string _connectionString;
-        protected ITransportSettings[] _transportSettings;
 
         #endregion
 
@@ -314,6 +313,7 @@ namespace Microsoft.Azure.TypeEdge.Modules
         internal virtual List<string> Routes { get; }
         internal virtual TwinCollection DefaultTwin { get; private set; }
         protected ILogger Logger { get; }
+        protected ITransportSettings[] TransportSettings { get; set; }
 
         #endregion
 
