@@ -1,11 +1,12 @@
-﻿using System;
-using System.Reflection;
-using Castle.DynamicProxy;
+﻿using Castle.DynamicProxy;
 using Microsoft.Azure.TypeEdge.Attributes;
 using Microsoft.Azure.TypeEdge.Modules;
 using Microsoft.Azure.TypeEdge.Modules.Endpoints;
 using Microsoft.Azure.TypeEdge.Twins;
 using Microsoft.Azure.TypeEdge.Volumes;
+using System;
+using System.Globalization;
+using System.Reflection;
 
 namespace Microsoft.Azure.TypeEdge.Proxy
 {
@@ -16,17 +17,17 @@ namespace Microsoft.Azure.TypeEdge.Proxy
         public ModuleProxyBase(Type type)
         {
             _type = type;
+            if (!(_type.GetCustomAttribute(typeof(TypeModuleAttribute), true) is TypeModuleAttribute))
+                throw new ArgumentException($"{_type.Name} has no TypeModule annotation");
+            if (!_type.IsInterface)
+                throw new ArgumentException($"{_type.Name} needs to be an interface");
         }
 
         public override string Name
         {
             get
             {
-                if (!(_type.GetCustomAttribute(typeof(TypeModuleAttribute), true) is TypeModuleAttribute))
-                    throw new ArgumentException($"{_type.Name} has no TypeModule annotation");
-                if (!_type.IsInterface)
-                    throw new ArgumentException($"{_type.Name} needs to be an interface");
-                return _type.Name.Substring(1).ToLower();
+                return _type.GetModuleName();
             }
         }
 

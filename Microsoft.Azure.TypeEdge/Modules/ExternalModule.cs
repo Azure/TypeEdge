@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Microsoft.Azure.Devices.Shared;
+﻿using Microsoft.Azure.Devices.Shared;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.TypeEdge.Modules
 {

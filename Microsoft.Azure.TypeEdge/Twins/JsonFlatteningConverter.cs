@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using System;
+using System.Linq;
 
 namespace Microsoft.Azure.TypeEdge.Twins
 {
@@ -12,7 +12,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
 
         public JsonFlatteningConverter(IContractResolver resolver)
         {
-            _resolver = resolver ?? throw new ArgumentNullException();
+            _resolver = resolver ?? throw new ArgumentNullException($"Null argument {nameof(resolver)}");
         }
 
         public override bool CanWrite => false;
@@ -30,7 +30,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
 
             var jObject = JObject.Load(reader);
             var contract =
-                (JsonObjectContract) _resolver
+                (JsonObjectContract)_resolver
                     .ResolveContract(
                         objectType); // Throw an InvalidCastException if this object does not map to a JObject.
 

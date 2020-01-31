@@ -1,13 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <PackageId>Microsoft.Azure.TypeEdge.Proxy</PackageId>
     <Authors>Microsoft</Authors>
-
-    <Version>0.4.4.39</Version>
-
+    <Version>1.0.10.9</Version>
     <PackageProjectUrl>https://aka.ms/TypeEdge</PackageProjectUrl>
     <Copyright>© Microsoft Corporation. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/Azure/TypeEdge/blob/master/LICENSE</PackageLicenseUrl>
@@ -15,35 +12,38 @@
     <PackageTags>Microsoft;Azure;IoT;Edge;Experimental</PackageTags>
     <PackageIconUrl>https://github.com/Azure/TypeEdge/blob/master/Templates/favicon.ico</PackageIconUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
-    
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Microsoft.Azure.TypeEdge.Proxy</AssemblyName>
     <RootNamespace>Microsoft.Azure.TypeEdge.Proxy</RootNamespace>
     <Configurations>Debug;Release</Configurations>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="$(Configuration) == 'Release'">
     <BumpRevision>True</BumpRevision>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Devices" Version="1.17.1" />
-    <PackageReference Include="Microsoft.Azure.Devices.Shared" Version="1.15.1" />
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.18.2" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" />
     <PackageReference Include="MSBump" Version="2.3.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.Azure.TypeEdge\Microsoft.Azure.TypeEdge.csproj" />
+  </ItemGroup>
+  <!--<ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.18.2" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" />
+    <ProjectReference Include="..\azure-iot-sdk-csharp\iothub\service\src\Microsoft.Azure.Devices.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"/>
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.18.2" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(Configuration) == 'Release'">
     <Exec Command="dotnet pack --no-build -c Release" />
   </Target>
-
 </Project>

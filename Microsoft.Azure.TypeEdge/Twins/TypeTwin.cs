@@ -1,9 +1,9 @@
-﻿using System;
-using System.Reflection;
-using Microsoft.Azure.Devices.Shared;
+﻿using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using System;
+using System.Reflection;
 
 namespace Microsoft.Azure.TypeEdge.Twins
 {
@@ -15,7 +15,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
         internal TwinCollection GetReportedProperties(string twinName = null)
         {
             if (_twin == null)
-                _twin = new Twin(new TwinProperties {Desired = new TwinCollection(), Reported = new TwinCollection()});
+                _twin = new Twin(new TwinProperties { Desired = new TwinCollection(), Reported = new TwinCollection() });
             UpdateProperties(_twin.Properties.Reported, twinName ?? _name);
             return _twin.Properties.Reported;
         }
@@ -24,7 +24,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
         {
             //only the proxy is calling this
             if (_twin == null)
-                _twin = new Twin(new TwinProperties {Desired = new TwinCollection(), Reported = new TwinCollection()});
+                _twin = new Twin(new TwinProperties { Desired = new TwinCollection(), Reported = new TwinCollection() });
             UpdateProperties(_twin.Properties.Desired, _name);
             return _twin;
         }
@@ -38,7 +38,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
 
         public static TypeTwin CreateTwin(Type type, string name, TwinCollection desiredProperties)
         {
-            var instance = (TypeTwin) Activator.CreateInstance(type);
+            var instance = (TypeTwin)Activator.CreateInstance(type);
             return SetupInstance(name,
                 new Twin(new TwinProperties
                 {
@@ -67,7 +67,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
             var settings = new JsonSerializerSettings
             {
                 ContractResolver = resolver,
-                Converters = new JsonConverter[] {new JsonFlatteningConverter(resolver)}
+                Converters = new JsonConverter[] { new JsonFlatteningConverter(resolver) }
             };
 
             JsonConvert.PopulateObject(props.ToJson(), this, settings);
@@ -91,7 +91,7 @@ namespace Microsoft.Azure.TypeEdge.Twins
             if (!props.Contains(nameToken) ||
                 !(props[nameToken] is JValue nameValue) ||
                 nameValue.Type != JTokenType.Boolean ||
-                !(bool) nameValue.Value)
+                !(bool)nameValue.Value)
                 return false;
             return true;
         }

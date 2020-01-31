@@ -1,62 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="Current">
   <PropertyGroup>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageOutputPath>../../TypeEdgeNuGets</PackageOutputPath>
     <Authors>Microsoft</Authors>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <Configurations>Debug;Release</Configurations>
-
-    <Version>0.4.4.55</Version>
+    <Version>1.0.10.38</Version>
     <NuspecProperties>version=$(Version)</NuspecProperties>
-
     <NuspecFile>.nuspec</NuspecFile>
-
     <AssemblyName>Microsoft.Azure.TypeEdge.Host</AssemblyName>
-
     <RootNamespace>Microsoft.Azure.TypeEdge.Host</RootNamespace>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="deviceconfig.json" />
   </ItemGroup>
-
   <PropertyGroup Condition="$(Configuration) == 'Release'">
     <BumpRevision>True</BumpRevision>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\IoT.Edge\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Core\Microsoft.Azure.Devices.Edge.Agent.Core.csproj" />
     <ProjectReference Include="..\IoT.Edge\edge-agent\src\Microsoft.Azure.Devices.Edge.Agent.Docker\Microsoft.Azure.Devices.Edge.Agent.Docker.csproj" />
     <ProjectReference Include="..\IoT.Edge\edge-hub\src\Microsoft.Azure.Devices.Edge.Hub.Service\Microsoft.Azure.Devices.Edge.Hub.Service.csproj" />
     <ProjectReference Include="..\Microsoft.Azure.TypeEdge\Microsoft.Azure.TypeEdge.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="appsettings_hub.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Dockerfile">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="deviceconfig.json" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Docker.DotNet" Version="3.125.2" />
     <PackageReference Include="MSBump" Version="2.3.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.10" />
-    <PackageReference Include="System.CodeDom" Version="4.5.0" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.11" />
+    <PackageReference Include="System.CodeDom" Version="4.7.0" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="mscorlib">
       <HintPath>mscorlib</HintPath>
@@ -68,11 +58,9 @@
       <HintPath>System.Core</HintPath>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Service\Service.cs">
       <DesignTime>True</DesignTime>
@@ -80,14 +68,22 @@
       <DependentUpon>Service.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="Service\Service.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>Service.cs</LastGenOutput>
     </None>
   </ItemGroup>
+  
+  <!--<ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices.Shared" Version="1.16.0" Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'" />
+    <ProjectReference Include="..\azure-iot-sdk-csharp\shared\src\Microsoft.Azure.Devices.Shared.csproj" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"/>
+  </ItemGroup>-->
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Azure.Devices.Shared" Version="1.16.0" />
+  </ItemGroup>
+  
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(Configuration) == 'Release'">
     <Exec Command="dotnet pack --no-build -c Release" />
   </Target>

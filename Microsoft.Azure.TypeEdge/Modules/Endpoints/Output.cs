@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Azure.TypeEdge.Enums;
+﻿using Microsoft.Azure.TypeEdge.Enums;
 using Microsoft.Azure.TypeEdge.Modules.Messages;
 using Microsoft.Azure.TypeEdge.Volumes;
+using System;
+using System.Threading.Tasks;
 
 namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
 {
@@ -25,15 +25,15 @@ namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
 
         public async Task<PublishResult> PublishAsync(T message)
         {
-            if (_volume == null) return await Module.PublishMessageAsync(Name, message);
+            if (_volume == null) return await Module.PublishMessageAsync(Name, message).ConfigureAwait(false);
             var fileName = $@"{DateTime.Now.Ticks}";
-            if (!_volume.TryWrite(message, fileName)) return await Module.PublishMessageAsync(Name, message);
+            if (!_volume.TryWrite(message, fileName)) return await Module.PublishMessageAsync(Name, message).ConfigureAwait(false);
             typeof(T).GetProperty("FileName").SetValue(message, fileName);
             typeof(T).GetProperty("Message").SetValue(message, null);
-            var referenceCount = (int) typeof(T).GetProperty("ReferenceCount").GetValue(message);
+            var referenceCount = (int)typeof(T).GetProperty("ReferenceCount").GetValue(message);
             typeof(T).GetProperty("ReferenceCount").SetValue(message, ++referenceCount);
 
-            return await Module.PublishMessageAsync(Name, message);
+            return await Module.PublishMessageAsync(Name, message).ConfigureAwait(false);
         }
 
         public virtual void Subscribe(TypeModule input, Func<T, Task<MessageResult>> handler)
@@ -44,7 +44,7 @@ namespace Microsoft.Azure.TypeEdge.Modules.Endpoints
                 {
                     //todo: find a typed way to do this
                     var fileName = typeof(T).GetProperty("FileName").GetValue(t) as string;
-                    var referenceCount = (int) typeof(T).GetProperty("ReferenceCount").GetValue(t);
+                    var referenceCount = (int)typeof(T).GetProperty("ReferenceCount").GetValue(t);
                     var message = _volume.Read(fileName);
 
                     var res = handler(message);

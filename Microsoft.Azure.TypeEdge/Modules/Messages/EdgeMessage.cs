@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace Microsoft.Azure.TypeEdge.Modules.Messages
 {

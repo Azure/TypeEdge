@@ -28,7 +28,7 @@ namespace Microsoft.Azure.TypeEdge.DovEnv
                 {
                     // When variable is not defined the result should be "{}".
                     var replace = string.IsNullOrEmpty(parsedVars[var]) ? "{}" : parsedVars[var];
-                    value = value.Replace("${" + var + "}", replace, StringComparison.OrdinalIgnoreCase);
+                    value = value.Replace("${" + var + "}", replace);
                 }
 
                 Environment.SetEnvironmentVariable(key, value);
@@ -49,7 +49,7 @@ namespace Microsoft.Azure.TypeEdge.DovEnv
             return _variables.DeepClone();
         }
 
-        protected IList<string> ParseValue(string value)
+        protected static IList<string> ParseValue(string value)
         {
             var vars = new List<string>();
             var regex = new Regex(@"\$\{(.*?)\}");
@@ -64,7 +64,7 @@ namespace Microsoft.Azure.TypeEdge.DovEnv
             return vars;
         }
 
-        protected Dictionary<string, string> ParseContent(string content)
+        protected static Dictionary<string, string> ParseContent(string content)
         {
             var lines = content.Split('\n');
             var vars = new Dictionary<string, string>();

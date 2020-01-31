@@ -9,7 +9,8 @@ using Agent = Microsoft.Azure.Devices.Edge.Agent.Core;
 
 namespace Microsoft.Azure.TypeEdge.Host.Hub
 {
-    internal class EdgeHub : TypeModule
+   
+    internal class EdgeHub : TypeModule, IEdgeHub
     {
         public override string Name => Agent.Constants.EdgeHubModuleIdentityName;
 

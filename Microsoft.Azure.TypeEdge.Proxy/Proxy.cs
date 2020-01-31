@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Microsoft.Azure.TypeEdge.Proxy
 {
-    internal class Proxy<T> : TypeModule, IInterceptor
+    internal class Proxy<T> : TypeModule, IProxy
         where T : class
     {
         private readonly string _deviceId;
@@ -36,7 +36,7 @@ namespace Microsoft.Azure.TypeEdge.Proxy
                     throw new ArgumentException($"{typeof(T).Name} has no TypeModule annotation");
                 if (!typeof(T).IsInterface)
                     throw new ArgumentException($"{typeof(T).Name} needs to be an interface");
-                return typeof(T).Name.Substring(1).ToLower();
+                return typeof(T).GetModuleName();
             }
         }
 
@@ -58,7 +58,7 @@ namespace Microsoft.Azure.TypeEdge.Proxy
             {
                 //direct methods
                 var methodInvocation =
-                    new CloudToDeviceMethod(invocation.Method.Name) {ResponseTimeout = TimeSpan.FromSeconds(30)};
+                    new CloudToDeviceMethod(invocation.Method.Name) { ResponseTimeout = TimeSpan.FromSeconds(30) };
                 var paramData = JsonConvert.SerializeObject(invocation.Arguments);
                 methodInvocation.SetPayloadJson(paramData);
 
@@ -82,7 +82,7 @@ namespace Microsoft.Azure.TypeEdge.Proxy
 
         internal override async Task<TT> GetTwinAsync<TT>(string name)
         {
-            var twin = await _registryManager.GetTwinAsync(_deviceId, Name);
+            var twin = await _registryManager.GetTwinAsync(_deviceId, Name).ConfigureAwait(false);
             var typeTwin = TypeTwin.CreateTwin<TT>(name, twin);
             return typeTwin;
         }
@@ -90,7 +90,7 @@ namespace Microsoft.Azure.TypeEdge.Proxy
         internal override async Task<TT> PublishTwinAsync<TT>(string name, TT typeTwin)
         {
             var twin = typeTwin.GetTwin();
-            var newTwin = await _registryManager.UpdateTwinAsync(_deviceId, Name, twin, twin.ETag);
+            var newTwin = await _registryManager.UpdateTwinAsync(_deviceId, Name, twin, twin.ETag).ConfigureAwait(false);
             return TypeTwin.CreateTwin<TT>(name, newTwin);
         }
     }

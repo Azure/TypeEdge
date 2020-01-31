@@ -35,13 +35,15 @@ namespace ThermostatApplication
             var manifest = host.GenerateDeviceManifest((e, settings) =>
             {
                 //this is the opportunity of the host to change the hosting settings of the module e
-                settings.Config = new DockerConfig($"{dockerRegistry}{e}:latest", settings.Config.CreateOptions);
+                if (!settings.IsExternalModule && !settings.IsSystemModule)
+                    settings.Config = new DockerConfig($"{dockerRegistry}{e}:latest", settings.Config.CreateOptions);
                 return settings;
             });
-            var sasToken = host.ProvisionDevice(manifest);
-            host.BuildEmulatedDevice(sasToken);
-
             File.WriteAllText("../../../manifest.json", manifest);
+
+            var sasToken = host.ProvisionDevice(manifest);
+
+            host.BuildEmulatedDevice(sasToken);
 
             await host.RunAsync();
 
